@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUZAFFAR Gallery - Мои фотографии</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00ffc8;
+            --secondary-color: #00aaff;
+            --accent-color: #ff00aa;
+            --bg-color: #0a0a15;
+            --card-bg: rgba(20, 20, 35, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0ff;
+            --gradient: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 200, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 170, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 170, 0.05) 0%, transparent 50%);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(
+                145deg,
+                rgba(25, 25, 45, 0.7),
+                rgba(15, 15, 30, 0.7)
+            );
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        
+        .upload-section {
+            background: rgba(15, 15, 30, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px dashed rgba(0, 255, 200, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: var(--primary-color);
+            background: rgba(15, 15, 30, 0.8);
+        }
+        
+        .upload-btn {
+            display: inline-block;
+            background: var(--gradient);
+            color: var(--bg-color);
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 200, 0.3);
+        }
+        
+        .upload-btn input {
+            display: none;
+        }
+        
+        .upload-info {
+            display: inline-block;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        
+        /* Фильтры */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(15, 15, 30, 0.6);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 200, 0.2);
+        }
+        
+        .filter-btn {
+            background: rgba(30, 30, 50, 0.7);
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .filter-btn.active {
+            background: var(--gradient);
+            color: var(--bg-color);
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(0, 255, 200, 0.3);
+        }
+        
+        /* Галерея */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .photo-card {
+            background: linear-gradient(
+                145deg,
+                rgba(25, 25, 45, 0.9),
+                rgba(15, 15, 30, 0.9)
+            );
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .photo-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary-color);
+            box-shadow: 
+                0 20px 40px rgba(0, 255, 200, 0.2),
+                0 0 60px rgba(0, 170, 255, 0.1);
+        }
+        
+        .photo-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+        
+        .photo-card:hover .photo-img {
+            transform: scale(1.05);
+        }
+        
+        .photo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                to bottom,
+                transparent 60%,
+                rgba(0, 0, 0, 0.8) 100%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+        
+        .photo-card:hover .photo-overlay {
+            opacity: 1;
+        }
+        
+        .photo-info {
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .photo-card:hover .photo-info {
+            transform: translateY(0);
+        }
+        
+        .photo-title {
+            color: var(--text-primary);
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .photo-date {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .photo-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            border-color: var(--primary-color);
+        }
+        
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            margin: auto;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-color);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 50px rgba(0, 255, 200, 0.3);
+        }
+        
+        .modal-img {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .modal-info {
+            padding: 20px;
+            background: rgba(15, 15, 30, 0.9);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .modal-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .modal-stats {
+            display: flex;
+            gap: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--text-primary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .modal-close:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            transform: rotate(90deg);
+        }
+        
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--text-primary);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .modal-prev {
+            left: 20px;
+        }
+        
+        .modal-next {
+            right: 20px;
+        }
+        
+        .modal-nav:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+        
+        .page-btn {
+            background: rgba(30, 30, 50, 0.7);
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .page-btn.active {
+            background: var(--gradient);
+            color: var(--bg-color);
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(0, 255, 200, 0.3);
+        }
+        
+        /* Счетчик фотографий */
+        .photo-counter {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        
+        .counter-number {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            .upload-btn {
+                display: block;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            
+            .filters {
+                justify-content: center;
+            }
+            
+            .modal-content {
+                max-width: 95%;
+            }
+            
+            .modal-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .photo-img {
+                height: 200px;
+            }
+            
+            .filters {
+                gap: 10px;
+            }
+            
+            .filter-btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+            
+            .modal-nav {
+                width: 35px;
+                height: 35px;
+                font-size: 1em;
+            }
+            
+            .modal-prev {
+                left: 10px;
+            }
+            
+            .modal-next {
+                right: 10px;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .photo-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+        
+        .photo-card:nth-child(1) { animation-delay: 0.1s; }
+        .photo-card:nth-child(2) { animation-delay: 0.2s; }
+        .photo-card:nth-child(3) { animation-delay: 0.3s; }
+        .photo-card:nth-child(4) { animation-delay: 0.4s; }
+        .photo-card:nth-child(5) { animation-delay: 0.5s; }
+        .photo-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        /* Drag & Drop */
+        .upload-section.drag-over {
+            background: rgba(0, 255, 200, 0.1);
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MUZAFFAR GALLERY</h1>
+            <p class="tagline">Мои фотографии и творческие работы</p>
+            
+            <div class="upload-section" id="uploadSection">
+                <label class="upload-btn">
+                    <i class="fas fa-upload"></i> Загрузить фото
+                    <input type="file" id="uploadInput" accept="image/*" multiple>
+                </label>
+                <span class="upload-info">Поддерживаются JPG, PNG, GIF до 10MB</span>
+            </div>
+        </div>
+        
+        <!-- Счетчик фотографий -->
+        <div class="photo-counter">
+            Всего фотографий: <span class="counter-number" id="photoCount">0</span>
+            <span id="filterInfo"></span>
+        </div>
+        
+        <!-- Фильтры -->
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">Все фото</button>
+            <button class="filter-btn" data-filter="nature">Природа</button>
+            <button class="filter-btn" data-filter="city">Город</button>
+            <button class="filter-btn" data-filter="people">Люди</button>
+            <button class="filter-btn" data-filter="art">Искусство</button>
+            <button class="filter-btn" data-filter="travel">Путешествия</button>
+            <button class="filter-btn" data-filter="abstract">Абстракция</button>
+        </div>
+        
+        <!-- Галерея -->
+        <div class="gallery-grid" id="gallery">
+            <!-- Фотографии будут загружаться здесь -->
+        </div>
+        
+        <!-- Пагинация -->
+        <div class="pagination" id="pagination">
+            <!-- Страницы будут генерироваться динамически -->
+        </div>
+    </div>
+    
+    <!-- Модальное окно -->
+    <div class="modal" id="modal">
+        <button class="modal-close" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <button class="modal-nav modal-prev" onclick="prevPhoto()">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="modal-nav modal-next" onclick="nextPhoto()">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="modal-content">
+            <img class="modal-img" id="modalImg" src="" alt="">
+            <div class="modal-info">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <p class="modal-description" id="modalDescription"></p>
+                <div class="modal-stats">
+                    <span id="modalDate"></span>
+                    <span id="modalSize"></span>
+                    <span id="modalCategory"></span>
+                </div>
+                <div class="photo-actions" style="margin-top: 15px;">
+                    <button class="action-btn" onclick="downloadCurrentPhoto()">
+                        <i class="fas fa-download"></i> Скачать
+                    </button>
+                    <button class="action-btn" onclick="sharePhoto()">
+                        <i class="fas fa-share-alt"></i> Поделиться
+                    </button>
+                    <button class="action-btn" onclick="setAsWallpaper()" style="background: rgba(255, 0, 170, 0.2);">
+                        <i class="fas fa-image"></i> Обои
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Данные галереи
+        const galleryData = [
+            {
+                id: 1,
+                title: "Городские огни",
+                category: "city",
+                date: "15.01.2025",
+                size: "1920x1080",
+                description: "Ночной город с прекрасным освещением. Снято на профессиональную камеру в центре города.",
+                src: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 2,
+                title: "Горный пейзаж",
+                category: "nature",
+                date: "10.01.2025",
+                size: "1920x1080",
+                description: "Величественные горы на рассвете. Утренний туман создает волшебную атмосферу.",
+                src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 3,
+                title: "Абстрактная композиция",
+                category: "abstract",
+                date: "05.01.2025",
+                size: "1920x1080",
+                description: "Цветовые градиенты и геометрические формы. Цифровое искусство.",
+                src: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 4,
+                title: "Морской берег",
+                category: "nature",
+                date: "03.01.2025",
+                size: "1920x1080",
+                description: "Волны накатывают на песчаный берег. Умиротворяющий звук моря.",
+                src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 5,
+                title: "Уличная фотография",
+                category: "people",
+                date: "28.12.2024",
+                size: "1920x1080",
+                description: "Жизнь в городе. Моменты из повседневной жизни людей.",
+                src: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 6,
+                title: "Цифровое искусство",
+                category: "art",
+                date: "25.12.2024",
+                size: "1920x1080",
+                description: "Современное цифровое творчество. Смешение реальности и воображения.",
+                src: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 7,
+                title: "Путешествия",
+                category: "travel",
+                date: "20.12.2024",
+                size: "1920x1080",
+                description: "Новые места и впечатления. Исследование неизвестных уголков мира.",
+                src: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 8,
+                title: "Лесная тропа",
+                category: "nature",
+                date: "15.12.2024",
+                size: "1920x1080",
+                description: "Тайны леса. Прогулка по загадочным лесным тропинкам.",
+                src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 9,
+                title: "Архитектура",
+                category: "city",
+                date: "10.12.2024",
+                size: "1920x1080",
+                description: "Современная архитектура. Линии и формы городских строений.",
+                src: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 10,
+                title: "Портрет",
+                category: "people",
+                date: "05.12.2024",
+                size: "1920x1080",
+                description: "Эмоции и чувства. Человеческое лицо как отражение души.",
+                src: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 11,
+                title: "Космическая абстракция",
+                category: "abstract",
+                date: "01.12.2024",
+                size: "1920x1080",
+                description: "Космос и звезды. Бесконечность вселенной в цифровом искусстве.",
+                src: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800&auto=format&fit=crop"
+            },
+            {
+                id: 12,
+                title: "Зимний лес",
+                category: "nature",
+                date: "25.11.2024",
+                size: "1920x1080",
+                description: "Зимняя сказка. Заснеженные деревья и тишина зимнего леса.",
+                src: "https://images.unsplash.com/photo-1418985991508-e47386d96a71?w=800&auto=format&fit=crop"
+            }
+        ];
+        
+        let currentGallery = [...galleryData];
+        let currentFilter = 'all';
+        let currentPage = 1;
+        let currentPhotoIndex = 0;
+        let currentFilteredData = [];
+        const photosPerPage = 9;
+        
+        // Элементы DOM
+        const galleryEl = document.getElementById('gallery');
+        const modalEl = document.getElementById('modal');
+        const modalImg = document.getElementById('modalImg');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalDate = document.getElementById('modalDate');
+        const modalSize = document.getElementById('modalSize');
+        const modalCategory = document.getElementById('modalCategory');
+        const uploadInput = document.getElementById('uploadInput');
+        const uploadSection = document.getElementById('uploadSection');
+        const paginationEl = document.getElementById('pagination');
+        const photoCountEl = document.getElementById('photoCount');
+        const filterInfoEl = document.getElementById('filterInfo');
+        
+        // Инициализация галереи
+        function initGallery() {
+            renderGallery();
+            setupFilters();
+            setupUpload();
+            setupDragAndDrop();
+            renderPagination();
+            updateCounter();
+        }
+        
+        // Рендер галереи
+        function renderGallery() {
+            galleryEl.innerHTML = '';
+            
+            // Фильтрация
+            currentFilteredData = currentFilter === 'all' 
+                ? currentGallery 
+                : currentGallery.filter(photo => photo.category === currentFilter);
+            
+            // Пагинация
+            const startIndex = (currentPage - 1) * photosPerPage;
+            const endIndex = startIndex + photosPerPage;
+            const pageData = currentFilteredData.slice(startIndex, endIndex);
+            
+            // Рендер фотографий
+            pageData.forEach((photo, index) => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.style.animationDelay = `${(index % 6) * 0.1}s`;
+                card.dataset.id = photo.id;
+                
+                card.innerHTML = `
+                    <img src="${photo.src}" alt="${photo.title}" class="photo-img" loading="lazy">
+                    <div class="photo-overlay">
+                        <div class="photo-info">
+                            <div class="photo-title">${photo.title}</div>
+                            <div class="photo-date">
+                                <i class="far fa-calendar"></i> ${photo.date} 
+                                <i class="fas fa-tag"></i> ${photo.category}
+                            </div>
+                            <div class="photo-actions">
+                                <button class="action-btn" onclick="viewPhoto(${photo.id})">
+                                    <i class="fas fa-expand"></i> Просмотр
+                                </button>
+                                <button class="action-btn" onclick="downloadPhoto(${photo.id})">
+                                    <i class="fas fa-download"></i> Скачать
+                                </button>
+                                <button class="action-btn" onclick="favoritePhoto(${photo.id})">
+                                    <i class="far fa-heart"></i> В избранное
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                galleryEl.appendChild(card);
+            });
+        }
+        
+        // Настройка фильтров
+        function setupFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    currentFilter = btn.dataset.filter;
+                    currentPage = 1;
+                    renderGallery();
+                    renderPagination();
+                    updateCounter();
+                });
+            });
+        }
+        
+        // Настройка загрузки
+        function setupUpload() {
+            uploadInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    uploadPhotos(files);
+                }
+            });
+        }
+        
+        // Настройка Drag & Drop
+        function setupDragAndDrop() {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadSection.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadSection.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadSection.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadSection.classList.add('drag-over');
+            }
+            
+            function unhighlight() {
+                uploadSection.classList.remove('drag-over');
+            }
+            
+            uploadSection.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length > 0) {
+                    uploadPhotos(files);
+                }
+            }
+        }
+        
+        // Загрузка фотографий
+        function uploadPhotos(files) {
+            let uploadedCount = 0;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Проверка типа файла
+                if (!file.type.match('image.*')) {
+                    alert(`Файл ${file.name} не является изображением`);
+                    continue;
+                }
+                
+                // Проверка размера файла (макс 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`Файл ${file.name} слишком большой (макс. 10MB)`);
+                    continue;
+                }
+                
+                // Создание URL для превью
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const newPhoto = {
+                        id: Date.now() + i,
+                        title: file.name.replace(/\.[^/.]+$/, ""),
+                        category: getRandomCategory(),
+                        date: new Date().toLocaleDateString('ru-RU'),
+                        size: `${Math.round(file.size / 1024)}KB`,
+                        description: "Загруженная фотография",
+                        src: e.target.result
+                    };
+                    
+                    currentGallery.unshift(newPhoto);
+                    uploadedCount++;
+                    
+                    if (uploadedCount === files.length) {
+                        renderGallery();
+                        renderPagination();
+                        updateCounter();
+                        
+                        // Сохранение в LocalStorage
+                        saveToLocalStorage();
+                        
+                        // Показать сообщение об успехе
+                        showNotification(`Загружено ${uploadedCount} фотографий`);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Сброс input
+            uploadInput.value = '';
+        }
+        
+        // Сохранение в LocalStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('muzaffarGallery', JSON.stringify(currentGallery));
+        }
+        
+        // Загрузка из LocalStorage
+        function loadFromLocalStorage() {
+            const savedPhotos = JSON.parse(localStorage.getItem('muzaffarGallery'));
+            if (savedPhotos && savedPhotos.length > 0) {
+                currentGallery = savedPhotos;
+            }
+        }
+        
+        // Просмотр фотографии
+        function viewPhoto(id) {
+            const photoIndex = currentFilteredData.findIndex(p => p.id === id);
+            if (photoIndex === -1) return;
+            
+            currentPhotoIndex = photoIndex;
+            showPhoto(photoIndex);
+        }
+        
+        // Показать фотографию в модальном окне
+        function showPhoto(index) {
+            const photo = currentFilteredData[index];
+            if (!photo) return;
+            
+            modalImg.src = photo.src;
+            modalImg.alt = photo.title;
+            modalTitle.textContent = photo.title;
+            modalDescription.textContent = photo.description;
+            modalDate.innerHTML = `<i class="far fa-calendar"></i> ${photo.date}`;
+            modalSize.innerHTML = `<i class="fas fa-expand"></i> ${photo.size}`;
+            modalCategory.innerHTML = `<i class="fas fa-tag"></i> ${photo.category}`;
+            
+            modalEl.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Предыдущая фотография
+        function prevPhoto() {
+            if (currentFilteredData.length === 0) return;
+            currentPhotoIndex = (currentPhotoIndex - 1 + currentFilteredData.length) % currentFilteredData.length;
+            showPhoto(currentPhotoIndex);
+        }
+        
+        // Следующая фотография
+        function nextPhoto() {
+            if (currentFilteredData.length === 0) return;
+            currentPhotoIndex = (currentPhotoIndex + 1) % currentFilteredData.length;
+            showPhoto(currentPhotoIndex);
+        }
+        
+        // Закрытие модального окна
+        function closeModal() {
+            modalEl.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Скачивание фотографии
+        function downloadPhoto(id) {
+            const photo = currentGallery.find(p => p.id === id);
+            if (!photo) return;
+            
+            const link = document.createElement('a');
+            link.href = photo.src;
+            link.download = `${photo.title}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Скачивание текущей фотографии
+        function downloadCurrentPhoto() {
+            const photo = currentFilteredData[currentPhotoIndex];
+            if (photo) {
+                downloadPhoto(photo.id);
+            }
+        }
+        
+        // Добавление в избранное
+        function favoritePhoto(id) {
+            const photo = currentGallery.find(p => p.id === id);
+            if (!photo) return;
+            
+            let favorites = JSON.parse(localStorage.getItem('muzaffarFavorites')) || [];
+            
+            if (favorites.some(fav => fav.id === id)) {
+                // Удалить из избранного
+                favorites = favorites.filter(fav => fav.id !== id);
+                showNotification('Удалено из избранного');
+            } else {
+                // Добавить в избранное
+                favorites.push(photo);
+                showNotification('Добавлено в избранное');
+            }
+            
+            localStorage.setItem('muzaffarFavorites', JSON.stringify(favorites));
+        }
+        
+        // Поделиться фотографией
+        function sharePhoto() {
+            const photo = currentFilteredData[currentPhotoIndex];
+            if (!photo) return;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: photo.title,
+                    text: photo.description,
+                    url: photo.src
+                });
+            } else {
+                // Копирование ссылки в буфер обмена
+                navigator.clipboard.writeText(photo.src).then(() => {
+                    showNotification('Ссылка скопирована в буфер обмена');
+                });
+            }
+        }
+        
+        // Установка как обои
+        function setAsWallpaper() {
+            const photo = currentFilteredData[currentPhotoIndex];
+            if (!photo) return;
+            
+            showNotification('Функция установки обоев доступна в мобильном приложении');
+        }
+        
+        // Рендер пагинации
+        function renderPagination() {
+            paginationEl.innerHTML = '';
+            
+            const totalPages = Math.ceil(currentFilteredData.length / photosPerPage);
+            
+            if (totalPages <= 1) return;
+            
+            // Предыдущая страница
+            if (currentPage > 1) {
+                const prevBtn = createPageBtn('<i class="fas fa-chevron-left"></i>', () => {
+                    currentPage--;
+                    renderGallery();
+                    renderPagination();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                paginationEl.appendChild(prevBtn);
+            }
+            
+            // Номера страниц
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = createPageBtn(i, () => {
+                    currentPage = i;
+                    renderGallery();
+                    renderPagination();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                
+                if (i === currentPage) {
+                    pageBtn.classList.add('active');
+                }
+                
+                paginationEl.appendChild(pageBtn);
+            }
+            
+            // Следующая страница
+            if (currentPage < totalPages) {
+                const nextBtn = createPageBtn('<i class="fas fa-chevron-right"></i>', () => {
+                    currentPage++;
+                    renderGallery();
+                    renderPagination();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                paginationEl.appendChild(nextBtn);
+            }
+        }
+        
+        // Создание кнопки страницы
+        function createPageBtn(content, onClick) {
+            const btn = document.createElement('div');
+            btn.className = 'page-btn';
+            btn.innerHTML = content;
+            btn.addEventListener('click', onClick);
+            return btn;
+        }
+        
+        // Обновление счетчика
+        function updateCounter() {
+            const totalCount = currentGallery.length;
+            const filteredCount = currentFilteredData.length;
+            
+            photoCountEl.textContent = totalCount;
+            
+            if (currentFilter !== 'all') {
+                filterInfoEl.textContent = ` (показано: ${filteredCount} из ${totalCount})`;
+            } else {
+                filterInfoEl.textContent = '';
+            }
+        }
+        
+        // Случайная категория для загруженных фото
+        function getRandomCategory() {
+            const categories = ['nature', 'city', 'people', 'art', 'travel', 'abstract'];
+            return categories[Math.floor(Math.random() * categories.length)];
+        }
+        
+        // Показать уведомление
+        function showNotification(message) {
+            // Создаем элемент уведомления
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--gradient);
+                color: var(--bg-color);
+                padding: 15px 25px;
+                border-radius: 10px;
+                font-weight: bold;
+                z-index: 10000;
+                animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+                box-shadow: 0 5px 15px rgba(0, 255, 200, 0.3);
+            `;
+            
+            // Добавляем стили для анимации
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Удаляем уведомление через 3 секунды
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+        
+        // Закрытие модального окна по клику вне изображения
+        modalEl.addEventListener('click', (e) => {
+            if (e.target === modalEl) {
+                closeModal();
+            }
+        });
+        
+        // Навигация по фотографиям с помощью клавиш
+        document.addEventListener('keydown', (e) => {
+            if (modalEl.style.display !== 'block') return;
+            
+            switch(e.key) {
+                case 'Escape':
+                    closeModal();
+                    break;
+                case 'ArrowLeft':
+                    prevPhoto();
+                    break;
+                case 'ArrowRight':
+                    nextPhoto();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    nextPhoto();
+                    break;
+            }
+        });
+        
+        // Загрузка данных при инициализации
+        window.addEventListener('load', () => {
+            loadFromLocalStorage();
+            initGallery();
+        });
+    </script>
+</body>
+</html>
