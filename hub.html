@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Простой публикатор кода</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        textarea { width: 100%; height: 200px; }
+        button { padding: 10px 20px; margin: 10px 0; }
+        #result { margin-top: 20px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Публикатор кода</h1>
+    
+    <textarea id="code">
+<h1>Привет!</h1>
+<p>Это тестовая страница</p>
+    </textarea>
+    
+    <button onclick="createLink()">Создать ссылку</button>
+    
+    <div id="result" style="display:none;">
+        <h3>Ваша ссылка:</h3>
+        <a id="link" target="_blank">Нажми здесь</a>
+        <button onclick="copyLink()">Копировать</button>
+    </div>
+
+    <script>
+        function createLink() {
+            // Берем код из textarea
+            var code = document.getElementById("code").value;
+            
+            // Создаем Data URL
+            var dataUrl = "data:text/html;charset=utf-8," + encodeURIComponent(code);
+            
+            // Показываем ссылку
+            document.getElementById("link").href = dataUrl;
+            document.getElementById("link").textContent = "Открыть страницу";
+            document.getElementById("result").style.display = "block";
+            
+            // Открываем в новом окне для проверки
+            window.open(dataUrl, "_blank");
+            
+            alert("Ссылка создана! Кликните на ссылку выше.");
+        }
+        
+        function copyLink() {
+            var link = document.getElementById("link").href;
+            navigator.clipboard.writeText(link).then(function() {
+                alert("Ссылка скопирована!");
+            });
+        }
+    </script>
+</body>
+</html>
