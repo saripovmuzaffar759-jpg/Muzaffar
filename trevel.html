@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Планировщик Путешествий</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #2E8B57;
+        }
+
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        nav a:hover {
+            background-color: #3CB371;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h2 {
+            color: #2E8B57;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input, textarea, select {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .plan-list {
+            margin-top: 20px;
+        }
+
+        .plan-item {
+            background-color: white;
+            border-left: 5px solid #4CAF50;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Планировщик Путешествий</h1>
+    </header>
+
+    <nav>
+        <a href="#plan-trip">Создать План</a>
+        <a href="#plans">Мои Планы</a>
+    </nav>
+
+    <main>
+        <section id="plan-trip">
+            <h2>Создать новый план путешествия</h2>
+            <form id="tripForm">
+                <input type="text" id="destination" placeholder="Куда поедем?" required>
+                <input type="date" id="startDate" required>
+                <input type="date" id="endDate" required>
+                <textarea id="notes" rows="4" placeholder="Дополнительные заметки"></textarea>
+                <button type="submit">Сохранить план</button>
+            </form>
+        </section>
+
+        <section id="plans">
+            <h2>Мои планы путешествий</h2>
+            <div class="plan-list" id="planList">
+                <!-- Здесь будут появляться планы -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('tripForm');
+        const planList = document.getElementById('planList');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const destination = document.getElementById('destination').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const notes = document.getElementById('notes').value;
+
+            const planItem = document.createElement('div');
+            planItem.className = 'plan-item';
+            planItem.innerHTML = `
+                <h3>${destination}</h3>
+                <p><strong>С:</strong> ${startDate} <strong>До:</strong> ${endDate}</p>
+                <p>${notes}</p>
+            `;
+
+            planList.appendChild(planItem);
+
+            form.reset();
+        });
+    </script>
+</body>
+</html>
