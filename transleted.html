@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MUZAFFAR Translate - Переводчик нового поколения</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #00bfa6;
+        --primary-dark: #009e8b;
+        --secondary: #ffd54f;
+        --dark: #101010;
+        --darker: #0b0b0b;
+        --light: #f1f1f1;
+        --gray: #333;
+    }
+
+    body {
+        background-color: var(--dark);
+        color: var(--light);
+        font-family: 'Montserrat', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        background-image: radial-gradient(circle at 10% 20%, rgba(0, 191, 166, 0.1) 0%, rgba(0, 191, 166, 0.05) 90%);
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .logo {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-shadow: 0 0 10px rgba(0, 191, 166, 0.4);
+    }
+
+    .tagline {
+        color: var(--secondary);
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 800px;
+        background-color: var(--darker);
+        border-radius: 12px;
+        padding: 30px;
+        border: 1px solid var(--gray);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid var(--gray);
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--light);
+        font-family: 'Roboto Mono', monospace;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        resize: vertical;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(0, 191, 166, 0.3);
+    }
+
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    select {
+        flex: 1;
+        min-width: 200px;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 2px solid var(--gray);
+        background-color: #1c1c1c;
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        appearance: none;
+    }
+
+    /* Главное — сделать фон и текст видимыми при открытии */
+    select option {
+        background-color: #1c1c1c;
+        color: #ffffff;
+        padding: 10px;
+    }
+
+    select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(0, 191, 166, 0.3);
+    }
+
+    button {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    button:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 191, 166, 0.3);
+    }
+
+    .output-text {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+        min-height: 100px;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 1.1rem;
+        border-left: 4px solid var(--primary);
+    }
+
+    .footer {
+        margin-top: 40px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .controls {
+            flex-direction: column;
+        }
+
+        select, button {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">MUZAFFAR Translate</div>
+    <div class="tagline">Переводчик нового поколения</div>
+</div>
+
+<div class="container">
+    <textarea id="textInput" placeholder="Введите текст, который нужно перевести..."></textarea>
+
+    <div class="controls">
+        <select id="langSelect"></select>
+        <button id="translateButton">Перевести</button>
+    </div>
+
+    <div id="translatedText" class="output-text">Здесь появится перевод...</div>
+</div>
+
+<div class="footer">
+    © 2025 NovaTranslate | Все права защищены
+</div>
+
+<script>
+const languages = {
+    "af": "Африкаанс", "sq": "Албанский", "am": "Амхарский", "ar": "Арабский", "hy": "Армянский",
+    "az": "Азербайджанский", "eu": "Баскский", "bn": "Бенгальский", "be": "Белорусский",
+    "bg": "Болгарский", "my": "Бирманский", "zh-CN": "Китайский (упрощённый)",
+    "zh-TW": "Китайский (традиционный)", "hr": "Хорватский", "cs": "Чешский", "da": "Датский",
+    "nl": "Голландский", "en": "Английский", "eo": "Эсперанто", "et": "Эстонский",
+    "fi": "Финский", "fr": "Французский", "ka": "Грузинский", "de": "Немецкий",
+    "el": "Греческий", "hi": "Хинди", "hu": "Венгерский", "id": "Индонезийский",
+    "it": "Итальянский", "ja": "Японский", "kk": "Казахский", "ko": "Корейский",
+    "la": "Латинский", "lv": "Латышский", "lt": "Литовский", "mk": "Македонский",
+    "ms": "Малайский", "mn": "Монгольский", "ne": "Непальский", "no": "Норвежский",
+    "fa": "Персидский", "pl": "Польский", "pt": "Португальский", "ro": "Румынский",
+    "ru": "Русский", "sr": "Сербский", "sk": "Словацкий", "sl": "Словенский",
+    "es": "Испанский", "sw": "Суахили", "sv": "Шведский", "th": "Тайский",
+    "tr": "Турецкий", "uk": "Украинский", "ur": "Урду", "uz": "Узбекский",
+    "vi": "Вьетнамский", "cy": "Валлийский", "xh": "Коса", "yi": "Идиш", "zu": "Зулу"
+};
+
+const langSelect = document.getElementById('langSelect');
+const sortedLanguages = Object.entries(languages).sort((a,b)=>a[1].localeCompare(b[1]));
+for (const [code, name] of sortedLanguages) {
+    const option = document.createElement('option');
+    option.value = code;
+    option.textContent = name;
+    langSelect.appendChild(option);
+}
+langSelect.value = 'ru';
+
+async function translateText(text, targetLang) {
+    const output = document.getElementById('translatedText');
+    output.textContent = "Перевод...";
+    try {
+        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
+        const data = await res.json();
+        const result = data[0].map(item => item[0]).join(" ");
+        output.textContent = result;
+    } catch {
+        output.textContent = "Ошибка перевода.";
+    }
+}
+
+document.getElementById('translateButton').addEventListener('click', async () => {
+    const text = document.getElementById('textInput').value.trim();
+    const target = langSelect.value;
+    if (!text) return alert("Введите текст!");
+    await translateText(text, target);
+});
+</script>
+</body>
+</html>
