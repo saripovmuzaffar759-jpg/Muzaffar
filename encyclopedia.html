@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Универсальная Энциклопедия</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ff4e50, #f9d423); /* Плавный переход */
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 30px;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input, select {
+      padding: 10px;
+      font-size: 1em;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      width: 180px;
+    }
+
+    select {
+      width: 140px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 8px;
+      background: #222;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    .results {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+    }
+
+    .card {
+      background: rgba(0,0,0,0.4);
+      padding: 20px;
+      border-radius: 20px;
+      width: 280px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.3);
+      text-align: left;
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.4em;
+    }
+
+    .card p {
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Универсальная Энциклопедия</h1>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Введите запрос...">
+    <select id="languageSelect">
+      <option value="ru">Русский</option>
+      <option value="en">English</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="es">Español</option>
+    </select>
+    <button onclick="search()">Найти</button>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <script>
+    async function search() {
+      const query = document.getElementById("searchInput").value.trim();
+      const lang = document.getElementById("languageSelect").value;
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      if (!query) return;
+
+      try {
+        const res = await fetch(`https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`);
+        const data = await res.json();
+        const results = data.query.search;
+
+        if (results.length === 0) {
+          resultsDiv.innerHTML = "<p>Ничего не найдено.</p>";
+          return;
+        }
+
+        results.slice(0, 5).forEach(async item => {
+          const pageTitle = item.title;
+
+          const summaryRes = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
+          const summary = await summaryRes.json();
+
+          const card = document.createElement("div");
+          card.className = "card";
+
+          if (summary.thumbnail && summary.thumbnail.source) {
+            const img = document.createElement("img");
+            img.src = summary.thumbnail.source;
+            card.appendChild(img);
+          }
+
+          const title = document.createElement("h3");
+          title.textContent = summary.title || pageTitle;
+          card.appendChild(title);
+
+          const desc = document.createElement("p");
+          desc.textContent = summary.extract || "Нет описания.";
+          card.appendChild(desc);
+
+          resultsDiv.appendChild(card);
+        });
+      } catch (e) {
+        resultsDiv.innerHTML = "<p>Произошла ошибка при поиске.</p>";
+      }
+    }
+  </script>
+</body>
+</html>
