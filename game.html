@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мир Игр - Портал</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00ffc8;
+            --secondary-color: #00aaff;
+            --bg-color: #0d0d1a;
+            --card-bg: rgba(20, 20, 40, 0.5);
+            --card-border: 1px solid rgba(0, 255, 200, 0.2);
+        }
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--bg-color);
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            background: linear-gradient(45deg, var(--bg-color) 0%, #1a0d1a 100%);
+            animation: background-glow 20s infinite alternate ease-in-out;
+        }
+        @keyframes background-glow {
+            from {
+                filter: hue-rotate(0deg);
+            }
+            to {
+                filter: hue-rotate(360deg);
+            }
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 200, 0.2);
+        }
+        h1 {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .tagline {
+            font-size: 1em;
+            color: var(--secondary-color);
+            margin-bottom: 40px;
+        }
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .project-card {
+            background-color: var(--card-bg);
+            border: var(--card-border);
+            border-radius: 15px;
+            padding: 25px;
+            text-decoration: none;
+            color: #ffffff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--primary-color) 0%, transparent 60%);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            z-index: -1;
+        }
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 255, 200, 0.4);
+            background-color: rgba(20, 20, 40, 0.8);
+        }
+        .project-card:hover::before {
+            opacity: 0.5;
+            transform: scale(1);
+        }
+        .card-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        .card-description {
+            font-size: 0.9em;
+            color: #ccc;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 1em;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .back-link:hover {
+            color: #ffffff;
+        }
+        footer {
+            margin-top: 50px;
+            font-size: 0.8em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Мир Игр</h1>
+        <p class="tagline">Выбери игру, чтобы начать.</p>
+        <div class="project-grid">
+            <a href="https://mrworld819.github.io/-Muzaffar1/" class="project-card">
+                <div class="card-title">Крестики-нолики</div>
+                <div class="card-description">Классическая игра с ИИ и режимом для двух игроков.</div>
+            </a>
+            <a href="https://mrworld819.github.io/-Muzaffar/" class="project-card">
+                <div class="card-title">угадай число</div>
+                <div class="card-description">ии который отгодает твоё число которое ты загодаешь.</div>
+            </a>
+            <a href="https://mrworld819.github.io/-m/" class="project-card">
+                <div class="card-title">мемори</div>
+                <div class="card-description">Разбей все кирпичи в этой культовой аркаде.</div>
+            </a>
+            <a href="https://gd.games/games/7f4f3c22-f943-4672-8291-e8ed49fcba1c" class="project-card">
+                <div class="card-title">игра с экшенем</div>
+                <div class="card-description">сражайся с другими игроками и не дай им убить твой куб жизни.</div>
+            </a>
+             <a href="https://gd.games/games/fb6408f3-d823-491a-9250-3da34e8bbf29" class="project-card">
+                <div class="card-title">3 д игра</div>
+                <div class="card-description">сражайся с другими игроками и не дай им убить себя.</div>
+            </a>
+<a href="https://gd.games/games/e57f0b18-60fa-4ae0-8cc9-e18bf8494a1b" class="project-card">
+                <div class="card-title">Деревня</div>
+                <div class="card-description">создавай свою деревню и увеличивая прибыль.</div>
+            </a>
+            <a href="https://gd.games/games/19c0e7ef-6bdd-4378-8bb9-337a49d445ba" class="project-card">
+                <div class="card-title">курица</div>
+                <div class="card-description">создавай свою деревню и увеличивая прибыль.</div>
+            </a>
+            <a href="https://muzaffar699.github.io/cbvjy-ujdjhbn/" class="project-card">
+                <div class="card-title">Саймон говорит</div>
+                <div class="card-description">Игра на память, где нужно повторять последовательность.</div>
+            </a>
+             <a href="https://gd.games/games/062d2e65-032f-438a-a77b-aaebe062ec8e" class="project-card">
+                <div class="card-title">акула бизенеса </div>
+                <div class="card-description">Игра на память, где нужно повторять последовательность.</div>
+            </a>
+             <a href="https://muzaffarsharipov058-creator.github.io/muzaffar/strayk.html" class="project-card">
+                <div class="card-title">Strike </div>
+                <div class="card-description">Игра Strike   </div>
+            </a>
+              <a href="https://muzaffarsharipov058-creator.github.io/muzaffar/shah.html" class="project-card">
+                <div class="card-title">Shahmat </div>
+                <div class="card-description">Игра Shahmat </div>
+            </a>
+            
+        </div>
+        <a href="index.html" class="back-link">&larr; Вернуться на главный портал</a>
+    </div>
+    <footer>
+        Создано с душой от Музаффара. © 2025 
+    </footer>
+</body>
+
+</html>
+
+
+
