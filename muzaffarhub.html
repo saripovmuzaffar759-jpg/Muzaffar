@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUZAFFAR — Файлы, код и ссылки</title>
+    <title>MUZAFFAR 2.0 — Мега загрузчик</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -22,12 +22,14 @@
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
             padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .header {
@@ -41,29 +43,57 @@
             justify-content: center;
             gap: 15px;
             margin-bottom: 20px;
+            position: relative;
         }
 
         .logo-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            border-radius: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            border-radius: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 28px;
+            font-size: 36px;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 10px 20px rgba(255, 65, 108, 0.4);
+            transform: rotate(10deg);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: rotate(0deg) scale(1.1);
         }
 
         .logo-text {
-            font-size: 42px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            font-size: 52px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            letter-spacing: 2px;
+        }
+
+        .badge {
+            background: gold;
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 14px;
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            transform: rotate(5deg);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: rotate(5deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.1); }
         }
 
         .description {
@@ -72,6 +102,10 @@
             line-height: 1.6;
             margin-bottom: 30px;
             text-align: center;
+            background: rgba(255,255,255,0.7);
+            padding: 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
         }
 
         .mode-selector {
@@ -83,182 +117,234 @@
         }
 
         .mode-btn {
-            padding: 12px 24px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            background: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.2);
             color: #2c3e50;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+            border: 2px solid transparent;
         }
 
         .mode-btn.active {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
             color: white;
-            border-color: transparent;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 65, 108, 0.4);
+            border-color: white;
         }
 
         .mode-btn:hover:not(.active) {
-            background: #f8fafc;
-            border-color: #ff6b6b;
+            background: rgba(255,255,255,0.4);
+            border-color: #ff416c;
         }
 
         .input-section {
             display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .input-section.active {
             display: block;
         }
 
+        .input-group {
+            background: rgba(255,255,255,0.8);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
         .url-input, .name-input, .text-input {
             width: 100%;
-            padding: 16px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            padding: 18px 25px;
+            border: 3px solid #e2e8f0;
+            border-radius: 60px;
             font-size: 16px;
             transition: all 0.3s ease;
-            background: #f8fafc;
+            background: white;
             margin-bottom: 15px;
             font-family: inherit;
         }
 
         .text-input {
             min-height: 200px;
-            resize: vertical;
+            border-radius: 25px;
             font-family: 'Courier New', monospace;
         }
 
         .url-input:focus, .name-input:focus, .text-input:focus {
             outline: none;
-            border-color: #ff6b6b;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+            border-color: #ff416c;
+            box-shadow: 0 0 0 5px rgba(255, 65, 108, 0.2);
+            transform: scale(1.02);
         }
 
         .file-upload-area {
-            border: 3px dashed #e2e8f0;
-            border-radius: 12px;
-            padding: 40px;
+            border: 4px dashed #ff416c;
+            border-radius: 30px;
+            padding: 50px;
             text-align: center;
-            background: #f8fafc;
+            background: rgba(255,255,255,0.9);
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .file-upload-area:hover, .file-upload-area.dragover {
-            border-color: #ff6b6b;
-            background: #fff5f5;
+        .file-upload-area::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .file-upload-area:hover {
+            border-color: #ff4b2b;
+            background: white;
+            transform: scale(1.02);
         }
 
         .file-upload-icon {
-            font-size: 48px;
-            color: #ff6b6b;
+            font-size: 64px;
+            color: #ff416c;
             margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .file-upload-text {
             color: #2c3e50;
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .file-upload-hint {
-            color: #94a3b8;
-            font-size: 14px;
+            font-weight: 700;
         }
 
         .file-info {
-            background: #e2e8f0;
-            border-radius: 8px;
-            padding: 12px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            border-radius: 60px;
+            padding: 15px 25px;
             margin-top: 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
             flex-wrap: wrap;
+            color: white;
+            animation: slideIn 0.3s ease;
         }
 
         .file-name {
-            font-weight: 600;
-            color: #2c3e50;
+            font-weight: 700;
             word-break: break-all;
         }
 
-        .file-size {
-            color: #64748b;
-            font-size: 14px;
-        }
-
         .remove-file {
-            background: #ff7675;
+            background: rgba(255,255,255,0.3);
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 5px 10px;
+            border-radius: 30px;
+            padding: 8px 20px;
             cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .remove-file:hover {
-            background: #d63031;
+            background: rgba(255,255,255,0.5);
+            transform: scale(1.1);
         }
 
         .btn {
-            padding: 16px 32px;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            padding: 18px 35px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
             margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
         }
 
         .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px rgba(255, 65, 108, 0.5);
         }
 
         .btn:disabled {
             background: #cbd5e1;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            opacity: 0.5;
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
         }
 
         .result {
             display: none;
             background: linear-gradient(135deg, #fff5f5, #fff);
-            padding: 25px;
-            border-radius: 15px;
-            margin-top: 20px;
-            border: 2px solid #ffeaa7;
+            padding: 30px;
+            border-radius: 25px;
+            margin: 20px 0;
+            border: 3px solid #ff416c;
+            box-shadow: 0 10px 30px rgba(255, 65, 108, 0.2);
+            animation: slideIn 0.3s ease;
         }
 
         .result-title {
-            color: #2d3436;
-            font-size: 16px;
+            color: #ff416c;
+            font-size: 20px;
             margin-bottom: 15px;
-            font-weight: 600;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -272,242 +358,276 @@
         }
 
         .short-url {
-            color: #e17055;
+            color: #2c3e50;
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 600;
             text-decoration: none;
             word-break: break-all;
             flex: 1;
             font-family: 'Courier New', monospace;
+            padding: 15px;
+            background: rgba(255,65,108,0.1);
+            border-radius: 15px;
         }
 
         .short-url:hover {
+            color: #ff416c;
             text-decoration: underline;
-            color: #ff6b6b;
         }
 
         .copy-btn {
-            padding: 12px 20px;
-            background: #00b894;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #00b09b, #96c93d);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            white-space: nowrap;
+            border-radius: 60px;
+            font-size: 16px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .copy-btn:hover {
-            background: #00a085;
-            transform: translateY(-1px);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 176, 155, 0.4);
         }
 
-        .stats {
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin: 30px 0;
-            padding: 25px 0;
-            border-top: 2px solid #ffeaa7;
-            border-bottom: 2px solid #ffeaa7;
         }
 
-        .stat {
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
             text-align: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff416c;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
         }
 
         .stat-number {
-            font-size: 28px;
-            font-weight: 800;
-            color: #e17055;
+            font-size: 32px;
+            font-weight: 900;
+            color: #ff416c;
             display: block;
         }
 
         .stat-label {
             font-size: 14px;
-            color: #636e72;
-            margin-top: 8px;
+            color: #64748b;
             font-weight: 600;
         }
 
-        .links-section {
+        .items-section {
             margin-top: 30px;
         }
 
         .section-title {
-            color: #2d3436;
-            font-size: 20px;
+            color: white;
+            font-size: 24px;
             margin-bottom: 20px;
             font-weight: 700;
             display: flex;
             align-items: center;
             gap: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
-        .links-grid {
+        .items-grid {
             display: grid;
-            gap: 15px;
-            max-height: 400px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-height: 500px;
             overflow-y: auto;
             padding: 10px;
         }
 
-        .link-card {
-            background: white;
-            border: 2px solid #dfe6e9;
-            border-radius: 12px;
+        .item-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
             padding: 20px;
             transition: all 0.3s ease;
+            border: 2px solid transparent;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
         }
 
-        .link-card:hover {
-            border-color: #ff6b6b;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.1);
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
         }
 
-        .link-header {
+        .item-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #ff416c;
+            box-shadow: 0 20px 30px rgba(255, 65, 108, 0.2);
+        }
+
+        .item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
             gap: 10px;
         }
 
-        .link-name {
+        .item-name {
             font-size: 18px;
             font-weight: 700;
-            color: #2d3436;
-            background: #ffeaa7;
-            padding: 5px 12px;
-            border-radius: 8px;
+            color: #ff416c;
+            background: rgba(255,65,108,0.1);
+            padding: 5px 15px;
+            border-radius: 30px;
         }
 
-        .link-type {
-            background: #74b9ff;
+        .item-type {
+            background: #2c3e50;
             color: white;
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 5px 15px;
+            border-radius: 30px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        .link-date {
-            color: #636e72;
-            font-size: 12px;
-        }
-
-        .link-content {
-            margin: 10px 0;
-            padding: 10px;
+        .item-preview {
+            margin: 15px 0;
+            padding: 15px;
             background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 15px;
             max-height: 100px;
             overflow: auto;
             font-family: 'Courier New', monospace;
             font-size: 12px;
             white-space: pre-wrap;
             word-break: break-all;
+            border: 1px solid #e2e8f0;
         }
 
-        .link-url {
-            color: #e17055;
+        .item-url {
+            color: #2c3e50;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             word-break: break-all;
             text-decoration: none;
             display: block;
             margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,65,108,0.05);
+            border-radius: 10px;
         }
 
-        .link-actions {
+        .item-actions {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            margin-top: 15px;
         }
 
         .action-btn {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
-            font-size: 12px;
+            border-radius: 30px;
+            font-size: 13px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
+            flex: 1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .copy-action {
-            background: #74b9ff;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
             color: white;
-        }
-
-        .copy-action:hover {
-            background: #0984e3;
-        }
-
-        .delete-action {
-            background: #ff7675;
-            color: white;
-        }
-
-        .delete-action:hover {
-            background: #d63031;
         }
 
         .download-action {
-            background: #00b894;
+            background: linear-gradient(135deg, #00b09b, #96c93d);
             color: white;
         }
 
-        .download-action:hover {
-            background: #00a085;
+        .delete-action {
+            background: linear-gradient(135deg, #ff7675, #d63031);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
         }
 
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #00b894;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00b09b, #96c93d);
             color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 15px 30px;
+            border-radius: 60px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             display: none;
             z-index: 1000;
             font-weight: 600;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .error {
             color: #d63031;
-            font-size: 14px;
-            margin-top: 10px;
+            font-size: 16px;
+            margin: 15px 0;
             display: none;
             font-weight: 600;
-            padding: 10px;
-            background: #ffeaa7;
-            border-radius: 8px;
-            border-left: 4px solid #d63031;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 60px;
+            border-left: 5px solid #d63031;
+            box-shadow: 0 5px 15px rgba(214, 48, 49, 0.2);
         }
 
         .loading {
             display: none;
             text-align: center;
-            color: #636e72;
+            color: white;
             margin: 20px 0;
+            padding: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 60px;
+            backdrop-filter: blur(5px);
         }
 
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #ff6b6b;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid #ff416c;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
             margin: 0 auto 15px;
         }
@@ -519,11 +639,42 @@
 
         .empty-state {
             text-align: center;
-            color: #636e72;
-            padding: 40px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            border: 2px dashed #b2bec3;
+            color: white;
+            padding: 60px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 30px;
+            border: 3px dashed rgba(255,255,255,0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .qrcode {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .qrcode img {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            padding: 10px;
+            background: white;
         }
 
         @media (max-width: 768px) {
@@ -531,21 +682,20 @@
                 padding: 20px;
             }
             
-            .stats {
-                grid-template-columns: 1fr;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
             
             .logo-text {
                 font-size: 32px;
             }
             
-            .mode-selector {
-                flex-direction: column;
+            .badge {
+                right: 0;
             }
             
-            .mode-btn {
-                width: 100%;
-                justify-content: center;
+            .items-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -556,9 +706,10 @@
             <div class="logo">
                 <div class="logo-icon">M</div>
                 <h1 class="logo-text">MUZAFFAR</h1>
+                <div class="badge">PRO 2.0</div>
             </div>
             <p class="description">
-                Загружайте файлы, делитесь кодом и создавайте короткие ссылки. Всё в одном месте!
+                🚀 Мега загрузчик файлов | 🔗 Короткие ссылки | 📝 Хранилище кода | ⚡ Мгновенно
             </p>
         </div>
 
@@ -570,47 +721,79 @@
                 <span>📁</span> Файлы
             </button>
             <button class="mode-btn" data-mode="text">
-                <span>📝</span> Текст/Код
+                <span>📝</span> Текст
+            </button>
+            <button class="mode-btn" data-mode="qrcode">
+                <span>📱</span> QR-код
             </button>
         </div>
 
         <!-- Режим ссылок -->
         <div class="input-section active" id="url-mode">
-            <input type="text" class="name-input" id="urlNameInput" 
-                   placeholder="Имя ссылки (например: Мой сайт)">
-            <input type="url" class="url-input" id="urlInput" 
-                   placeholder="Введите длинную ссылку">
-            <button class="btn" id="createUrlBtn" disabled>✨ Создать короткую ссылку</button>
+            <div class="input-group">
+                <input type="text" class="name-input" id="urlNameInput" 
+                       placeholder="🔖 Имя ссылки (например: Мой Instagram)">
+                <input type="url" class="url-input" id="urlInput" 
+                       placeholder="🌐 Введите длинную ссылку">
+                <div class="progress-bar" id="urlProgress">
+                    <div class="progress-fill"></div>
+                </div>
+                <button class="btn" id="createUrlBtn" disabled>✨ Создать короткую ссылку</button>
+            </div>
         </div>
 
         <!-- Режим файлов -->
         <div class="input-section" id="file-mode">
-            <input type="text" class="name-input" id="fileNameInput" 
-                   placeholder="Имя файла (например: Моя картинка)">
-            <div class="file-upload-area" id="fileDropArea">
-                <div class="file-upload-icon">📁</div>
-                <div class="file-upload-text">Перетащите файл сюда или нажмите для выбора</div>
-                <div class="file-upload-hint">Максимальный размер: 10 МБ</div>
-                <input type="file" id="fileInput" style="display: none;">
+            <div class="input-group">
+                <input type="text" class="name-input" id="fileNameInput" 
+                       placeholder="📌 Имя файла (например: Моё фото)">
+                <div class="file-upload-area" id="fileDropArea">
+                    <div class="file-upload-icon">📁</div>
+                    <div class="file-upload-text">Перетащи файл сюда</div>
+                    <div class="file-upload-hint">или нажми для выбора (до 25 МБ)</div>
+                    <input type="file" id="fileInput" style="display: none;">
+                </div>
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <span class="file-name" id="selectedFileName"></span>
+                    <span class="file-size" id="selectedFileSize"></span>
+                    <button class="remove-file" id="removeFileBtn">✕ Удалить</button>
+                </div>
+                <div class="progress-bar" id="fileProgress">
+                    <div class="progress-fill"></div>
+                </div>
+                <button class="btn" id="uploadFileBtn" disabled>📤 Загрузить файл</button>
             </div>
-            <div class="file-info" id="fileInfo" style="display: none;">
-                <span class="file-name" id="selectedFileName"></span>
-                <span class="file-size" id="selectedFileSize"></span>
-                <button class="remove-file" id="removeFileBtn">✕</button>
-            </div>
-            <button class="btn" id="uploadFileBtn" disabled>📤 Загрузить файл</button>
         </div>
 
         <!-- Режим текста -->
         <div class="input-section" id="text-mode">
-            <input type="text" class="name-input" id="textNameInput" 
-                   placeholder="Имя текста (например: Мой код)">
-            <textarea class="text-input" id="textInput" 
-                      placeholder="Вставьте текст или код..."></textarea>
-            <button class="btn" id="createTextBtn" disabled>📝 Сохранить текст</button>
+            <div class="input-group">
+                <input type="text" class="name-input" id="textNameInput" 
+                       placeholder="📝 Имя текста (например: Мой код)">
+                <textarea class="text-input" id="textInput" 
+                          placeholder="Вставь текст или код сюда..."></textarea>
+                <div class="progress-bar" id="textProgress">
+                    <div class="progress-fill"></div>
+                </div>
+                <button class="btn" id="createTextBtn" disabled>💾 Сохранить текст</button>
+            </div>
         </div>
 
-        <button class="btn btn-secondary" id="clearBtn">🗑️ Очистить историю</button>
+        <!-- Режим QR-кода -->
+        <div class="input-section" id="qrcode-mode">
+            <div class="input-group">
+                <input type="text" class="name-input" id="qrNameInput" 
+                       placeholder="📱 Название QR-кода">
+                <input type="text" class="url-input" id="qrInput" 
+                       placeholder="🔗 Текст или ссылка для QR-кода">
+                <div class="qrcode" id="qrPreview" style="display: none;">
+                    <img id="qrImage" src="" alt="QR Code">
+                </div>
+                <button class="btn" id="createQrBtn" disabled>✨ Создать QR-код</button>
+            </div>
+        </div>
+
+        <button class="btn btn-secondary" id="clearBtn">🗑️ Очистить всё</button>
 
         <div class="error" id="errorMessage"></div>
 
@@ -621,7 +804,7 @@
 
         <div class="result" id="resultContainer">
             <div class="result-title">
-                <span>🎉 Готово!</span>
+                <span>🎉 Готово! Твоя ссылка:</span>
             </div>
             <div class="result-content">
                 <a href="#" class="short-url" id="resultLink" target="_blank"></a>
@@ -629,59 +812,69 @@
             </div>
         </div>
 
-        <div class="stats">
-            <div class="stat">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
                 <span class="stat-number" id="totalItems">0</span>
-                <span class="stat-label">Всего элементов</span>
+                <span class="stat-label">Всего</span>
             </div>
-            <div class="stat">
+            <div class="stat-card">
+                <div class="stat-icon">🔗</div>
+                <span class="stat-number" id="urlCount">0</span>
+                <span class="stat-label">Ссылок</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📁</div>
                 <span class="stat-number" id="fileCount">0</span>
                 <span class="stat-label">Файлов</span>
             </div>
-            <div class="stat">
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
                 <span class="stat-number" id="textCount">0</span>
                 <span class="stat-label">Текстов</span>
             </div>
         </div>
 
-        <div class="links-section">
+        <div class="items-section">
             <div class="section-title">
-                <span>📁 Ваши элементы</span>
+                <span>📦 Твои файлы и ссылки</span>
             </div>
-            <div class="links-grid" id="itemsList"></div>
+            <div class="items-grid" id="itemsList"></div>
         </div>
     </div>
 
     <div class="notification" id="notification"></div>
 
     <script>
-        class MuzaffarService {
+        class MuzaffarPro {
             constructor() {
-                this.storageKey = 'muzaffar_items';
+                this.storageKey = 'muzaffar_pro_data';
                 this.items = [];
                 this.currentMode = 'url';
                 this.currentFile = null;
-                this.maxFileSize = 10 * 1024 * 1024; // 10 МБ
+                this.maxFileSize = 25 * 1024 * 1024; // 25 МБ
                 
-                this.initializeElements();
-                this.attachEventListeners();
-                this.loadFromStorage();
-                this.updateDisplay();
+                this.initElements();
+                this.initEventListeners();
+                this.loadData();
+                this.updateStats();
             }
 
-            initializeElements() {
+            initElements() {
                 // Mode elements
                 this.modeBtns = document.querySelectorAll('.mode-btn');
                 this.modeSections = {
                     url: document.getElementById('url-mode'),
                     file: document.getElementById('file-mode'),
-                    text: document.getElementById('text-mode')
+                    text: document.getElementById('text-mode'),
+                    qrcode: document.getElementById('qrcode-mode')
                 };
 
                 // URL mode
                 this.urlNameInput = document.getElementById('urlNameInput');
                 this.urlInput = document.getElementById('urlInput');
                 this.createUrlBtn = document.getElementById('createUrlBtn');
+                this.urlProgress = document.getElementById('urlProgress');
 
                 // File mode
                 this.fileNameInput = document.getElementById('fileNameInput');
@@ -692,11 +885,20 @@
                 this.selectedFileSize = document.getElementById('selectedFileSize');
                 this.removeFileBtn = document.getElementById('removeFileBtn');
                 this.uploadFileBtn = document.getElementById('uploadFileBtn');
+                this.fileProgress = document.getElementById('fileProgress');
 
                 // Text mode
                 this.textNameInput = document.getElementById('textNameInput');
                 this.textInput = document.getElementById('textInput');
                 this.createTextBtn = document.getElementById('createTextBtn');
+                this.textProgress = document.getElementById('textProgress');
+
+                // QR mode
+                this.qrNameInput = document.getElementById('qrNameInput');
+                this.qrInput = document.getElementById('qrInput');
+                this.createQrBtn = document.getElementById('createQrBtn');
+                this.qrPreview = document.getElementById('qrPreview');
+                this.qrImage = document.getElementById('qrImage');
 
                 // Common elements
                 this.clearBtn = document.getElementById('clearBtn');
@@ -710,6 +912,7 @@
                 
                 // Stats elements
                 this.totalItems = document.getElementById('totalItems');
+                this.urlCount = document.getElementById('urlCount');
                 this.fileCount = document.getElementById('fileCount');
                 this.textCount = document.getElementById('textCount');
                 
@@ -717,24 +920,19 @@
                 this.itemsList = document.getElementById('itemsList');
             }
 
-            attachEventListeners() {
+            initEventListeners() {
                 // Mode switching
                 this.modeBtns.forEach(btn => {
                     btn.addEventListener('click', () => this.switchMode(btn.dataset.mode));
                 });
 
                 // URL mode
-                this.urlNameInput.addEventListener('input', () => this.toggleUrlButton());
-                this.urlInput.addEventListener('input', () => this.toggleUrlButton());
-                this.urlInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !this.createUrlBtn.disabled) {
-                        this.createUrlItem();
-                    }
-                });
+                this.urlNameInput.addEventListener('input', () => this.validateUrlMode());
+                this.urlInput.addEventListener('input', () => this.validateUrlMode());
                 this.createUrlBtn.addEventListener('click', () => this.createUrlItem());
 
                 // File mode
-                this.fileNameInput.addEventListener('input', () => this.toggleFileButton());
+                this.fileNameInput.addEventListener('input', () => this.validateFileMode());
                 this.fileDropArea.addEventListener('click', () => this.fileInput.click());
                 this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e.target.files[0]));
                 this.removeFileBtn.addEventListener('click', () => this.removeSelectedFile());
@@ -758,13 +956,18 @@
                 });
 
                 // Text mode
-                this.textNameInput.addEventListener('input', () => this.toggleTextButton());
-                this.textInput.addEventListener('input', () => this.toggleTextButton());
+                this.textNameInput.addEventListener('input', () => this.validateTextMode());
+                this.textInput.addEventListener('input', () => this.validateTextMode());
                 this.createTextBtn.addEventListener('click', () => this.createTextItem());
 
+                // QR mode
+                this.qrNameInput.addEventListener('input', () => this.validateQrMode());
+                this.qrInput.addEventListener('input', () => this.validateQrMode());
+                this.createQrBtn.addEventListener('click', () => this.createQrItem());
+
                 // Common buttons
-                this.clearBtn.addEventListener('click', () => this.clearHistory());
-                this.copyResultBtn.addEventListener('click', () => this.copyResultToClipboard());
+                this.clearBtn.addEventListener('click', () => this.clearAll());
+                this.copyResultBtn.addEventListener('click', () => this.copyResult());
             }
 
             switchMode(mode) {
@@ -781,27 +984,33 @@
                 this.hideError();
             }
 
-            toggleUrlButton() {
+            validateUrlMode() {
                 const name = this.urlNameInput.value.trim();
                 const url = this.urlInput.value.trim();
                 this.createUrlBtn.disabled = !(name && this.isValidUrl(url));
             }
 
-            toggleFileButton() {
+            validateFileMode() {
                 const name = this.fileNameInput.value.trim();
                 this.uploadFileBtn.disabled = !(name && this.currentFile);
             }
 
-            toggleTextButton() {
+            validateTextMode() {
                 const name = this.textNameInput.value.trim();
                 const text = this.textInput.value.trim();
                 this.createTextBtn.disabled = !(name && text);
             }
 
+            validateQrMode() {
+                const name = this.qrNameInput.value.trim();
+                const text = this.qrInput.value.trim();
+                this.createQrBtn.disabled = !(name && text);
+            }
+
             isValidUrl(url) {
                 try {
-                    const urlObj = new URL(url);
-                    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+                    new URL(url);
+                    return true;
                 } catch {
                     return false;
                 }
@@ -811,7 +1020,7 @@
                 if (!file) return;
 
                 if (file.size > this.maxFileSize) {
-                    this.showError(`Файл слишком большой. Максимальный размер: 10 МБ`);
+                    this.showError(`Файл слишком большой. Максимум: 25 МБ`);
                     return;
                 }
 
@@ -820,7 +1029,7 @@
                 this.selectedFileSize.textContent = this.formatFileSize(file.size);
                 this.fileInfo.style.display = 'flex';
                 this.fileDropArea.style.display = 'none';
-                this.toggleFileButton();
+                this.validateFileMode();
             }
 
             removeSelectedFile() {
@@ -828,28 +1037,24 @@
                 this.fileInput.value = '';
                 this.fileInfo.style.display = 'none';
                 this.fileDropArea.style.display = 'block';
-                this.toggleFileButton();
+                this.validateFileMode();
             }
 
             formatFileSize(bytes) {
                 if (bytes < 1024) return bytes + ' Б';
                 if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' КБ';
-                return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+                if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+                return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' ГБ';
             }
 
             async createUrlItem() {
                 const name = this.urlNameInput.value.trim();
                 const url = this.urlInput.value.trim();
 
-                if (!this.isValidUrl(url)) {
-                    this.showError('Введите корректный URL (начинается с http:// или https://)');
-                    return;
-                }
-
-                this.showLoading('Создание короткой ссылки...');
+                this.showLoading('Создаю короткую ссылку...');
+                this.showProgress(this.urlProgress, 50);
 
                 try {
-                    // Используем clck.ru для сокращения
                     const response = await fetch('https://clck.ru/--', {
                         method: 'POST',
                         headers: {
@@ -861,6 +1066,12 @@
                     if (!response.ok) throw new Error('Ошибка сервера');
 
                     const shortUrl = await response.text();
+                    
+                    this.showProgress(this.urlProgress, 100);
+                    
+                    setTimeout(() => {
+                        this.hideProgress(this.urlProgress);
+                    }, 500);
 
                     const item = {
                         id: Date.now().toString(),
@@ -875,8 +1086,7 @@
                     this.saveItem(item);
                     
                 } catch (error) {
-                    console.error('Error:', error);
-                    this.showError('Не удалось создать ссылку. Попробуйте еще раз.');
+                    this.showError('Не удалось создать ссылку');
                 } finally {
                     this.hideLoading();
                 }
@@ -886,89 +1096,124 @@
                 const name = this.fileNameInput.value.trim();
                 if (!this.currentFile) return;
 
-                this.showLoading('Загрузка файла...');
+                this.showLoading('Загружаю файл...');
+                this.showProgress(this.fileProgress, 30);
 
-                try {
-                    // Создаем data URL для файла
-                    const reader = new FileReader();
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    this.showProgress(this.fileProgress, 70);
                     
-                    reader.onload = (e) => {
-                        const base64Data = e.target.result;
-                        
-                        const item = {
-                            id: Date.now().toString(),
-                            type: 'file',
-                            name: name,
-                            fileName: this.currentFile.name,
-                            fileSize: this.currentFile.size,
-                            fileType: this.currentFile.type,
-                            data: base64Data,
-                            url: URL.createObjectURL(this.currentFile),
-                            createdAt: new Date().toISOString()
-                        };
+                    const base64Data = e.target.result;
+                    
+                    const item = {
+                        id: Date.now().toString(),
+                        type: 'file',
+                        name: name,
+                        fileName: this.currentFile.name,
+                        fileSize: this.currentFile.size,
+                        fileType: this.currentFile.type,
+                        data: base64Data,
+                        url: URL.createObjectURL(this.currentFile),
+                        createdAt: new Date().toISOString()
+                    };
 
-                        this.items.unshift(item);
+                    this.items.unshift(item);
+                    
+                    this.showProgress(this.fileProgress, 100);
+                    
+                    setTimeout(() => {
+                        this.hideProgress(this.fileProgress);
                         this.saveItem(item);
-                        
-                        this.removeSelectedFile();
-                        this.fileNameInput.value = '';
-                        this.hideLoading();
-                    };
+                    }, 500);
+                    
+                    this.removeSelectedFile();
+                    this.fileNameInput.value = '';
+                };
 
-                    reader.onerror = () => {
-                        this.showError('Ошибка при чтении файла');
-                        this.hideLoading();
-                    };
+                reader.onerror = () => {
+                    this.showError('Ошибка при чтении файла');
+                    this.hideProgress(this.fileProgress);
+                };
 
-                    reader.readAsDataURL(this.currentFile);
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    this.showError('Не удалось загрузить файл');
-                    this.hideLoading();
-                }
+                reader.readAsDataURL(this.currentFile);
             }
 
             async createTextItem() {
                 const name = this.textNameInput.value.trim();
                 const text = this.textInput.value.trim();
 
-                this.showLoading('Сохранение текста...');
+                this.showLoading('Сохраняю текст...');
+                this.showProgress(this.textProgress, 50);
 
                 try {
-                    // Кодируем текст в base64 для хранения
                     const encodedText = btoa(unescape(encodeURIComponent(text)));
+                    
+                    this.showProgress(this.textProgress, 100);
+                    
+                    setTimeout(() => {
+                        this.hideProgress(this.textProgress);
+                        
+                        const item = {
+                            id: Date.now().toString(),
+                            type: 'text',
+                            name: name,
+                            content: text,
+                            encodedContent: encodedText,
+                            url: `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`,
+                            createdAt: new Date().toISOString()
+                        };
+
+                        this.items.unshift(item);
+                        this.saveItem(item);
+                        
+                        this.textNameInput.value = '';
+                        this.textInput.value = '';
+                    }, 500);
+
+                } catch (error) {
+                    this.showError('Не удалось сохранить текст');
+                    this.hideProgress(this.textProgress);
+                }
+            }
+
+            async createQrItem() {
+                const name = this.qrNameInput.value.trim();
+                const text = this.qrInput.value.trim();
+
+                this.showLoading('Создаю QR-код...');
+
+                try {
+                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
                     
                     const item = {
                         id: Date.now().toString(),
-                        type: 'text',
+                        type: 'qrcode',
                         name: name,
                         content: text,
-                        encodedContent: encodedText,
-                        url: `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`,
+                        qrUrl: qrUrl,
+                        url: qrUrl,
                         createdAt: new Date().toISOString()
                     };
 
                     this.items.unshift(item);
                     this.saveItem(item);
                     
-                    this.textNameInput.value = '';
-                    this.textInput.value = '';
+                    this.qrNameInput.value = '';
+                    this.qrInput.value = '';
 
                 } catch (error) {
-                    console.error('Error:', error);
-                    this.showError('Не удалось сохранить текст');
-                } finally {
-                    this.hideLoading();
+                    this.showError('Не удалось создать QR-код');
                 }
             }
 
             saveItem(item) {
                 this.saveToStorage();
-                this.updateDisplay();
-                this.showResult(item.url, `${item.name} — ${item.type === 'url' ? 'ссылка' : item.type === 'file' ? 'файл' : 'текст'}`);
-                this.showNotification(`"${item.name}" сохранено!`);
-                this.toggleUrlButton();
+                this.updateStats();
+                this.showResult(item.url, `${item.name} — готово!`);
+                this.showNotification(`✅ ${item.name} сохранено`);
+                this.renderItems();
+                this.validateUrlMode();
             }
 
             showResult(url, text) {
@@ -981,31 +1226,48 @@
                 this.resultContainer.style.display = 'none';
             }
 
+            showProgress(element, percent) {
+                element.style.display = 'block';
+                const fill = element.querySelector('.progress-fill');
+                fill.style.width = percent + '%';
+            }
+
+            hideProgress(element) {
+                setTimeout(() => {
+                    element.style.display = 'none';
+                    const fill = element.querySelector('.progress-fill');
+                    fill.style.width = '0%';
+                }, 500);
+            }
+
             showLoading(text) {
-                this.loadingText.textContent = text || 'Обработка...';
+                this.loadingText.textContent = text;
                 this.loading.style.display = 'block';
-                this.disableAllButtons(true);
+                this.disableButtons(true);
             }
 
             hideLoading() {
                 this.loading.style.display = 'none';
-                this.disableAllButtons(false);
+                this.disableButtons(false);
             }
 
-            disableAllButtons(disable) {
-                const buttons = [
+            disableButtons(disable) {
+                const btns = [
                     this.createUrlBtn,
                     this.uploadFileBtn,
                     this.createTextBtn,
+                    this.createQrBtn,
                     this.clearBtn
                 ];
-                buttons.forEach(btn => btn.disabled = disable);
+                btns.forEach(btn => btn.disabled = disable);
             }
 
             showError(message) {
                 this.errorMessage.textContent = message;
                 this.errorMessage.style.display = 'block';
-                setTimeout(() => this.hideError(), 5000);
+                setTimeout(() => {
+                    this.errorMessage.style.display = 'none';
+                }, 5000);
             }
 
             hideError() {
@@ -1020,10 +1282,10 @@
                 }, 3000);
             }
 
-            async copyResultToClipboard() {
+            async copyResult() {
                 try {
                     await navigator.clipboard.writeText(this.resultLink.href);
-                    this.showNotification('Скопировано!');
+                    this.showNotification('📋 Скопировано!');
                 } catch {
                     const textArea = document.createElement('textarea');
                     textArea.value = this.resultLink.href;
@@ -1031,17 +1293,17 @@
                     textArea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
-                    this.showNotification('Скопировано!');
+                    this.showNotification('📋 Скопировано!');
                 }
             }
 
             copyItem(url, name) {
                 navigator.clipboard.writeText(url).then(() => {
-                    this.showNotification(`"${name}" скопировано!`);
+                    this.showNotification(`📋 "${name}" скопировано`);
                 });
             }
 
-            downloadFile(item) {
+            downloadItem(item) {
                 if (item.type === 'file' && item.data) {
                     const link = document.createElement('a');
                     link.href = item.data;
@@ -1062,80 +1324,92 @@
                 if (confirm(`Удалить "${name}"?`)) {
                     this.items = this.items.filter(item => item.id !== id);
                     this.saveToStorage();
-                    this.updateDisplay();
-                    this.showNotification(`"${name}" удалено!`);
+                    this.updateStats();
+                    this.renderItems();
+                    this.showNotification(`🗑️ "${name}" удалено`);
                 }
             }
 
-            clearHistory() {
-                if (confirm('Очистить всю историю?')) {
+            clearAll() {
+                if (confirm('Очистить всё? Это действие нельзя отменить!')) {
                     this.items = [];
                     this.saveToStorage();
-                    this.updateDisplay();
-                    this.showNotification('История очищена!');
+                    this.updateStats();
+                    this.renderItems();
+                    this.showNotification('🧹 Всё очищено');
                 }
             }
 
-            updateDisplay() {
-                const stats = this.calculateStats();
-                this.totalItems.textContent = stats.total;
-                this.fileCount.textContent = stats.files;
-                this.textCount.textContent = stats.texts;
-                this.renderItems();
-            }
-
-            calculateStats() {
-                return {
+            updateStats() {
+                const stats = {
                     total: this.items.length,
-                    files: this.items.filter(i => i.type === 'file').length,
-                    texts: this.items.filter(i => i.type === 'text').length
+                    url: this.items.filter(i => i.type === 'url').length,
+                    file: this.items.filter(i => i.type === 'file').length,
+                    text: this.items.filter(i => i.type === 'text' || i.type === 'qrcode').length
                 };
+                
+                this.totalItems.textContent = stats.total;
+                this.urlCount.textContent = stats.url;
+                this.fileCount.textContent = stats.file;
+                this.textCount.textContent = stats.text;
             }
 
             renderItems() {
                 if (this.items.length === 0) {
                     this.itemsList.innerHTML = `
                         <div class="empty-state">
-                            <div style="font-size: 48px; margin-bottom: 15px;">📁</div>
-                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Пока ничего нет</div>
-                            <div>Создайте ссылку, загрузите файл или текст!</div>
+                            <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+                            <div style="font-size: 24px; font-weight: 700; margin-bottom: 10px;">Тут пока пусто</div>
+                            <div style="font-size: 16px;">Создай ссылку, загрузи файл или текст!</div>
                         </div>
                     `;
                     return;
                 }
 
                 this.itemsList.innerHTML = this.items.map(item => {
-                    const typeIcon = item.type === 'url' ? '🔗' : item.type === 'file' ? '📁' : '📝';
-                    const typeText = item.type === 'url' ? 'Ссылка' : item.type === 'file' ? 'Файл' : 'Текст';
+                    const typeIcons = {
+                        url: '🔗',
+                        file: '📁',
+                        text: '📝',
+                        qrcode: '📱'
+                    };
                     
-                    let contentPreview = '';
-                    if (item.type === 'text' && item.content) {
-                        contentPreview = item.content.substring(0, 200) + (item.content.length > 200 ? '...' : '');
+                    const typeNames = {
+                        url: 'Ссылка',
+                        file: 'Файл',
+                        text: 'Текст',
+                        qrcode: 'QR-код'
+                    };
+
+                    let preview = '';
+                    if (item.type === 'text') {
+                        preview = item.content.substring(0, 100) + (item.content.length > 100 ? '...' : '');
                     } else if (item.type === 'file') {
-                        contentPreview = `${item.fileName} (${this.formatFileSize(item.fileSize)})`;
+                        preview = `${item.fileName} (${this.formatFileSize(item.fileSize)})`;
                     } else if (item.type === 'url') {
-                        contentPreview = item.originalUrl;
+                        preview = item.originalUrl;
+                    } else if (item.type === 'qrcode') {
+                        preview = item.content;
                     }
 
                     return `
-                        <div class="link-card">
-                            <div class="link-header">
-                                <span class="link-name">${this.escapeHtml(item.name)}</span>
-                                <span class="link-type">${typeIcon} ${typeText}</span>
-                                <span class="link-date">${new Date(item.createdAt).toLocaleString()}</span>
+                        <div class="item-card">
+                            <div class="item-header">
+                                <span class="item-name">${this.escapeHtml(item.name)}</span>
+                                <span class="item-type">${typeIcons[item.type]} ${typeNames[item.type]}</span>
                             </div>
-                            <div class="link-content" title="${this.escapeHtml(contentPreview)}">
-                                ${this.escapeHtml(this.truncateText(contentPreview, 150))}
+                            <div class="item-preview">
+                                ${this.escapeHtml(preview)}
                             </div>
-                            <a href="${item.url}" class="link-url" target="_blank" title="${item.url}">
-                                ${this.truncateText(item.url, 50)}
+                            <a href="${item.url}" class="item-url" target="_blank">
+                                ${this.truncate(item.url, 40)}
                             </a>
-                            <div class="link-actions">
+                            <div class="item-actions">
                                 <button class="action-btn copy-action" onclick="muzaffar.copyItem('${item.url}', '${this.escapeHtml(item.name)}')">
                                     📋 Копировать
                                 </button>
                                 ${item.type === 'file' || item.type === 'text' ? `
-                                    <button class="action-btn download-action" onclick="muzaffar.downloadFile(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                                    <button class="action-btn download-action" onclick="muzaffar.downloadItem(${JSON.stringify(item).replace(/"/g, '&quot;')})">
                                         ⬇️ Скачать
                                     </button>
                                 ` : ''}
@@ -1148,9 +1422,9 @@
                 }).join('');
             }
 
-            truncateText(text, maxLength) {
+            truncate(text, max) {
                 if (!text) return '';
-                return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+                return text.length > max ? text.substring(0, max) + '...' : text;
             }
 
             escapeHtml(text) {
@@ -1159,7 +1433,7 @@
                 return div.innerHTML;
             }
 
-            loadFromStorage() {
+            loadData() {
                 const saved = localStorage.getItem(this.storageKey);
                 if (saved) {
                     try {
@@ -1175,10 +1449,10 @@
             }
         }
 
-        // Инициализация
+        // Запуск
         let muzaffar;
         document.addEventListener('DOMContentLoaded', () => {
-            muzaffar = new MuzaffarService();
+            muzaffar = new MuzaffarPro();
             window.muzaffar = muzaffar;
         });
     </script>
