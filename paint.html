@@ -1,201 +1,339 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUZAFFAR Paint</title>
+    <title>MUZAFFAR Paint Pro</title>
     <style>
-        :root {
-            --primary-color: #0078d7;
-            --toolbar-bg: #f3f3f3;
-            --toolbar-border: #d0d0d0;
-            --button-hover: #e5f3ff;
-            --button-active: #cce8ff;
-            --canvas-bg: #d0d0d0;
-            --status-bar-bg: #0078d7;
-        }
-
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-darker: #0d0d0d;
+            --bg-light: #2d2d2d;
+            --accent: #0078d7;
+            --accent-light: #2b88d8;
+            --accent-dark: #005a9e;
+            --text: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border: #404040;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --gradient: linear-gradient(135deg, #0078d7, #00b4ff);
         }
 
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Glassmorphism эффект */
+        .glass {
+            background: rgba(45, 45, 45, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Title bar */
         .title-bar {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 5px 10px;
-            font-size: 14px;
+            background: var(--bg-darker);
+            padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--border);
             -webkit-app-region: drag;
         }
 
         .app-title {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 14px;
         }
 
         .app-icon {
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0, 120, 215, 0.3));
         }
 
+        .window-controls {
+            display: flex;
+            gap: 8px;
+            -webkit-app-region: no-drag;
+        }
+
+        .window-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .window-btn:hover {
+            background: var(--bg-light);
+        }
+
+        .window-btn.close:hover {
+            background: #e81123;
+        }
+
+        /* Main layout */
         .main-container {
             display: flex;
-            flex: 1;
-            overflow: hidden;
+            height: calc(100vh - 53px);
         }
 
+        /* Left toolbar */
         .toolbar {
-            background-color: var(--toolbar-bg);
-            border-right: 1px solid var(--toolbar-border);
-            padding: 10px;
+            background: var(--bg-darker);
+            width: 80px;
+            padding: 16px 8px;
             display: flex;
             flex-direction: column;
-            width: 70px;
-            gap: 5px;
-            align-items: center;
+            gap: 16px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
         }
 
         .tool-group {
-            width: 100%;
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .tool-group-title {
-            font-size: 11px;
-            color: #666;
-            margin-bottom: 5px;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
             text-align: center;
         }
 
         .tool-btn {
-            background-color: transparent;
+            background: transparent;
             border: 1px solid transparent;
-            padding: 6px;
-            border-radius: 4px;
+            border-radius: 8px;
+            padding: 8px 4px;
+            color: var(--text);
             cursor: pointer;
-            font-size: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            width: 100%;
-            margin-bottom: 2px;
             transition: all 0.2s;
-        }
-
-        .tool-btn:hover {
-            background-color: var(--button-hover);
-            border-color: #b1d9f8;
-        }
-
-        .tool-btn.active {
-            background-color: var(--button-active);
-            border-color: #7cb9f0;
-        }
-
-        .tool-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        .tool-name {
+            width: 100%;
             font-size: 10px;
         }
 
+        .tool-btn:hover {
+            background: var(--bg-light);
+            border-color: var(--border);
+            transform: translateY(-1px);
+        }
+
+        .tool-btn.active {
+            background: var(--gradient);
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(0, 120, 215, 0.3);
+        }
+
+        .tool-icon {
+            width: 24px;
+            height: 24px;
+            filter: invert(1);
+        }
+
+        /* Color section */
         .color-palette {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 4px;
-            width: 100%;
-            margin-top: 10px;
+            gap: 6px;
+            padding: 4px;
         }
 
         .color-swatch {
-            width: 25px;
-            height: 25px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 2px solid transparent;
             cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--text);
         }
 
         .color-swatch.active {
-            border: 2px solid #000;
-        }
-
-        .color-picker-container {
-            width: 100%;
-            margin-top: 10px;
+            border-color: var(--text);
+            box-shadow: 0 0 0 2px var(--accent);
         }
 
         .color-picker {
             width: 100%;
-            height: 30px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
+            background: var(--bg-light);
+            padding: 2px;
         }
 
+        /* Size selector */
         .size-selector-container {
-            width: 100%;
-            margin-top: 10px;
+            padding: 8px 4px;
+            text-align: center;
         }
 
-        .size-selector {
+        #sizeSelector {
             width: 100%;
-            margin-top: 5px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: var(--bg-light);
+            border-radius: 2px;
+            outline: none;
         }
 
+        #sizeSelector::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 120, 215, 0.4);
+            transition: all 0.2s;
+        }
+
+        #sizeSelector::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        #sizeValue {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Right panel */
         .right-panel {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            flex: 1;
+            background: var(--bg-dark);
         }
 
+        /* Top toolbar */
         .top-toolbar {
-            background-color: var(--toolbar-bg);
-            border-bottom: 1px solid var(--toolbar-border);
-            padding: 5px 10px;
+            background: var(--bg-darker);
+            padding: 8px 16px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
+            border-bottom: 1px solid var(--border);
         }
 
         .top-tool-btn {
-            background-color: transparent;
+            background: transparent;
             border: 1px solid transparent;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: var(--text);
             font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            cursor: pointer;
             transition: all 0.2s;
         }
 
         .top-tool-btn:hover {
-            background-color: var(--button-hover);
-            border-color: #b1d9f8;
+            background: var(--bg-light);
+            border-color: var(--border);
         }
 
+        .top-tool-btn .tool-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 8px;
+        }
+
+        /* Shape options */
+        .shape-options {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .shape-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .shape-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .shape-select {
+            background: var(--bg-light);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .shape-select:hover {
+            border-color: var(--accent);
+        }
+
+        /* Canvas container */
         .canvas-container {
             flex: 1;
             overflow: auto;
-            background-color: var(--canvas-bg);
+            background: #1e1e1e;
+            background-image: 
+                linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+                linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
+                linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -203,38 +341,142 @@
         }
 
         #paintCanvas {
-            background-color: white;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            background: white;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
             cursor: crosshair;
+            transition: box-shadow 0.3s;
         }
 
+        #paintCanvas:hover {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Status bar */
         .status-bar {
-            background-color: var(--status-bar-bg);
-            color: white;
-            padding: 5px 10px;
-            font-size: 12px;
+            background: var(--bg-darker);
+            padding: 8px 16px;
             display: flex;
             justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
         }
 
-        .shape-options {
-            display: flex;
-            gap: 10px;
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            justify-content: center;
             align-items: center;
-            margin-left: 10px;
+            z-index: 1000;
         }
 
-        .shape-option {
+        .modal.active {
             display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
         }
 
-        .shape-select {
-            padding: 3px;
-            border-radius: 3px;
-            border: 1px solid #ccc;
+        .modal-content {
+            background: var(--bg-darker);
+            border-radius: 12px;
+            padding: 24px;
+            min-width: 400px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 120, 215, 0.4);
+        }
+
+        .modal-btn.secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .modal-btn.secondary:hover {
+            background: var(--bg-light);
+        }
+
+        /* Animation */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .saving {
+            animation: pulse 1s infinite;
         }
     </style>
 </head>
@@ -242,568 +484,946 @@
     <div class="title-bar">
         <div class="app-title">
             <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yMC43MSw3LjA0QzIxLjEsNi42NSAyMS4xLDYuMDQgMjAuNzEsNS42M0wxOC4zNywzLjI5QzE3Ljk4LDIuOSAxNy4zNSwyLjkgMTYuOTYsMy4yOUwxNS4wOCw1LjE3TDE4LjgzLDguOTJMMjAuNzEsNy4wNE0zLjE3LDE3LjI1VjIxSDcuMDhMMTguMjMsOS44N0wxNC41LDYuMTNMMy4xNywxNy4yNVoiIC8+PC9zdmc+" class="app-icon">
-            <span>MUZAFFAR Paint</span>
+            <span>MUZAFFAR Paint Pro</span>
         </div>
-        <div>
-            <span id="document-name">Untitled</span>
+        <div class="window-controls">
+            <button class="window-btn" onclick="window.minimize()">─</button>
+            <button class="window-btn" onclick="window.toggleMaximize()">□</button>
+            <button class="window-btn close" onclick="window.close()">×</button>
         </div>
     </div>
 
     <div class="main-container">
+        <!-- Left Toolbar -->
         <div class="toolbar">
             <div class="tool-group">
-                <div class="tool-group-title">Tools</div>
-                <button class="tool-btn active" id="pencilTool" title="Pencil (P)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTIwLjcxLDcuMDRDMjEuMSw2LjY1IDIxLjEsNi4wNCAyMC43MSw1LjYzTDE4LjM3LDMuMjdDMTcuOTgsMi44OCAxNy4zNSwyLjg4IDE2Ljk2LDMuMjdMMTUuMDgsNS4xNUwxOC44Myw4LjkyTDIwLjcxLDcuMDRNMy4xNywxNy4yNVYyMUg3LjA4TDE4LjIzLDkuODdMMTQuNSw2LjEzTDMuMTcsMTcuMjVaIiAvPjwvc3ZnPg==" class="tool-icon">
-                    <span class="tool-name">Pencil</span>
+                <div class="tool-group-title">Инструменты</div>
+                <button class="tool-btn active" id="pencilTool" title="Карандаш (P)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yMC43MSw3LjA0QzIxLjEsNi42NSAyMS4xLDYuMDQgMjAuNzEsNS42M0wxOC4zNywzLjI3QzE3Ljk4LDIuODggMTcuMzUsMi44OCAxNi45NiwzLjI3TDE1LjA4LDUuMTVMMTguODMsOC45MkwyMC43MSw3LjA0TTMuMTcsMTcuMjVWMjFINy4wOEwxOC4yMyw5Ljg3TDE0LjUsNi4xM0wzLjE3LDE3LjI1WiIgLz48L3N2Zz4=" class="tool-icon">
+                    <span>Pencil</span>
                 </button>
-                <button class="tool-btn" id="brushTool" title="Brush (B)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTIwLjcxLDQuMDRDMjEuMSwzLjY1IDIxLjEsMy4wNCAyMC43MSwyLjYzTDE5LjM3LDEuMjdDMTguOTgsMC44OCAxOC4zNSwwLjg4IDE3Ljk2LDEuMjdMOSw5LjI1TDE0Ljc1LDE1TDIyLjcxLDYuMDRDMjMuMSw1LjY1IDIzLjEsNS4wNCAyMi43MSw0LjYzTDIwLjcxLDQuMDRNMy4xNywxOC4yNVYyMkg3LjA4TDE1LjIzLDEzLjg3TDkuNSw4LjEzTDMuMTcsMTQuNDZMMy4xNywxOC4yNVoiIC8+PC9zdmc+" class="tool-icon">
-                    <span class="tool-name">Brush</span>
+                <button class="tool-btn" id="brushTool" title="Кисть (B)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yMC43MSw0LjA0QzIxLjEsMy42NSAyMS4xLDMuMDQgMjAuNzEsMi42M0wxOS4zNywxLjI3QzE4Ljk4LDAuODggMTguMzUsMC44OCAxNy45NiwxLjI3TDksOS4yNUwxNC43NSwxNUwyMi43MSw2LjA0QzIzLjEsNS42NSAyMy4xLDUuMDQgMjIuNzEsNC42M0wyMC43MSw0LjA0TTMuMTcsMTguMjVWMjJINy4wOEwxNS4yMywxMy44N0w5LjUsOC4xM0wzLjE3LDE0LjQ2TDMuMTcsMTguMjVaIiAvPjwvc3ZnPg==" class="tool-icon">
+                    <span>Brush</span>
                 </button>
-                <button class="tool-btn" id="eraserTool" title="Eraser (E)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTE2LjI0LDNINS43NkM1LjM1LDMsNSwzLjM1LDUsMy43NnYxNi40N0M1LDUuMTEsNSw1LjQ2LDUuMjQsNS43Nmw3LjU4LDcuNThjMS4wNiwxLjA2LDIuNzgsMS4wNiwzLjg0LDBsNS43NS01Ljc1YzEuMDYtMS4wNiwxLjA2LTIuNzgsMC0zLjg0TDE2LjI0LDNNMTQuODMsMTYuNDFMNy40Miw5LjE3bDEuNDEtMS40MWw3LjQxLDcuMjRMMTQuODMsMTYuNDFaIiAvPjwvc3ZnPg==" class="tool-icon">
-                    <span class="tool-name">Eraser</span>
+                <button class="tool-btn" id="eraserTool" title="Ластик (E)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xNi4yNCwzSDUuNzZDNS4zNSwzLDUsMy4zNSw1LDMuNzZ2MTYuNDdDNSw1LjExLDUsNS40Niw1LjI0LDUuNzZsNy41OCw3LjU4YzEuMDYsMS4wNiwyLjc4LDEuMDYsMy44NCwwbDUuNzUtNS43NWMxLjA2LTEuMDYsMS4wNi0yLjc4LDAtMy44NEwxNi4yNCwzTTE0LjgzLDE2LjQxTDcuNDIsOS4xN2wxLjQxLTEuNDFsNy40MSw3LjI0TDE0LjgzLDE2LjQxWiIgLz48L3N2Zz4=" class="tool-icon">
+                    <span>Eraser</span>
                 </button>
-                <button class="tool-btn" id="fillTool" title="Fill (F)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTE5LDExSDE3VjlDMTcsNy44OSAxNi4xMSw3IDE1LDdIMTNWNUMxMywzLjg5IDEyLjExLDMgMTEsM0g0QzIuOSwzIDIsMy45IDIsNVYxOUMyLDIwLjExIDIuOSwyMSA0LDIxSDEzQzE0LjExLDIxIDE1LDIwLjExIDE1LDE5VjE3SDE4QzE5LjExLDE3IDIwLDE2LjExIDIwLDE1VjEzQzIwLDExLjg5IDE5LjExLDExIDE5LDExTTgsNUg4VjdIOFY1TTgsOUg4VjExSDhWOU04LDEzSDhWMTVIOFYxM00xNCwxOUg0VjVIOFY5SDEyVjEzSDE2VjE1SDE0VjE5WiIgLz48L3N2Zz4=" class="tool-icon">
-                    <span class="tool-name">Fill</span>
+                <button class="tool-btn" id="fillTool" title="Заливка (F)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOSwxMUgxN1Y5QzE3LDcuODkgMTYuMTEsNyAxNSw3SDEzVjVDMTMsMy44OSAxMi4xMSwzIDExLDNINEMyLjksMyAyLDMuOSAyLDVWMTlDMiwyMC4xMSAyLjksMjEgNCwyMUgxM0MxNC4xMSwyMSAxNSwyMC4xMSAxNSwxOVYxN0gxOEMxOS4xMSwxNyAyMCwxNi4xMSAyMCwxNVYxM0MyMCwxMS44OSAxOS4xMSwxMSAxOSwxMU04LDVIOFY3SDhWNU04LDlIOFYxMUg4VjlNOCwxM0g4VjE1SDhWMTNNMTQsMTlINFY1SDhWOUgxMlYxM0gxNlYxNUgxNFYxOVoiIC8+PC9zdmc+" class="tool-icon">
+                    <span>Fill</span>
                 </button>
-            </div>
-
-            <div class="tool-group">
-                <div class="tool-group-title">Shapes</div>
-                <button class="tool-btn" id="lineTool" title="Line (L)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTE5LDEzSDVWMTFIMTlWMTNaIiAvPjwvc3ZnPg==" class="tool-icon">
-                    <span class="tool-name">Line</span>
-                </button>
-                <button class="tool-btn" id="rectTool" title="Rectangle (R)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTIsNEgyMlYxOUgyVjRNNCw2VjE3SDIwVjZINFoiIC8+PC9zdmc+" class="tool-icon">
-                    <span class="tool-name">Rectangle</span>
-                </button>
-                <button class="tool-btn" id="circleTool" title="Circle (C)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTEyLDJBMTAsMTAgMCAwLDAgMiwxMkExMCwxMCAwIDAsMCAxMiwyMkExMCwxMCAwIDAsMCAyMiwxMkExMCwxMCAwIDAsMCAxMiwyTTEyLDRBOCw4IDAgMCwxIDIwLDEyQTgsOCAwIDAsMSAxMiwyMEE4LDggMCAwLDEgNCwxMkE4LDggMCAwLDEgMTIsNCIgLz48L3N2Zz4=" class="tool-icon">
-                    <span class="tool-name">Circle</span>
-                </button>
-                <button class="tool-btn" id="triangleTool" title="Triangle (T)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTEyLDJMMiwyMkgyMkwxMiwyWiIgLz48L3N2Zz4=" class="tool-icon">
-                    <span class="tool-name">Triangle</span>
-                </button>
-                <button class="tool-btn" id="polygonTool" title="Polygon (Y)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTEyLDEuOTJMMTcuMzUsNi43N0wxNS41NiwxMy4wN0g4LjQ0TDYuNjUsNi43N0wxMiwxLjkyTTEyLDBMMTAsMkwyLDJMMTAsMTJMMTAsMjJMMTQsMjJMMTQsMTJMMjIsMkwxNCwyTDEyLDBaIiAvPjwvc3ZnPg==" class="tool-icon">
-                    <span class="tool-name">Polygon</span>
+                <button class="tool-btn" id="eyedropperTool" title="Пипетка (I)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOS4zNSwxMS43MUwxNy42MSwxMy40NUwxNS4yMiwxMS4wNkwxNy4zNSw4LjkzTDE5LjM1LDExLjcxTTUuOTQsMTguMjFMOC4zMywxNS44MkwxMC43MiwxOC4yMUw4LjMzLDIwLjZMMTUuMjIsMTMuNzFMMTMuMzMsMTEuODJMOS4yMywxNS45Mkw1Ljk0LDE4LjIxWiIgLz48L3N2Zz4=" class="tool-icon">
+                    <span>Eyedropper</span>
                 </button>
             </div>
 
             <div class="tool-group">
-                <div class="tool-group-title">Colors</div>
+                <div class="tool-group-title">Фигуры</div>
+                <button class="tool-btn" id="lineTool" title="Линия (L)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOSwxM0g1VjExSDE5VjEzWiIgLz48L3N2Zz4=" class="tool-icon">
+                    <span>Line</span>
+                </button>
+                <button class="tool-btn" id="rectTool" title="Прямоугольник (R)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yLDRIMjJWMTlIMlY0TTQsNlYxN0gyMFY2SDRaIiAvPjwvc3ZnPg==" class="tool-icon">
+                    <span>Rectangle</span>
+                </button>
+                <button class="tool-btn" id="circleTool" title="Круг (C)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiwyQTEwLDEwIDAgMCwwIDIsMTJBMTAsMTAgMCAwLDAgMTIsMjJBMTAsMTAgMCAwLDAgMjIsMTJBMTAsMTAgMCAwLDAgMTIsMk0xMiw0QTgsOCAwIDAsMSAyMCwxMkE4LDggMCAwLDEgMTIsMjBBOCw4IDAgMCwxIDQsMTJBOCw4IDAgMCwxIDEyLDQiIC8+PC9zdmc+" class="tool-icon">
+                    <span>Circle</span>
+                </button>
+                <button class="tool-btn" id="triangleTool" title="Треугольник (T)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiwyTDIsMjJIMjJMMTIsMloiIC8+PC9zdmc+" class="tool-icon">
+                    <span>Triangle</span>
+                </button>
+                <button class="tool-btn" id="polygonTool" title="Многоугольник (Y)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiwxLjkyTDE3LjM1LDYuNzdMMTUuNTYsMTMuMDdIOC40NEw2LjY1LDYuNzdMMTIsMS45Mk0xMiwwTDEwLDJMMiwyTDEwLDEyTDEwLDIyTDE0LDIyTDE0LDEyTDIyLDJMMTQsMkwxMiwwWiIgLz48L3N2Zz4=" class="tool-icon">
+                    <span>Polygon</span>
+                </button>
+                <button class="tool-btn" id="starTool" title="Звезда (S)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiwyTDE1LDlIMjJMMTYsMTRMMTksMjFMMTIsMTYuNUw1LDIxTDgsMTRMMiw5SDlMMTwyWiIgLz48L3N2Zz4=" class="tool-icon">
+                    <span>Star</span>
+                </button>
+            </div>
+
+            <div class="tool-group">
+                <div class="tool-group-title">Цвета</div>
                 <div class="color-palette">
-                    <div class="color-swatch active" style="background-color: #000000;" data-color="#000000"></div>
-                    <div class="color-swatch" style="background-color: #ff0000;" data-color="#ff0000"></div>
-                    <div class="color-swatch" style="background-color: #00ff00;" data-color="#00ff00"></div>
-                    <div class="color-swatch" style="background-color: #0000ff;" data-color="#0000ff"></div>
-                    <div class="color-swatch" style="background-color: #ffff00;" data-color="#ffff00"></div>
-                    <div class="color-swatch" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
-                    <div class="color-swatch" style="background-color: #00ffff;" data-color="#00ffff"></div>
-                    <div class="color-swatch" style="background-color: #ffffff; border: 1px solid #ccc;" data-color="#ffffff"></div>
+                    <div class="color-swatch active" style="background: #000000" data-color="#000000"></div>
+                    <div class="color-swatch" style="background: #ff0000" data-color="#ff0000"></div>
+                    <div class="color-swatch" style="background: #00ff00" data-color="#00ff00"></div>
+                    <div class="color-swatch" style="background: #0000ff" data-color="#0000ff"></div>
+                    <div class="color-swatch" style="background: #ffff00" data-color="#ffff00"></div>
+                    <div class="color-swatch" style="background: #ff00ff" data-color="#ff00ff"></div>
+                    <div class="color-swatch" style="background: #00ffff" data-color="#00ffff"></div>
+                    <div class="color-swatch" style="background: #ffffff" data-color="#ffffff"></div>
                 </div>
-                <div class="color-picker-container">
-                    <input type="color" class="color-picker" id="colorPicker" value="#000000" title="More Colors">
+                <input type="color" class="color-picker" id="colorPicker" value="#000000">
+                <div class="color-palette" style="margin-top: 8px;" id="recentColors">
+                    <!-- Recent colors will be added here -->
                 </div>
             </div>
 
             <div class="tool-group">
-                <div class="tool-group-title">Size</div>
+                <div class="tool-group-title">Размер</div>
                 <div class="size-selector-container">
-                    <input type="range" class="size-selector" id="sizeSelector" min="1" max="50" value="5">
-                    <div class="tool-name" id="sizeValue">5px</div>
+                    <input type="range" class="size-selector" id="sizeSelector" min="1" max="100" value="5">
+                    <div id="sizeValue">5px</div>
+                </div>
+            </div>
+
+            <div class="tool-group">
+                <div class="tool-group-title">Прозрачность</div>
+                <div class="size-selector-container">
+                    <input type="range" class="size-selector" id="opacitySelector" min="0" max="100" value="100">
+                    <div id="opacityValue">100%</div>
                 </div>
             </div>
         </div>
 
+        <!-- Right Panel -->
         <div class="right-panel">
+            <!-- Top Toolbar -->
             <div class="top-toolbar">
-                <button class="top-tool-btn" id="saveTool" title="Save (Ctrl+S)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTE1LDlINVY1SDE5VjlNMTYsMTdWMTlIOFYxN0gxNk0xMCwxM1YxNUg4VjEzSDEwbTMsMFYxNUgxMVYxM0gxM20zLDBWMTVIMTRWMTNIMTZNMTksM0g1QzMuODksMyAzLDMuOSAzLDVWMTlDMywyMC4xIDMuOSwyMSA1LDIxSDE5QzIwLjEsMjEgMjEsMjAuMSAyMSwxOVY1QzIxLDMuOSAyMC4xLDMgMTksM00xOSwxOUgxMVYxMUg5VjE5SDVWNUg5VjlIMTlWMTkiIC8+PC9zdmc+" class="tool-icon">
+                <button class="top-tool-btn" id="newTool">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOSwxM0gxM1YxOUgxMVYxM0g1VjExSDExVjVIMTNWMTFIMTlWMTNaIiAvPjwvc3ZnPg==" class="tool-icon">
+                    New
+                </button>
+                <button class="top-tool-btn" id="openTool">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yMCwxNkgxOFY4SDZWMTRINFY2SDIwVjE2WiBNMTYsMTRIMTBWMTJIMTZWMTRaIiAvPjwvc3ZnPg==" class="tool-icon">
+                    Open
+                </button>
+                <button class="top-tool-btn" id="saveTool">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xNSw5SDVWNUgxOVY5TTE2LDE3VjE5SDhWMTdIMTZNMTAsMTNWMTVIOFYxM0gxMG0zLDBWMTVIMTFWMTNIMTNtMywwVjE1SDE0VjEzSDE2TTE5LDNINUMzLjg5LDMgMywzLjkgMyw1VjE5QzMsMjAuMSAzLjksMjEgNSwyMUgxOUMyMC4xLDIxIDIxLDIwLjEgMjEsMTlWNUMyMSwzLjkgMjAuMSwzIDE5LDNNMTksMTlIMTFWMTFIOVYxOUg1VjVIOVY5SDE5VjE5WiIgLz48L3N2Zz4=" class="tool-icon">
                     Save
                 </button>
-                <button class="top-tool-btn" id="clearTool" title="Clear (Del)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTE5LDRIMTUuNUwxNC41LDNIOS41TDguNSw0SDVWNkgxOU02LDE5QTIsMiAwIDAsMCA4LDIxSDE2QTIsMiAwIDAsMCAxOCwxOVY3SDZWNjlaIiAvPjwvc3ZnPg==" class="tool-icon">
-                    Clear
+                <button class="top-tool-btn" id="exportTool">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOSwxM0g1VjExSDE5VjEzWk0xMiw1TDcsMTBIMTFWMTRIMTNWMTBIMTdMMTIsNVpNMTksMTdINVYxOUgxOVYxN1oiIC8+PC9zdmc+" class="tool-icon">
+                    Export
                 </button>
                 
+                <div class="separator"></div>
+                
+                <button class="top-tool-btn" id="undoTool" title="Отмена (Ctrl+Z)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMi41LDhDOS44NSw4IDcuNTUsOSA1LjYsMTAuNTlMMiw4VjE2SDExTDguNSwxMy41QzEwLjIsMTIuMTEgMTIuMjksMTEgMTQuNSwxMUMxOC4wOSwxMSAyMSwxMy45MSAyMSwxNy41VjE4SDIzVjE3LjVDMjMsMTIuODEgMTkuMTksOCAxNC41LDhIMTIuNVoiIC8+PC9zdmc+" class="tool-icon">
+                    Undo
+                </button>
+                <button class="top-tool-btn" id="redoTool" title="Повтор (Ctrl+Y)">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMC4wOCw4QzUuNDQsOCA0LDExLjMyIDQsMTQuNzdWN0gyVjE3SDExTDEwLDE1QzguNzIsMTYuMjMgNy4wOCwxNyA1LjE3LDE3QzIuNDMsMTcgMCwxNS43IDAsMTIuNzdDMCw4LjQ2IDMuNTgsOCA3LjA4LDhIMTBaIiAvPjwvc3ZnPg==" class="tool-icon">
+                    Redo
+                </button>
+                
+                <div class="separator"></div>
+                
+                <button class="top-tool-btn" id="clearTool">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOSw0SDE1LjVMMTQuNSwzSDkuNUw4LjUsNEg1VjZIMTlNNiwxOUEyLDIgMCAwLDAgOCwyMUgxNkEyLDIgMCAwLDAgMTgsMTlWN0g2VjE5WiIgLz48L3N2Zz4=" class="tool-icon">
+                    Clear
+                </button>
+                <button class="top-tool-btn" id="resizeTool">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yMCw5SDRWMTFIMjBWOXpNNCwxNUgyMFYxM0g0VjE1Wk0yLDVIMjJWMjFIMlY1Wk00LDdIMjBWMTlINFY3WiIgLz48L3N2Zz4=" class="tool-icon">
+                    Resize
+                </button>
+
                 <div class="shape-options" id="shapeOptions">
                     <div class="shape-option">
-                        <label for="fillShape">Fill:</label>
+                        <label for="fillShape">Заливка</label>
                         <input type="checkbox" id="fillShape">
                     </div>
                     <div class="shape-option">
-                        <label for="lineStyle">Style:</label>
+                        <label for="lineStyle">Стиль</label>
                         <select class="shape-select" id="lineStyle">
-                            <option value="solid">Solid</option>
-                            <option value="dashed">Dashed</option>
-                            <option value="dotted">Dotted</option>
+                            <option value="solid">Сплошная</option>
+                            <option value="dashed">Пунктир</option>
+                            <option value="dotted">Точки</option>
                         </select>
                     </div>
                 </div>
             </div>
 
+            <!-- Canvas -->
             <div class="canvas-container">
-                <canvas id="paintCanvas" width="800" height="600"></canvas>
+                <canvas id="paintCanvas" width="1200" height="800"></canvas>
             </div>
 
+            <!-- Status Bar -->
             <div class="status-bar">
                 <div id="cursorPos">X: 0, Y: 0</div>
-                <div id="toolInfo">Tool: Pencil | Size: 5px | Color: #000000</div>
+                <div id="canvasSize">1200 x 800</div>
+                <div id="toolInfo">Инструмент: Pencil | Размер: 5px | Цвет: #000000</div>
+                <div id="zoomInfo">Масштаб: 100%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for New File -->
+    <div class="modal" id="newFileModal">
+        <div class="modal-content">
+            <div class="modal-title">Новый файл</div>
+            <input type="number" class="modal-input" id="newWidth" placeholder="Ширина" value="1200">
+            <input type="number" class="modal-input" id="newHeight" placeholder="Высота" value="800">
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal('newFileModal')">Отмена</button>
+                <button class="modal-btn primary" onclick="createNewFile()">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Resize -->
+    <div class="modal" id="resizeModal">
+        <div class="modal-content">
+            <div class="modal-title">Изменить размер</div>
+            <input type="number" class="modal-input" id="resizeWidth" placeholder="Ширина">
+            <input type="number" class="modal-input" id="resizeHeight" placeholder="Высота">
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal('resizeModal')">Отмена</button>
+                <button class="modal-btn primary" onclick="resizeCanvas()">Применить</button>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const canvas = document.getElementById('paintCanvas');
-            const ctx = canvas.getContext('2d');
-            const colorPicker = document.getElementById('colorPicker');
-            const sizeSelector = document.getElementById('sizeSelector');
-            const sizeValue = document.getElementById('sizeValue');
-            const cursorPos = document.getElementById('cursorPos');
-            const toolInfo = document.getElementById('toolInfo');
-            const fillShape = document.getElementById('fillShape');
-            const lineStyle = document.getElementById('lineStyle');
-            const shapeOptions = document.getElementById('shapeOptions');
-            
-            // Tool buttons
-            const pencilTool = document.getElementById('pencilTool');
-            const brushTool = document.getElementById('brushTool');
-            const eraserTool = document.getElementById('eraserTool');
-            const lineTool = document.getElementById('lineTool');
-            const rectTool = document.getElementById('rectTool');
-            const circleTool = document.getElementById('circleTool');
-            const triangleTool = document.getElementById('triangleTool');
-            const polygonTool = document.getElementById('polygonTool');
-            const fillTool = document.getElementById('fillTool');
-            const clearTool = document.getElementById('clearTool');
-            const saveTool = document.getElementById('saveTool');
-            
-            // Color swatches
-            const colorSwatches = document.querySelectorAll('.color-swatch');
-            
-            // Drawing state
-            let isDrawing = false;
-            let currentTool = 'pencil';
-            let startX, startY;
-            let snapshot;
-            let polygonPoints = [];
-            let isDrawingPolygon = false;
-            
-            // Set canvas background to white
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Event listeners for tool selection
-            pencilTool.addEventListener('click', () => setActiveTool('pencil'));
-            brushTool.addEventListener('click', () => setActiveTool('brush'));
-            eraserTool.addEventListener('click', () => setActiveTool('eraser'));
-            lineTool.addEventListener('click', () => setActiveTool('line'));
-            rectTool.addEventListener('click', () => setActiveTool('rect'));
-            circleTool.addEventListener('click', () => setActiveTool('circle'));
-            triangleTool.addEventListener('click', () => setActiveTool('triangle'));
-            polygonTool.addEventListener('click', () => setActiveTool('polygon'));
-            fillTool.addEventListener('click', () => setActiveTool('fill'));
-            clearTool.addEventListener('click', clearCanvas);
-            saveTool.addEventListener('click', saveCanvas);
-            
-            // Color swatches
-            colorSwatches.forEach(swatch => {
-                swatch.addEventListener('click', function() {
-                    colorSwatches.forEach(s => s.classList.remove('active'));
-                    this.classList.add('active');
-                    colorPicker.value = this.getAttribute('data-color');
-                    updateToolInfo();
+        class PaintApp {
+            constructor() {
+                this.canvas = document.getElementById('paintCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.initializeCanvas();
+                this.setupEventListeners();
+                this.initializeState();
+                this.loadRecentColors();
+            }
+
+            initializeCanvas() {
+                // Set canvas background to white
+                this.ctx.fillStyle = 'white';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Initialize undo stack
+                this.undoStack = [];
+                this.redoStack = [];
+                this.saveState();
+                
+                // Recent colors
+                this.recentColors = JSON.parse(localStorage.getItem('recentColors')) || [];
+                
+                // Zoom level
+                this.zoomLevel = 1;
+            }
+
+            initializeState() {
+                // Drawing state
+                this.isDrawing = false;
+                this.currentTool = 'pencil';
+                this.startX = 0;
+                this.startY = 0;
+                this.snapshot = null;
+                this.polygonPoints = [];
+                this.isDrawingPolygon = false;
+                
+                // Colors and sizes
+                this.currentColor = '#000000';
+                this.currentSize = 5;
+                this.currentOpacity = 100;
+                
+                // History
+                this.maxHistorySize = 50;
+            }
+
+            setupEventListeners() {
+                // Tools
+                document.getElementById('pencilTool').addEventListener('click', () => this.setActiveTool('pencil'));
+                document.getElementById('brushTool').addEventListener('click', () => this.setActiveTool('brush'));
+                document.getElementById('eraserTool').addEventListener('click', () => this.setActiveTool('eraser'));
+                document.getElementById('lineTool').addEventListener('click', () => this.setActiveTool('line'));
+                document.getElementById('rectTool').addEventListener('click', () => this.setActiveTool('rect'));
+                document.getElementById('circleTool').addEventListener('click', () => this.setActiveTool('circle'));
+                document.getElementById('triangleTool').addEventListener('click', () => this.setActiveTool('triangle'));
+                document.getElementById('polygonTool').addEventListener('click', () => this.setActiveTool('polygon'));
+                document.getElementById('starTool').addEventListener('click', () => this.setActiveTool('star'));
+                document.getElementById('fillTool').addEventListener('click', () => this.setActiveTool('fill'));
+                document.getElementById('eyedropperTool').addEventListener('click', () => this.setActiveTool('eyedropper'));
+                
+                // Top tools
+                document.getElementById('newTool').addEventListener('click', () => this.openModal('newFileModal'));
+                document.getElementById('openTool').addEventListener('click', () => this.openImage());
+                document.getElementById('saveTool').addEventListener('click', () => this.saveCanvas());
+                document.getElementById('exportTool').addEventListener('click', () => this.exportCanvas());
+                document.getElementById('undoTool').addEventListener('click', () => this.undo());
+                document.getElementById('redoTool').addEventListener('click', () => this.redo());
+                document.getElementById('clearTool').addEventListener('click', () => this.clearCanvas());
+                document.getElementById('resizeTool').addEventListener('click', () => this.openModal('resizeModal'));
+                
+                // Color controls
+                document.querySelectorAll('.color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => this.selectColor(e.target));
                 });
-            });
-            
-            // Color picker
-            colorPicker.addEventListener('input', updateToolInfo);
-            
-            // Size selector
-            sizeSelector.addEventListener('input', function() {
-                sizeValue.textContent = this.value + 'px';
-                updateToolInfo();
-            });
-            
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    saveCanvas();
-                }
                 
-                switch(e.key.toLowerCase()) {
-                    case 'p': setActiveTool('pencil'); break;
-                    case 'b': setActiveTool('brush'); break;
-                    case 'e': setActiveTool('eraser'); break;
-                    case 'l': setActiveTool('line'); break;
-                    case 'r': setActiveTool('rect'); break;
-                    case 'c': setActiveTool('circle'); break;
-                    case 't': setActiveTool('triangle'); break;
-                    case 'y': setActiveTool('polygon'); break;
-                    case 'f': setActiveTool('fill'); break;
-                    case 'delete': clearCanvas(); break;
-                    case 'escape': 
-                        if (currentTool === 'polygon' && isDrawingPolygon) {
-                            cancelPolygon();
-                        }
-                        break;
-                    case 'enter':
-                        if (currentTool === 'polygon' && isDrawingPolygon && polygonPoints.length >= 3) {
-                            completePolygon();
-                        }
-                        break;
-                }
-            });
-            
-            // Mouse events
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', drawing);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            canvas.addEventListener('mousemove', updateCursorPosition);
-            canvas.addEventListener('dblclick', handleDoubleClick);
-            
-            // Touch events for mobile
-            canvas.addEventListener('touchstart', handleTouch);
-            canvas.addEventListener('touchmove', handleTouch);
-            canvas.addEventListener('touchend', stopDrawing);
-            
-            function handleTouch(e) {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const mouseEvent = new MouseEvent(
-                    e.type === 'touchstart' ? 'mousedown' : 'mousemove', 
-                    {
-                        clientX: touch.clientX,
-                        clientY: touch.clientY
-                    }
-                );
-                canvas.dispatchEvent(mouseEvent);
+                document.getElementById('colorPicker').addEventListener('input', (e) => {
+                    this.currentColor = e.target.value;
+                    this.addRecentColor(this.currentColor);
+                    this.updateToolInfo();
+                });
+                
+                document.getElementById('sizeSelector').addEventListener('input', (e) => {
+                    this.currentSize = e.target.value;
+                    document.getElementById('sizeValue').textContent = this.currentSize + 'px';
+                    this.updateToolInfo();
+                });
+                
+                document.getElementById('opacitySelector').addEventListener('input', (e) => {
+                    this.currentOpacity = e.target.value;
+                    document.getElementById('opacityValue').textContent = this.currentOpacity + '%';
+                });
+                
+                // Canvas events
+                this.canvas.addEventListener('mousedown', (e) => this.startDrawing(e));
+                this.canvas.addEventListener('mousemove', (e) => this.drawing(e));
+                this.canvas.addEventListener('mouseup', () => this.stopDrawing());
+                this.canvas.addEventListener('mouseout', () => this.stopDrawing());
+                this.canvas.addEventListener('mousemove', (e) => this.updateCursorPosition(e));
+                this.canvas.addEventListener('dblclick', (e) => this.handleDoubleClick(e));
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+                
+                // Touch events
+                this.canvas.addEventListener('touchstart', (e) => this.handleTouch(e));
+                this.canvas.addEventListener('touchmove', (e) => this.handleTouch(e));
+                this.canvas.addEventListener('touchend', () => this.stopDrawing());
+                
+                // Zoom with wheel
+                this.canvas.addEventListener('wheel', (e) => this.handleZoom(e));
             }
-            
-            function handleDoubleClick(e) {
-                if (currentTool === 'polygon' && isDrawingPolygon && polygonPoints.length >= 3) {
-                    completePolygon();
-                }
-            }
-            
-            function setActiveTool(tool) {
-                currentTool = tool;
+
+            setActiveTool(tool) {
+                this.currentTool = tool;
                 
-                // Update active button
-                const tools = [pencilTool, brushTool, eraserTool, lineTool, rectTool, circleTool, triangleTool, polygonTool, fillTool];
-                tools.forEach(t => t.classList.remove('active'));
+                // Update UI
+                document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+                const toolMap = {
+                    pencil: 'pencilTool',
+                    brush: 'brushTool',
+                    eraser: 'eraserTool',
+                    line: 'lineTool',
+                    rect: 'rectTool',
+                    circle: 'circleTool',
+                    triangle: 'triangleTool',
+                    polygon: 'polygonTool',
+                    star: 'starTool',
+                    fill: 'fillTool',
+                    eyedropper: 'eyedropperTool'
+                };
                 
-                switch(tool) {
-                    case 'pencil': pencilTool.classList.add('active'); break;
-                    case 'brush': brushTool.classList.add('active'); break;
-                    case 'eraser': eraserTool.classList.add('active'); break;
-                    case 'line': lineTool.classList.add('active'); break;
-                    case 'rect': rectTool.classList.add('active'); break;
-                    case 'circle': circleTool.classList.add('active'); break;
-                    case 'triangle': triangleTool.classList.add('active'); break;
-                    case 'polygon': polygonTool.classList.add('active'); break;
-                    case 'fill': fillTool.classList.add('active'); break;
+                if (toolMap[tool]) {
+                    document.getElementById(toolMap[tool]).classList.add('active');
                 }
                 
                 // Show/hide shape options
-                if (['line', 'rect', 'circle', 'triangle', 'polygon'].includes(tool)) {
-                    shapeOptions.style.display = 'flex';
-                } else {
-                    shapeOptions.style.display = 'none';
-                }
-                
-                // Reset polygon drawing state if switching tools
-                if (tool !== 'polygon') {
-                    isDrawingPolygon = false;
-                    polygonPoints = [];
-                }
-                
-                // Update cursor
-                canvas.style.cursor = (tool === 'fill') ? 'crosshair' : 'crosshair';
-                
-                updateToolInfo();
-            }
-            
-            function startDrawing(e) {
-                isDrawing = true;
-                startX = e.offsetX;
-                startY = e.offsetY;
-                
-                if (currentTool === 'polygon') {
-                    if (!isDrawingPolygon) {
-                        // Start a new polygon
-                        isDrawingPolygon = true;
-                        polygonPoints = [{x: startX, y: startY}];
-                        snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    } else {
-                        // Add a point to the current polygon
-                        polygonPoints.push({x: startX, y: startY});
-                    }
-                } else if (currentTool !== 'pencil' && currentTool !== 'brush' && currentTool !== 'eraser') {
-                    // Save the canvas state for shapes
-                    snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                }
-                
-                if (currentTool === 'fill') {
-                    floodFill(e.offsetX, e.offsetY, hexToRgb(colorPicker.value));
-                    isDrawing = false;
-                }
-                
-                ctx.beginPath();
-            }
-            
-            function drawing(e) {
-                if (!isDrawing) return;
-                
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                
-                // Set line style
-                if (lineStyle.value === 'dashed') {
-                    ctx.setLineDash([5, 5]);
-                } else if (lineStyle.value === 'dotted') {
-                    ctx.setLineDash([2, 5]);
-                } else {
-                    ctx.setLineDash([]);
-                }
-                
-                if (currentTool === 'pencil' || currentTool === 'brush' || currentTool === 'eraser') {
-                    // Free drawing tools
-                    ctx.lineTo(e.offsetX, e.offsetY);
-                    ctx.strokeStyle = currentTool === 'eraser' ? 'white' : colorPicker.value;
-                    ctx.lineWidth = currentTool === 'brush' ? sizeSelector.value * 2 : sizeSelector.value;
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(e.offsetX, e.offsetY);
-                } else if (currentTool === 'polygon' && isDrawingPolygon) {
-                    // For polygon, show preview of current line
-                    ctx.putImageData(snapshot, 0, 0);
-                    drawPolygonPreview(e.offsetX, e.offsetY);
-                } else {
-                    // Shape tools - restore snapshot and redraw
-                    ctx.putImageData(snapshot, 0, 0);
-                    
-                    ctx.strokeStyle = colorPicker.value;
-                    ctx.fillStyle = colorPicker.value;
-                    ctx.lineWidth = sizeSelector.value;
-                    
-                    const width = e.offsetX - startX;
-                    const height = e.offsetY - startY;
-                    
-                    switch(currentTool) {
-                        case 'line':
-                            ctx.beginPath();
-                            ctx.moveTo(startX, startY);
-                            ctx.lineTo(e.offsetX, e.offsetY);
-                            ctx.stroke();
-                            break;
-                        case 'rect':
-                            ctx.beginPath();
-                            ctx.rect(startX, startY, width, height);
-                            if (fillShape.checked) {
-                                ctx.fill();
-                            } else {
-                                ctx.stroke();
-                            }
-                            break;
-                        case 'circle':
-                            ctx.beginPath();
-                            const radius = Math.sqrt(width * width + height * height);
-                            ctx.arc(startX, startY, radius, 0, Math.PI * 2);
-                            if (fillShape.checked) {
-                                ctx.fill();
-                            } else {
-                                ctx.stroke();
-                            }
-                            break;
-                        case 'triangle':
-                            drawTriangle(startX, startY, e.offsetX, e.offsetY);
-                            break;
-                    }
-                }
-            }
-            
-            function stopDrawing() {
-                isDrawing = false;
-                
-                // For filled shapes (except polygon which is handled separately)
-                if (['rect', 'circle', 'triangle'].includes(currentTool) && fillShape.checked) {
-                    // Already filled in drawing function
-                }
-            }
-            
-            function drawTriangle(x1, y1, x2, y2) {
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.lineTo(x1 * 2 - x2, y2);
-                ctx.closePath();
-                
-                if (fillShape.checked) {
-                    ctx.fill();
-                } else {
-                    ctx.stroke();
-                }
-            }
-            
-            function drawPolygonPreview(currentX, currentY) {
-                ctx.strokeStyle = colorPicker.value;
-                ctx.fillStyle = colorPicker.value;
-                ctx.lineWidth = sizeSelector.value;
-                
-                // Draw the polygon so far
-                ctx.beginPath();
-                ctx.moveTo(polygonPoints[0].x, polygonPoints[0].y);
-                
-                for (let i = 1; i < polygonPoints.length; i++) {
-                    ctx.lineTo(polygonPoints[i].x, polygonPoints[i].y);
-                }
-                
-                // Draw the current line to cursor
-                ctx.lineTo(currentX, currentY);
-                
-                // Close the polygon for preview
-                ctx.closePath();
-                
-                if (fillShape.checked) {
-                    ctx.fill();
-                } else {
-                    ctx.stroke();
-                }
-            }
-            
-            function completePolygon() {
-                if (polygonPoints.length < 3) return;
-                
-                ctx.strokeStyle = colorPicker.value;
-                ctx.fillStyle = colorPicker.value;
-                ctx.lineWidth = sizeSelector.value;
-                
-                ctx.beginPath();
-                ctx.moveTo(polygonPoints[0].x, polygonPoints[0].y);
-                
-                for (let i = 1; i < polygonPoints.length; i++) {
-                    ctx.lineTo(polygonPoints[i].x, polygonPoints[i].y);
-                }
-                
-                ctx.closePath();
-                
-                if (fillShape.checked) {
-                    ctx.fill();
-                } else {
-                    ctx.stroke();
-                }
+                const shapeOptions = document.getElementById('shapeOptions');
+                shapeOptions.style.display = ['line', 'rect', 'circle', 'triangle', 'polygon', 'star'].includes(tool) ? 'flex' : 'none';
                 
                 // Reset polygon state
-                isDrawingPolygon = false;
-                polygonPoints = [];
+                if (tool !== 'polygon') {
+                    this.isDrawingPolygon = false;
+                    this.polygonPoints = [];
+                }
+                
+                this.updateToolInfo();
             }
-            
-            function cancelPolygon() {
-                // Restore the snapshot to remove the polygon preview
-                ctx.putImageData(snapshot, 0, 0);
-                isDrawingPolygon = false;
-                polygonPoints = [];
+
+            selectColor(swatch) {
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+                const color = swatch.dataset.color;
+                this.currentColor = color;
+                document.getElementById('colorPicker').value = color;
+                this.addRecentColor(color);
+                this.updateToolInfo();
             }
-            
-            function clearCanvas() {
-                if (confirm('Are you sure you want to clear the canvas?')) {
-                    ctx.fillStyle = 'white';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            addRecentColor(color) {
+                if (!this.recentColors.includes(color)) {
+                    this.recentColors.unshift(color);
+                    if (this.recentColors.length > 8) this.recentColors.pop();
+                    localStorage.setItem('recentColors', JSON.stringify(this.recentColors));
+                    this.updateRecentColors();
                 }
             }
-            
-            function saveCanvas() {
-                const link = document.createElement('a');
-                link.download = 'drawing.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+
+            updateRecentColors() {
+                const container = document.getElementById('recentColors');
+                if (!container) return;
+                
+                container.innerHTML = '';
+                this.recentColors.forEach(color => {
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.backgroundColor = color;
+                    swatch.dataset.color = color;
+                    swatch.addEventListener('click', (e) => this.selectColor(e.target));
+                    container.appendChild(swatch);
+                });
             }
-            
-            function updateCursorPosition(e) {
-                cursorPos.textContent = `X: ${e.offsetX}, Y: ${e.offsetY}`;
+
+            loadRecentColors() {
+                this.recentColors = JSON.parse(localStorage.getItem('recentColors')) || [];
+                this.updateRecentColors();
             }
-            
-            function updateToolInfo() {
-                const color = colorPicker.value;
-                const size = sizeSelector.value;
-                toolInfo.textContent = `Tool: ${currentTool.charAt(0).toUpperCase() + currentTool.slice(1)} | Size: ${size}px | Color: ${color}`;
+
+            startDrawing(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / this.zoomLevel;
+                const y = (e.clientY - rect.top) / this.zoomLevel;
+                
+                this.isDrawing = true;
+                this.startX = x;
+                this.startY = y;
+                
+                if (this.currentTool === 'eyedropper') {
+                    this.pickColor(x, y);
+                    this.isDrawing = false;
+                    return;
+                }
+                
+                if (this.currentTool === 'polygon') {
+                    if (!this.isDrawingPolygon) {
+                        this.isDrawingPolygon = true;
+                        this.polygonPoints = [{x, y}];
+                        this.snapshot = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                    } else {
+                        this.polygonPoints.push({x, y});
+                    }
+                    return;
+                }
+                
+                if (this.currentTool === 'fill') {
+                    this.floodFill(Math.floor(x), Math.floor(y), this.hexToRgb(this.currentColor));
+                    this.isDrawing = false;
+                    this.saveState();
+                    return;
+                }
+                
+                if (!['pencil', 'brush', 'eraser'].includes(this.currentTool)) {
+                    this.snapshot = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                }
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, y);
             }
-            
-            // Flood fill algorithm
-            function floodFill(x, y, fillColor) {
-                // Get canvas data
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            drawing(e) {
+                if (!this.isDrawing) return;
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / this.zoomLevel;
+                const y = (e.clientY - rect.top) / this.zoomLevel;
+                
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                
+                // Set opacity
+                this.ctx.globalAlpha = this.currentOpacity / 100;
+                
+                // Set line style
+                const style = document.getElementById('lineStyle').value;
+                if (style === 'dashed') {
+                    this.ctx.setLineDash([10, 5]);
+                } else if (style === 'dotted') {
+                    this.ctx.setLineDash([2, 5]);
+                } else {
+                    this.ctx.setLineDash([]);
+                }
+                
+                // Drawing tools
+                if (['pencil', 'brush', 'eraser'].includes(this.currentTool)) {
+                    this.ctx.lineTo(x, y);
+                    this.ctx.strokeStyle = this.currentTool === 'eraser' ? 'white' : this.currentColor;
+                    this.ctx.lineWidth = this.currentTool === 'brush' ? this.currentSize * 2 : this.currentSize;
+                    this.ctx.stroke();
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, y);
+                } 
+                else if (this.currentTool === 'polygon' && this.isDrawingPolygon) {
+                    this.ctx.putImageData(this.snapshot, 0, 0);
+                    this.drawPolygonPreview(x, y);
+                }
+                else if (this.snapshot) {
+                    this.ctx.putImageData(this.snapshot, 0, 0);
+                    
+                    this.ctx.strokeStyle = this.currentColor;
+                    this.ctx.fillStyle = this.currentColor;
+                    this.ctx.lineWidth = this.currentSize;
+                    
+                    const width = x - this.startX;
+                    const height = y - this.startY;
+                    
+                    switch(this.currentTool) {
+                        case 'line':
+                            this.drawLine(this.startX, this.startY, x, y);
+                            break;
+                        case 'rect':
+                            this.drawRect(this.startX, this.startY, width, height);
+                            break;
+                        case 'circle':
+                            this.drawCircle(this.startX, this.startY, x, y);
+                            break;
+                        case 'triangle':
+                            this.drawTriangle(this.startX, this.startY, x, y);
+                            break;
+                        case 'star':
+                            this.drawStar(this.startX, this.startY, x, y);
+                            break;
+                    }
+                }
+            }
+
+            stopDrawing() {
+                if (this.isDrawing) {
+                    this.isDrawing = false;
+                    this.saveState();
+                }
+            }
+
+            drawLine(x1, y1, x2, y2) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(x1, y1);
+                this.ctx.lineTo(x2, y2);
+                this.ctx.stroke();
+            }
+
+            drawRect(x, y, w, h) {
+                this.ctx.beginPath();
+                this.ctx.rect(x, y, w, h);
+                if (document.getElementById('fillShape').checked) {
+                    this.ctx.fill();
+                } else {
+                    this.ctx.stroke();
+                }
+            }
+
+            drawCircle(x1, y1, x2, y2) {
+                const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                this.ctx.beginPath();
+                this.ctx.arc(x1, y1, radius, 0, Math.PI * 2);
+                if (document.getElementById('fillShape').checked) {
+                    this.ctx.fill();
+                } else {
+                    this.ctx.stroke();
+                }
+            }
+
+            drawTriangle(x1, y1, x2, y2) {
+                const x3 = x1 * 2 - x2;
+                const y3 = y2;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(x1, y1);
+                this.ctx.lineTo(x2, y2);
+                this.ctx.lineTo(x3, y3);
+                this.ctx.closePath();
+                
+                if (document.getElementById('fillShape').checked) {
+                    this.ctx.fill();
+                } else {
+                    this.ctx.stroke();
+                }
+            }
+
+            drawStar(cx, cy, x2, y2) {
+                const outerR = Math.sqrt(Math.pow(x2 - cx, 2) + Math.pow(y2 - cy, 2));
+                const innerR = outerR * 0.4;
+                const spikes = 5;
+                let rotation = Math.PI / 2 * 3;
+                const step = Math.PI / spikes;
+                
+                this.ctx.beginPath();
+                
+                for (let i = 0; i < spikes; i++) {
+                    const x = cx + Math.cos(rotation) * outerR;
+                    const y = cy + Math.sin(rotation) * outerR;
+                    this.ctx.lineTo(x, y);
+                    rotation += step;
+                    
+                    const x1 = cx + Math.cos(rotation) * innerR;
+                    const y1 = cy + Math.sin(rotation) * innerR;
+                    this.ctx.lineTo(x1, y1);
+                    rotation += step;
+                }
+                
+                this.ctx.closePath();
+                
+                if (document.getElementById('fillShape').checked) {
+                    this.ctx.fill();
+                } else {
+                    this.ctx.stroke();
+                }
+            }
+
+            drawPolygonPreview(x, y) {
+                this.ctx.strokeStyle = this.currentColor;
+                this.ctx.fillStyle = this.currentColor;
+                this.ctx.lineWidth = this.currentSize;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.polygonPoints[0].x, this.polygonPoints[0].y);
+                
+                for (let i = 1; i < this.polygonPoints.length; i++) {
+                    this.ctx.lineTo(this.polygonPoints[i].x, this.polygonPoints[i].y);
+                }
+                
+                this.ctx.lineTo(x, y);
+                this.ctx.closePath();
+                
+                if (document.getElementById('fillShape').checked) {
+                    this.ctx.fill();
+                } else {
+                    this.ctx.stroke();
+                }
+            }
+
+            completePolygon() {
+                if (this.polygonPoints.length < 3) return;
+                
+                this.ctx.strokeStyle = this.currentColor;
+                this.ctx.fillStyle = this.currentColor;
+                this.ctx.lineWidth = this.currentSize;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.polygonPoints[0].x, this.polygonPoints[0].y);
+                
+                for (let i = 1; i < this.polygonPoints.length; i++) {
+                    this.ctx.lineTo(this.polygonPoints[i].x, this.polygonPoints[i].y);
+                }
+                
+                this.ctx.closePath();
+                
+                if (document.getElementById('fillShape').checked) {
+                    this.ctx.fill();
+                } else {
+                    this.ctx.stroke();
+                }
+                
+                this.isDrawingPolygon = false;
+                this.polygonPoints = [];
+                this.saveState();
+            }
+
+            cancelPolygon() {
+                if (this.snapshot) {
+                    this.ctx.putImageData(this.snapshot, 0, 0);
+                }
+                this.isDrawingPolygon = false;
+                this.polygonPoints = [];
+            }
+
+            pickColor(x, y) {
+                const imageData = this.ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1);
+                const [r, g, b] = imageData.data;
+                const color = '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
+                this.currentColor = color;
+                document.getElementById('colorPicker').value = color;
+                this.addRecentColor(color);
+                this.updateToolInfo();
+            }
+
+            floodFill(x, y, fillColor) {
+                const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
                 const data = imageData.data;
                 
-                // Get the color at the clicked position
-                const targetPos = (y * canvas.width + x) * 4;
+                const pos = (y * this.canvas.width + x) * 4;
                 const targetColor = {
-                    r: data[targetPos],
-                    g: data[targetPos + 1],
-                    b: data[targetPos + 2],
-                    a: data[targetPos + 3]
+                    r: data[pos],
+                    g: data[pos + 1],
+                    b: data[pos + 2],
+                    a: data[pos + 3]
                 };
                 
-                // Don't fill if the target color matches the fill color
                 if (targetColor.r === fillColor.r && 
                     targetColor.g === fillColor.g && 
                     targetColor.b === fillColor.b) {
                     return;
                 }
                 
-                // Stack-based flood fill
                 const stack = [{x, y}];
-                const width = canvas.width;
+                const width = this.canvas.width;
+                const height = this.canvas.height;
                 
                 while (stack.length) {
                     const {x, y} = stack.pop();
                     const pos = (y * width + x) * 4;
                     
-                    // Check boundaries and color match
-                    if (x < 0 || x >= width || y < 0 || y >= canvas.height) continue;
+                    if (x < 0 || x >= width || y < 0 || y >= height) continue;
                     if (data[pos] !== targetColor.r || 
                         data[pos + 1] !== targetColor.g || 
                         data[pos + 2] !== targetColor.b || 
                         data[pos + 3] !== targetColor.a) continue;
                     
-                    // Fill the pixel
                     data[pos] = fillColor.r;
                     data[pos + 1] = fillColor.g;
                     data[pos + 2] = fillColor.b;
                     data[pos + 3] = 255;
                     
-                    // Add neighboring pixels to stack
                     stack.push({x: x + 1, y});
                     stack.push({x: x - 1, y});
                     stack.push({x, y: y + 1});
                     stack.push({x, y: y - 1});
                 }
                 
-                // Put the modified data back to canvas
-                ctx.putImageData(imageData, 0, 0);
+                this.ctx.putImageData(imageData, 0, 0);
             }
-            
-            // Helper function to convert hex to RGB
-            function hexToRgb(hex) {
+
+            saveState() {
+                const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                this.undoStack.push(imageData);
+                this.redoStack = [];
+                
+                if (this.undoStack.length > this.maxHistorySize) {
+                    this.undoStack.shift();
+                }
+            }
+
+            undo() {
+                if (this.undoStack.length <= 1) return;
+                
+                const current = this.undoStack.pop();
+                this.redoStack.push(current);
+                
+                const previous = this.undoStack[this.undoStack.length - 1];
+                this.ctx.putImageData(previous, 0, 0);
+            }
+
+            redo() {
+                if (this.redoStack.length === 0) return;
+                
+                const next = this.redoStack.pop();
+                this.undoStack.push(next);
+                this.ctx.putImageData(next, 0, 0);
+            }
+
+            clearCanvas() {
+                if (confirm('Очистить холст?')) {
+                    this.ctx.fillStyle = 'white';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.saveState();
+                }
+            }
+
+            saveCanvas() {
+                const link = document.createElement('a');
+                link.download = 'drawing.png';
+                link.href = this.canvas.toDataURL('image/png');
+                link.click();
+            }
+
+            exportCanvas() {
+                const formats = ['png', 'jpeg', 'webp'];
+                const format = prompt('Выберите формат (png, jpeg, webp):', 'png');
+                if (!formats.includes(format)) return;
+                
+                const link = document.createElement('a');
+                link.download = `drawing.${format}`;
+                link.href = this.canvas.toDataURL(`image/${format}`);
+                link.click();
+            }
+
+            openImage() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
+                            this.saveState();
+                        };
+                        img.src = event.target.result;
+                    };
+                    
+                    reader.readAsDataURL(file);
+                };
+                
+                input.click();
+            }
+
+            createNewFile() {
+                const width = parseInt(document.getElementById('newWidth').value);
+                const height = parseInt(document.getElementById('newHeight').value);
+                
+                if (width > 0 && height > 0) {
+                    this.canvas.width = width;
+                    this.canvas.height = height;
+                    this.ctx.fillStyle = 'white';
+                    this.ctx.fillRect(0, 0, width, height);
+                    this.saveState();
+                    this.closeModal('newFileModal');
+                    document.getElementById('canvasSize').textContent = `${width} x ${height}`;
+                }
+            }
+
+            resizeCanvas() {
+                const width = parseInt(document.getElementById('resizeWidth').value);
+                const height = parseInt(document.getElementById('resizeHeight').value);
+                
+                if (width > 0 && height > 0) {
+                    const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                    this.canvas.width = width;
+                    this.canvas.height = height;
+                    this.ctx.putImageData(imageData, 0, 0);
+                    this.closeModal('resizeModal');
+                    document.getElementById('canvasSize').textContent = `${width} x ${height}`;
+                }
+            }
+
+            handleDoubleClick(e) {
+                if (this.currentTool === 'polygon' && this.isDrawingPolygon && this.polygonPoints.length >= 3) {
+                    this.completePolygon();
+                }
+            }
+
+            handleKeyboard(e) {
+                if (e.ctrlKey) {
+                    switch(e.key.toLowerCase()) {
+                        case 'z':
+                            e.preventDefault();
+                            this.undo();
+                            break;
+                        case 'y':
+                            e.preventDefault();
+                            this.redo();
+                            break;
+                        case 's':
+                            e.preventDefault();
+                            this.saveCanvas();
+                            break;
+                        case 'o':
+                            e.preventDefault();
+                            this.openImage();
+                            break;
+                        case 'n':
+                            e.preventDefault();
+                            this.openModal('newFileModal');
+                            break;
+                    }
+                } else {
+                    switch(e.key.toLowerCase()) {
+                        case 'p': this.setActiveTool('pencil'); break;
+                        case 'b': this.setActiveTool('brush'); break;
+                        case 'e': this.setActiveTool('eraser'); break;
+                        case 'l': this.setActiveTool('line'); break;
+                        case 'r': this.setActiveTool('rect'); break;
+                        case 'c': this.setActiveTool('circle'); break;
+                        case 't': this.setActiveTool('triangle'); break;
+                        case 'y': this.setActiveTool('polygon'); break;
+                        case 's': this.setActiveTool('star'); break;
+                        case 'f': this.setActiveTool('fill'); break;
+                        case 'i': this.setActiveTool('eyedropper'); break;
+                        case 'delete': this.clearCanvas(); break;
+                        case 'escape':
+                            if (this.currentTool === 'polygon' && this.isDrawingPolygon) {
+                                this.cancelPolygon();
+                            }
+                            break;
+                        case 'enter':
+                            if (this.currentTool === 'polygon' && this.isDrawingPolygon && this.polygonPoints.length >= 3) {
+                                this.completePolygon();
+                            }
+                            break;
+                    }
+                }
+            }
+
+            handleTouch(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent(
+                    e.type === 'touchstart' ? 'mousedown' : 'mousemove',
+                    {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    }
+                );
+                this.canvas.dispatchEvent(mouseEvent);
+            }
+
+            handleZoom(e) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                this.zoomLevel = Math.max(0.1, Math.min(5, this.zoomLevel + delta));
+                
+                this.canvas.style.transform = `scale(${this.zoomLevel})`;
+                document.getElementById('zoomInfo').textContent = `Масштаб: ${Math.round(this.zoomLevel * 100)}%`;
+            }
+
+            updateCursorPosition(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = Math.round((e.clientX - rect.left) / this.zoomLevel);
+                const y = Math.round((e.clientY - rect.top) / this.zoomLevel);
+                document.getElementById('cursorPos').textContent = `X: ${x}, Y: ${y}`;
+            }
+
+            updateToolInfo() {
+                document.getElementById('toolInfo').textContent = 
+                    `Инструмент: ${this.capitalize(this.currentTool)} | Размер: ${this.currentSize}px | Цвет: ${this.currentColor}`;
+            }
+
+            capitalize(str) {
+                return str.charAt(0).toUpperCase() + str.slice(1);
+            }
+
+            hexToRgb(hex) {
                 const r = parseInt(hex.substring(1, 3), 16);
                 const g = parseInt(hex.substring(3, 5), 16);
                 const b = parseInt(hex.substring(5, 7), 16);
                 return {r, g, b};
             }
-            
-            // Initialize with pencil tool
-            setActiveTool('pencil');
-        });
+
+            openModal(id) {
+                document.getElementById(id).classList.add('active');
+                if (id === 'resizeModal') {
+                    document.getElementById('resizeWidth').value = this.canvas.width;
+                    document.getElementById('resizeHeight').value = this.canvas.height;
+                }
+            }
+
+            closeModal(id) {
+                document.getElementById(id).classList.remove('active');
+            }
+        }
+
+        // Initialize the app
+        const app = new PaintApp();
+
+        // Window controls (mock functions for browser)
+        window.minimize = () => console.log('Minimize');
+        window.toggleMaximize = () => console.log('Maximize');
+        window.close = () => {
+            if (confirm('Закрыть приложение?')) {
+                window.close();
+            }
+        };
+
+        // Modal functions
+        function openModal(id) {
+            app.openModal(id);
+        }
+
+        function closeModal(id) {
+            app.closeModal(id);
+        }
+
+        function createNewFile() {
+            app.createNewFile();
+        }
+
+        function resizeCanvas() {
+            app.resizeCanvas();
+        }
     </script>
 </body>
 </html>
