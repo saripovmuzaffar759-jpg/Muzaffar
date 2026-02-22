@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О нас - Ваш Сайт</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap'); /* Для кода или технических деталей */
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.7;
+            color: #2c3e50;
+            background-color: #ecf0f1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            padding: 80px 20px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.05);
+            transform: rotate(45deg);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 3.2em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.4em;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background-color: #ffffff;
+            padding: 45px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .section h2 {
+            font-size: 2.6em;
+            color: #2980b9;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .section p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+        
+        .section ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 25px;
+        }
+        
+        .section ul li {
+            background-color: #f7f9fb;
+            margin-bottom: 12px;
+            padding: 18px;
+            border-left: 6px solid #3498db;
+            border-radius: 8px;
+            font-size: 1.05em;
+            color: #34495e;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .section ul li:hover {
+            border-left-color: #2c3e50;
+            transform: translateX(5px);
+        }
+
+        .team-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .founder-card {
+            background: linear-gradient(to right, #ecf0f1, #bdc3c7);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            margin: 30px auto;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #dcdcdc;
+            transition: all 0.3s ease;
+        }
+        
+        .founder-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .founder-card img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 25px;
+            border: 6px solid #3498db;
+            box-shadow: 0 0 0 8px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .founder-card img:hover {
+            transform: scale(1.05);
+            border-color: #2980b9;
+            box-shadow: 0 0 0 10px rgba(41, 128, 185, 0.4);
+        }
+
+        .founder-card h3 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .founder-card p {
+            font-size: 1.1em;
+            color: #34495e;
+            margin-bottom: 15px;
+        }
+
+        .footer {
+            background-color: #34495e;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 25px 20px;
+            margin-top: 50px;
+            font-size: 0.9em;
+            border-top: 3px solid #2c3e50;
+        }
+        
+        .footer p {
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+            .hero p {
+                font-size: 1.1em;
+            }
+            .section h2 {
+                font-size: 2em;
+            }
+            .section p, .section ul li {
+                font-size: 1em;
+            }
+            .founder-card {
+                max-width: 90%;
+            }
+            .founder-card img {
+                width: 150px;
+                height: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: 50px 15px;
+            }
+            .hero h1 {
+                font-size: 2em;
+            }
+            .hero p {
+                font-size: 1em;
+            }
+            .section {
+                padding: 30px;
+            }
+            .section h2 {
+                font-size: 1.8em;
+            }
+            .founder-card h3 {
+                font-size: 1.6em;
+            }
+            .founder-card p {
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="hero">
+        <h1>О нас</h1>
+        <p>Мы — команда, стоящая за будущим интернета, создавая инновации, меняющие мир.</p>
+    </header>
+
+    <section class="section">
+        <h2>Наша История и Видение</h2>
+        <p>Мы начали наш путь с глубокой верой в то, что технологии могут и должны служить для улучшения жизни каждого человека. Этот сайт был официально опубликован профессиональным разработчиком в **августе 2025 года**, став результатом многолетнего труда и стремления к совершенству.</p>
+        <p>Наша главная цель — **улучшить мир** через инновационные цифровые решения. Мы стремимся создавать продукты и сервисы, которые не только облегчают повседневную жизнь, но и вдохновляют на новые достижения, способствуют развитию и объединяют людей.</p>
+    </section>
+
+    <section class="section">
+        <h2>Наши Технологии и Подход</h2>
+        <p>Мы гордимся нашей уникальной архитектурой: наш сайт состоит почти из **35 интегрированных фронтенд сайтов**, каждый из которых разработан с максимальной производительностью и масштабируемостью. Такой подход позволяет нам обеспечивать беспрецедентную гибкость, надёжность и возможность быстро адаптироваться к изменяющимся потребностям пользователей и рынка.</p>
+        <p>Мы используем передовые технологии и методологии разработки, чтобы гарантировать высочайшее качество и безопасность наших продуктов. Каждый элемент нашего сайта создан с вниманием к деталям, чтобы обеспечить интуитивно понятный и приятный пользовательский опыт.</p>
+    </section>
+
+    <section class="section team-section">
+        <h2>Основатель</h2>
+        <div class="founder-card">
+            <img src="https://i.ibb.co/F42BP4FX/photo-2025-06-06-14-16-12.jpg" alt="Фото Основателя">
+            <h3>Шарипов Музаффар Анварович</h3>
+            <p> Главный Разработчик</p>
+            <p>Шарипов Музаффар Анварович — движущая сила нашего проекта, чьё видение и техническое мастерство легли в основу каждого аспекта нашего сайта. Его страсть к инновациям и стремление к совершенству вдохновляют всю команду.</p>
+        </div>
+    </section>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2025 портал MUZAFFAR. Все права защищены. Создано с любовью к технологиям и стремлением к лучшему будущему.</p>
+</footer>
+
+</body>
+
+</html>
