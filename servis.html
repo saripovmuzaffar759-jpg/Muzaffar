@@ -1,0 +1,530 @@
+import speech_recognition as sr
+import pyautogui
+import subprocess
+import webbrowser
+import pywhatkit as kit
+import pygetwindow as gw
+import psutil
+import requests
+import time
+import datetime
+import random
+import sys
+import os
+import tempfile
+import threading
+from gtts import gTTS
+import playsound
+
+# ===== НАСТРОЙКИ =====
+WAKE_WORDS = ["музафар", "музаффар", "джарвис", "jarvis"]
+LANG = "ru-RU"
+
+# Для погоды (нужен API-ключ OpenWeatherMap)
+WEATHER_API_KEY = "твой_ключ"   # замени на свой, если нужна погода
+CITY = "Moscow"
+
+# Для курса валют (используем бесплатный API)
+CURRENCY_API = "https://www.cbr-xml-daily.ru/daily_json.js"
+
+# ===== ФУНКЦИИ =====
+def speak(text):
+    """Голосовой вывод через Google TTS (естественный голос)"""
+    print(f"JARVIS: {text}")
+    try:
+        tts = gTTS(text=text, lang='ru')
+        with tempfile.NamedTemporaryFile(delete=True, suffix='.mp3') as tmp:
+            tts.save(tmp.name)
+            playsound.playsound(tmp.name)
+    except Exception as e:
+        print(f"Ошибка TTS: {e}")
+
+def listen(recognizer, source, timeout=2, phrase_limit=7):
+    try:
+        audio = recognizer.listen(source, timeout=timeout, phrase_time_limit=phrase_limit)
+        text = recognizer.recognize_google(audio, language=LANG).lower()
+        return text
+    except sr.UnknownValueError:
+        return ""
+    except sr.RequestError:
+        speak("Ошибка распознавания, проверьте интернет")
+        return ""
+    except sr.WaitTimeoutError:
+        return ""
+
+# ----- НОВЫЕ ФУНКЦИИ -----
+reminders = []  # список напоминаний (время, сообщение)
+
+def set_reminder(seconds, message):
+    """Устанавливает напоминание через указанное количество секунд"""
+    def remind():
+        time.sleep(seconds)
+        speak(f"Напоминание: {message}")
+    threading.Thread(target=remind, daemon=True).start()
+    reminders.append((time.time() + seconds, message))
+    speak(f"Напомню через {seconds} секунд: {message}")
+
+def get_currency_rate(currency_code="USD"):
+    """Получает курс валюты к рублю с сайта ЦБ РФ"""
+    try:
+        response = requests.get(CURRENCY_API)
+        data = response.json()
+        if currency_code.upper() in data["Valute"]:
+            rate = data["Valute"][currency_code.upper()]["Value"]
+            name = data["Valute"][currency_code.upper()]["Name"]
+            speak(f"Курс {name} составляет {rate} рублей")
+        else:
+            speak(f"Валюта {currency_code} не найдена")
+    except:
+        speak("Не удалось получить курс валют")
+
+def type_text(text):
+    """Печатает текст в активном окне (диктовка)"""
+    pyautogui.write(text, interval=0.05)
+    speak("Текст набран")
+
+# ----- ОСНОВНОЙ ОБРАБОТЧИК КОМАНД -----
+def execute_command(command):
+    if not command:
+        return
+
+    # ----- ПОИСК В ИНТЕРНЕТЕ -----
+    if "найди в youtube" in command:
+        query = command.replace("найди в youtube", "").strip()
+        if query:
+            speak(f"Ищу {query} на YouTube")
+            kit.playonyt(query)
+        else:
+            speak("Что именно искать?")
+        return
+    elif "найди в google" in command or "найди в гугле" in command:
+        query = command.replace("найди в google", "").replace("найди в гугле", "").strip()
+        if query:
+            speak(f"Ищу {query} в Google")
+            webbrowser.open(f"https://www.google.com/search?q={query}")
+        else:
+            speak("Что искать?")
+        return
+
+    # ----- НОВЫЕ КОМАНДЫ -----
+    # Таймер / напоминание
+    if "напомни через" in command or "таймер на" in command:
+        # Пример: "напомни через 5 минут позвонить маме"
+        words = command.split()
+        try:
+            # Ищем число и единицу времени
+            for i, word in enumerate(words):
+                if word.isdigit():
+                    value = int(word)
+                    unit = words[i+1] if i+1 < len(words) else "секунд"
+                    if "минут" in unit:
+                        seconds = value * 60
+                    elif "час" in unit:
+                        seconds = value * 3600
+                    else:
+                        seconds = value
+                    message = " ".join(words[i+2:]) if i+2 < len(words) else "время вышло"
+                    set_reminder(seconds, message)
+                    return
+        except:
+            speak("Не понял, на сколько установить таймер")
+        return
+
+    # Курс валют
+    if "курс доллара" in command:
+        get_currency_rate("USD")
+        return
+    if "курс евро" in command:
+        get_currency_rate("EUR")
+        return
+
+    # Случайное число
+    if "случайное число" in command or "рандомное число" in command:
+        number = random.randint(1, 100)
+        speak(f"Случайное число: {number}")
+        return
+
+    # Диктовка текста
+    if "напиши" in command and "текст" in command:
+        text_to_type = command.replace("напиши", "").replace("текст", "").strip()
+        if text_to_type:
+            type_text(text_to_type)
+        else:
+            speak("Что написать?")
+        return
+
+    # Управление вкладками браузера
+    if "новая вкладка" in command:
+        pyautogui.hotkey('ctrl', 't')
+        speak("Новая вкладка открыта")
+        return
+    if "закрой вкладку" in command:
+        pyautogui.hotkey('ctrl', 'w')
+        speak("Вкладка закрыта")
+        return
+    if "обнови страницу" in command:
+        pyautogui.hotkey('ctrl', 'r')
+        speak("Страница обновлена")
+        return
+
+    # ----- УПРАВЛЕНИЕ ОКНАМИ -----
+    if any(word in command for word in ["свернуть все", "показать рабочий стол"]):
+        speak("Сворачиваю все окна")
+        pyautogui.hotkey('win', 'd')
+        return
+    elif any(word in command for word in ["свернуть текущее", "сверни это"]):
+        try:
+            active = gw.getActiveWindow()
+            if active:
+                active.minimize()
+                speak("Окно свернуто")
+            else:
+                speak("Нет активного окна")
+        except:
+            speak("Не удалось свернуть окно")
+        return
+    elif any(word in command for word in ["развернуть", "на весь экран"]):
+        try:
+            active = gw.getActiveWindow()
+            if active:
+                if active.isMaximized:
+                    active.restore()
+                else:
+                    active.maximize()
+                speak("Окно развернуто")
+            else:
+                speak("Нет активного окна")
+        except:
+            speak("Не удалось развернуть окно")
+        return
+    elif any(word in command for word in ["закрыть окно", "закрой окно"]):
+        speak("Закрываю активное окно")
+        pyautogui.hotkey('alt', 'f4')
+        return
+    elif any(word in command for word in ["переключиться", "переключи окно"]):
+        pyautogui.hotkey('alt', 'tab')
+        speak("Переключил")
+        return
+    elif any(word in command for word in ["список окон", "какие окна"]):
+        windows = gw.getAllTitles()
+        titles = [w for w in windows if w.strip() and not w.startswith('Program Manager')]
+        if titles:
+            speak(f"Открыто {len(titles)} окон. Например: {', '.join(titles[:3])}")
+        else:
+            speak("Нет открытых окон")
+        return
+
+    # ----- ГРОМКОСТЬ И МЕДИА -----
+    if "громче" in command:
+        pyautogui.press('volumeup')
+        speak("Громкость увеличена")
+        return
+    elif "тише" in command:
+        pyautogui.press('volumedown')
+        speak("Громкость уменьшена")
+        return
+    elif any(word in command for word in ["выключи звук", "без звука"]):
+        pyautogui.press('volumemute')
+        speak("Звук выключен")
+        return
+    elif "максимальная громкость" in command:
+        for _ in range(10):
+            pyautogui.press('volumeup')
+        speak("Громкость на максимуме")
+        return
+    elif "минимальная громкость" in command:
+        for _ in range(10):
+            pyautogui.press('volumedown')
+        speak("Громкость на минимуме")
+        return
+    elif any(word in command for word in ["пауза", "воспроизведи", "продолжить"]):
+        pyautogui.press('playpause')
+        speak("Ок")
+        return
+    elif any(word in command for word in ["следующий трек", "дальше"]):
+        pyautogui.press('nexttrack')
+        speak("Следующий")
+        return
+    elif any(word in command for word in ["предыдущий трек", "назад"]):
+        pyautogui.press('prevtrack')
+        speak("Предыдущий")
+        return
+    elif "стоп" in command and "закрой" not in command and "выход" not in command:
+        pyautogui.press('stop')
+        speak("Остановлено")
+        return
+
+    # ----- СКРИНШОТЫ И ФОТО -----
+    if any(word in command for word in ["скриншот", "снимок экрана"]):
+        filename = f"screenshot_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        pyautogui.screenshot(filename)
+        speak(f"Скриншот сохранён как {filename}")
+        return
+    elif "сделай фото" in command:
+        take_photo()
+        return
+
+    # ----- УПРАВЛЕНИЕ ПИТАНИЕМ -----
+    if any(word in command for word in ["выключи компьютер", "выключи пк"]):
+        speak("Выключаю компьютер")
+        os.system("shutdown /s /t 5")
+        return
+    elif any(word in command for word in ["перезагрузи", "перезагрузка"]):
+        speak("Перезагружаю компьютер")
+        os.system("shutdown /r /t 5")
+        return
+    elif any(word in command for word in ["спящий режим", "усыпить"]):
+        speak("Перевожу в спящий режим")
+        os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+        return
+    elif any(word in command for word in ["заблокировать", "блокировка"]):
+        speak("Блокирую экран")
+        subprocess.Popen("rundll32.exe user32.dll,LockWorkStation")
+        return
+    elif "выйти из системы" in command:
+        speak("Выхожу из системы")
+        os.system("shutdown /l")
+        return
+
+    # ----- СИСТЕМНАЯ ИНФОРМАЦИЯ -----
+    if any(word in command for word in ["сколько времени", "который час"]):
+        now = datetime.datetime.now()
+        speak(f"Сейчас {now.hour} часов {now.minute} минут")
+        return
+    elif any(word in command for word in ["какая дата", "сегодня число"]):
+        today = datetime.datetime.now().strftime("%d %B %Y")
+        speak(f"Сегодня {today}")
+        return
+    elif any(word in command for word in ["загрузка процессора", "cpu"]):
+        cpu = psutil.cpu_percent(interval=1)
+        speak(f"Загрузка процессора {cpu} процентов")
+        return
+    elif any(word in command for word in ["оперативная память", "ram"]):
+        mem = psutil.virtual_memory()
+        speak(f"Используется {mem.percent:.1f} процентов оперативной памяти")
+        return
+    elif "батарея" in command:
+        battery = psutil.sensors_battery()
+        if battery:
+            percent = battery.percent
+            plug = "в сети" if battery.power_plugged else "не в сети"
+            speak(f"Заряд батареи {percent} процентов, {plug}")
+        else:
+            speak("Нет данных о батарее")
+        return
+    elif "как дела" in command:
+        replies = ["Всё отлично, сэр!", "Работаю в штатном режиме", "Лучше всех, спасибо"]
+        speak(random.choice(replies))
+        return
+    elif any(word in command for word in ["свободное место", "на диске"]):
+        usage = psutil.disk_usage('C:')
+        free_gb = usage.free // (1024**3)
+        speak(f"На диске C свободно {free_gb} гигабайт")
+        return
+    elif any(word in command for word in ["сколько работает компьютер", "время работы"]):
+        uptime_seconds = time.time() - psutil.boot_time()
+        hours = int(uptime_seconds // 3600)
+        minutes = int((uptime_seconds % 3600) // 60)
+        speak(f"Компьютер работает {hours} часов {minutes} минут")
+        return
+
+    # ----- ПОГОДА -----
+    if "погода" in command and WEATHER_API_KEY != "твой_ключ":
+        get_weather()
+        return
+
+    # ----- РАЗВЛЕЧЕНИЯ -----
+    if any(word in command for word in ["анекдот", "пошути"]):
+        jokes = [
+            "Колобок повесился. Шутка.",
+            "Почему программисты путают Хэллоуин и Рождество? Потому что 31 октября = 25 декабря.",
+            "Встречаются два сисадмина: — Ты зачем клавиатуру в мойку замачиваешь? — А мне коллега посоветовал: перед уходом с работы замачивай клавиатуру в мыльной воде, а утром споласкивай — и как новая. — И что, помогает? — Не знаю, я ещё ни разу не смог её собрать обратно."
+        ]
+        speak(random.choice(jokes))
+        return
+    elif "спасибо" in command:
+        speak("Всегда рад помочь, сэр")
+        return
+    elif any(word in command for word in ["ты кто", "кто ты"]):
+        speak("Я Музафар Ассистент, создан, чтобы помогать вам управлять компьютером и отвечать на вопросы")
+        return
+    elif any(word in command for word in ["пока", "выход", "заверши работу"]):
+        speak("Отключаюсь, сэр. До свидания!")
+        sys.exit(0)
+
+    # ----- РАБОТА С ФАЙЛАМИ -----
+    if "создай папку" in command:
+        foldername = command.replace("создай папку", "").strip()
+        if not foldername:
+            foldername = f"Новая папка {datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        path = os.path.join(os.path.expanduser("~"), "Desktop", foldername)
+        try:
+            os.mkdir(path)
+            speak(f"Папка {foldername} создана на рабочем столе")
+        except:
+            speak("Не удалось создать папку")
+        return
+    elif "очисти корзину" in command:
+        try:
+            import winshell
+            winshell.recycle_bin().empty(confirm=False, show_progress=False, sound=False)
+            speak("Корзина очищена")
+        except ImportError:
+            speak("Не установлен модуль winshell")
+        except:
+            speak("Не удалось очистить корзину")
+        return
+
+    # ----- ОТКРЫТИЕ САЙТОВ И ПРОГРАММ -----
+    if any(word in command for word in ["браузер", "google", "гугл"]):
+        speak("Открываю браузер")
+        webbrowser.open("https://google.com")
+        return
+    elif any(word in command for word in ["youtube", "ютуб", "ютюб"]):
+        speak("Открываю YouTube")
+        webbrowser.open("https://youtube.com")
+        return
+    elif any(word in command for word in ["вк", "vk"]):
+        speak("Открываю ВКонтакте")
+        webbrowser.open("https://vk.com")
+        return
+    elif any(word in command for word in ["телеграм", "telegram", "тг"]):
+        speak("Открываю Telegram")
+        webbrowser.open("https://web.telegram.org")
+        return
+    elif any(word in command for word in ["дискорд", "discord"]):
+        speak("Открываю Discord")
+        webbrowser.open("https://discord.com/app")
+        return
+    elif any(word in command for word in ["новости", "новост"]):
+        speak("Свежие новости")
+        webbrowser.open("https://yandex.ru/news")
+        return
+    elif any(word in command for word in ["калькулятор", "кальк"]):
+        speak("Запускаю калькулятор")
+        subprocess.Popen("calc.exe")
+        return
+    elif any(word in command for word in ["блокнот", "notepad"]):
+        speak("Открываю блокнот")
+        subprocess.Popen("notepad.exe")
+        return
+    elif any(word in command for word in ["проводник", "explorer"]):
+        speak("Открываю проводник")
+        subprocess.Popen("explorer.exe")
+        return
+    elif any(word in command for word in ["командную строку", "cmd"]):
+        speak("Запускаю командную строку")
+        subprocess.Popen("cmd.exe")
+        return
+    elif any(word in command for word in ["диспетчер задач", "taskmgr"]):
+        speak("Открываю диспетчер задач")
+        subprocess.Popen("taskmgr.exe")
+        return
+    elif any(word in command for word in ["настройки", "параметры"]):
+        speak("Открываю настройки Windows")
+        subprocess.Popen("start ms-settings:", shell=True)
+        return
+    elif any(word in command for word in ["панель управления", "control"]):
+        speak("Открываю панель управления")
+        subprocess.Popen("control.exe")
+        return
+    elif "корзину" in command:
+        speak("Открываю корзину")
+        os.startfile("shell:RecycleBinFolder")
+        return
+    elif any(word in command for word in ["мои документы", "документы"]):
+        speak("Открываю папку Документы")
+        subprocess.Popen(r"explorer.exe %userprofile%\Documents")
+        return
+    elif "загрузки" in command:
+        speak("Открываю папку Загрузки")
+        subprocess.Popen(r"explorer.exe %userprofile%\Downloads")
+        return
+    elif "рабочий стол" in command:
+        speak("Открываю папку рабочего стола")
+        subprocess.Popen(r"explorer.exe %userprofile%\Desktop")
+        return
+    elif any(word in command for word in ["мой компьютер", "этот компьютер"]):
+        speak("Открываю Мой компьютер")
+        subprocess.Popen("explorer.exe shell:MyComputerFolder")
+        return
+
+    # Если ничего не подошло
+    speak("Не понял команду, повторите, сэр")
+
+def get_weather():
+    try:
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={WEATHER_API_KEY}&units=metric&lang=ru"
+        res = requests.get(url)
+        data = res.json()
+        if data["cod"] == 200:
+            temp = data["main"]["temp"]
+            desc = data["weather"][0]["description"]
+            speak(f"Сейчас в городе {CITY} {temp} градусов, {desc}")
+        else:
+            speak("Не удалось получить погоду")
+    except:
+        speak("Ошибка при запросе погоды")
+
+def take_photo():
+    import cv2
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        speak("Камера не доступна")
+        return
+    ret, frame = cap.read()
+    if ret:
+        filename = f"photo_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        cv2.imwrite(filename, frame)
+        speak(f"Фото сохранено как {filename}")
+    else:
+        speak("Не удалось сделать фото")
+    cap.release()
+    cv2.destroyAllWindows()
+
+# ===== ОСНОВНОЙ ЦИКЛ =====
+def main():
+    recognizer = sr.Recognizer()
+    recognizer.energy_threshold = 200
+    recognizer.dynamic_energy_threshold = True
+    recognizer.pause_threshold = 0.8
+    recognizer.phrase_threshold = 0.3
+
+    with sr.Microphone() as source:
+        recognizer.adjust_for_ambient_noise(source, duration=1.5)
+        speak("Система готова, сэр. Скажите 'Музафар' для активации")
+        listening_for_command = False
+
+        while True:
+            try:
+                text = listen(recognizer, source, timeout=1, phrase_limit=7)
+                if text:
+                    print(f"[LOG] Распознано: {text}")
+
+                    wake_found = None
+                    for wake in WAKE_WORDS:
+                        if wake in text:
+                            wake_found = wake
+                            break
+
+                    if wake_found:
+                        command_text = text.replace(wake_found, '', 1).strip()
+                        if command_text:
+                            execute_command(command_text)
+                            listening_for_command = False
+                        else:
+                            speak("Слушаю, сэр")
+                            listening_for_command = True
+                    else:
+                        if listening_for_command:
+                            execute_command(text)
+                            listening_for_command = False
+            except KeyboardInterrupt:
+                speak("Программа остановлена")
+                break
+            except Exception as e:
+                print(f"Ошибка: {e}")
+                continue
+
+if __name__ == "__main__":
+    main()
