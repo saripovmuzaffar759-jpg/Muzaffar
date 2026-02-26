@@ -1,530 +1,1064 @@
-import speech_recognition as sr
-import pyautogui
-import subprocess
-import webbrowser
-import pywhatkit as kit
-import pygetwindow as gw
-import psutil
-import requests
-import time
-import datetime
-import random
-import sys
-import os
-import tempfile
-import threading
-from gtts import gTTS
-import playsound
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA-Services — Реестр Услуг: люди предлагают помощь</title>
+    <meta name="description" content="MA-Services — реестр локальных нужд и помощи. Подайте свою просьбу или поддержите чужую.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-auth-compat.js"></script> 
+    
+    <style>
+        :root {
+            --primary: #f1c40f; 
+            --secondary: #e67e22; 
+            --dark: #1a1a1a;
+            --darker: #111;
+            --light: #f5f5f5;
+            --gray: #333;
+            --lighter-gray: #444;
+        }
 
-# ===== НАСТРОЙКИ =====
-WAKE_WORDS = ["музафар", "музаффар", "джарвис", "jarvis"]
-LANG = "ru-RU"
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-# Для погоды (нужен API-ключ OpenWeatherMap)
-WEATHER_API_KEY = "твой_ключ"   # замени на свой, если нужна погода
-CITY = "Moscow"
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
 
-# Для курса валют (используем бесплатный API)
-CURRENCY_API = "https://www.cbr-xml-daily.ru/daily_json.js"
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-# ===== ФУНКЦИИ =====
-def speak(text):
-    """Голосовой вывод через Google TTS (естественный голос)"""
-    print(f"JARVIS: {text}")
-    try:
-        tts = gTTS(text=text, lang='ru')
-        with tempfile.NamedTemporaryFile(delete=True, suffix='.mp3') as tmp:
-            tts.save(tmp.name)
-            playsound.playsound(tmp.name)
-    except Exception as e:
-        print(f"Ошибка TTS: {e}")
+        header {
+            background-color: var(--darker);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-def listen(recognizer, source, timeout=2, phrase_limit=7):
-    try:
-        audio = recognizer.listen(source, timeout=timeout, phrase_time_limit=phrase_limit)
-        text = recognizer.recognize_google(audio, language=LANG).lower()
-        return text
-    except sr.UnknownValueError:
-        return ""
-    except sr.RequestError:
-        speak("Ошибка распознавания, проверьте интернет")
-        return ""
-    except sr.WaitTimeoutError:
-        return ""
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px; 
+        }
 
-# ----- НОВЫЕ ФУНКЦИИ -----
-reminders = []  # список напоминаний (время, сообщение)
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
 
-def set_reminder(seconds, message):
-    """Устанавливает напоминание через указанное количество секунд"""
-    def remind():
-        time.sleep(seconds)
-        speak(f"Напоминание: {message}")
-    threading.Thread(target=remind, daemon=True).start()
-    reminders.append((time.time() + seconds, message))
-    speak(f"Напомню через {seconds} секунд: {message}")
+        .logo i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
 
-def get_currency_rate(currency_code="USD"):
-    """Получает курс валюты к рублю с сайта ЦБ РФ"""
-    try:
-        response = requests.get(CURRENCY_API)
-        data = response.json()
-        if currency_code.upper() in data["Valute"]:
-            rate = data["Valute"][currency_code.upper()]["Value"]
-            name = data["Valute"][currency_code.upper()]["Name"]
-            speak(f"Курс {name} составляет {rate} рублей")
-        else:
-            speak(f"Валюта {currency_code} не найдена")
-    except:
-        speak("Не удалось получить курс валют")
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-def type_text(text):
-    """Печатает текст в активном окне (диктовка)"""
-    pyautogui.write(text, interval=0.05)
-    speak("Текст набран")
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
 
-# ----- ОСНОВНОЙ ОБРАБОТЧИК КОМАНД -----
-def execute_command(command):
-    if not command:
-        return
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .add-wish-btn {
+            background-color: var(--primary);
+            color: var(--darker); 
+        }
 
-    # ----- ПОИСК В ИНТЕРНЕТЕ -----
-    if "найди в youtube" in command:
-        query = command.replace("найди в youtube", "").strip()
-        if query:
-            speak(f"Ищу {query} на YouTube")
-            kit.playonyt(query)
-        else:
-            speak("Что именно искать?")
-        return
-    elif "найди в google" in command or "найди в гугле" in command:
-        query = command.replace("найди в google", "").replace("найди в гугле", "").strip()
-        if query:
-            speak(f"Ищу {query} в Google")
-            webbrowser.open(f"https://www.google.com/search?q={query}")
-        else:
-            speak("Что искать?")
-        return
+        .add-wish-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
 
-    # ----- НОВЫЕ КОМАНДЫ -----
-    # Таймер / напоминание
-    if "напомни через" in command or "таймер на" in command:
-        # Пример: "напомни через 5 минут позвонить маме"
-        words = command.split()
-        try:
-            # Ищем число и единицу времени
-            for i, word in enumerate(words):
-                if word.isdigit():
-                    value = int(word)
-                    unit = words[i+1] if i+1 < len(words) else "секунд"
-                    if "минут" in unit:
-                        seconds = value * 60
-                    elif "час" in unit:
-                        seconds = value * 3600
-                    else:
-                        seconds = value
-                    message = " ".join(words[i+2:]) if i+2 < len(words) else "время вышло"
-                    set_reminder(seconds, message)
-                    return
-        except:
-            speak("Не понял, на сколько установить таймер")
-        return
+        .admin-btn {
+            background-color: #c0392b; 
+            color: var(--light);
+        }
 
-    # Курс валют
-    if "курс доллара" in command:
-        get_currency_rate("USD")
-        return
-    if "курс евро" in command:
-        get_currency_rate("EUR")
-        return
+        .admin-btn:hover {
+            background-color: #e74c3c;
+            transform: translateY(-2px);
+        }
 
-    # Случайное число
-    if "случайное число" in command or "рандомное число" in command:
-        number = random.randint(1, 100)
-        speak(f"Случайное число: {number}")
-        return
+        /* МОДАЛЬНЫЕ ОКНА */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
 
-    # Диктовка текста
-    if "напиши" in command and "текст" in command:
-        text_to_type = command.replace("напиши", "").replace("текст", "").strip()
-        if text_to_type:
-            type_text(text_to_type)
-        else:
-            speak("Что написать?")
-        return
+        .modal-content {
+            background-color: var(--darker);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            color: var(--light);
+            /* ИСПРАВЛЕНИЕ: Обеспечивает прокрутку содержимого модального окна */
+            max-height: 90vh; 
+            overflow-y: auto; 
+            /* Конец ИСПРАВЛЕНИЯ */
+        }
 
-    # Управление вкладками браузера
-    if "новая вкладка" in command:
-        pyautogui.hotkey('ctrl', 't')
-        speak("Новая вкладка открыта")
-        return
-    if "закрой вкладку" in command:
-        pyautogui.hotkey('ctrl', 'w')
-        speak("Вкладка закрыта")
-        return
-    if "обнови страницу" in command:
-        pyautogui.hotkey('ctrl', 'r')
-        speak("Страница обновлена")
-        return
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--light);
+            transition: color 0.3s;
+        }
 
-    # ----- УПРАВЛЕНИЕ ОКНАМИ -----
-    if any(word in command for word in ["свернуть все", "показать рабочий стол"]):
-        speak("Сворачиваю все окна")
-        pyautogui.hotkey('win', 'd')
-        return
-    elif any(word in command for word in ["свернуть текущее", "сверни это"]):
-        try:
-            active = gw.getActiveWindow()
-            if active:
-                active.minimize()
-                speak("Окно свернуто")
-            else:
-                speak("Нет активного окна")
-        except:
-            speak("Не удалось свернуть окно")
-        return
-    elif any(word in command for word in ["развернуть", "на весь экран"]):
-        try:
-            active = gw.getActiveWindow()
-            if active:
-                if active.isMaximized:
-                    active.restore()
-                else:
-                    active.maximize()
-                speak("Окно развернуто")
-            else:
-                speak("Нет активного окна")
-        except:
-            speak("Не удалось развернуть окно")
-        return
-    elif any(word in command for word in ["закрыть окно", "закрой окно"]):
-        speak("Закрываю активное окно")
-        pyautogui.hotkey('alt', 'f4')
-        return
-    elif any(word in command for word in ["переключиться", "переключи окно"]):
-        pyautogui.hotkey('alt', 'tab')
-        speak("Переключил")
-        return
-    elif any(word in command for word in ["список окон", "какие окна"]):
-        windows = gw.getAllTitles()
-        titles = [w for w in windows if w.strip() and not w.startswith('Program Manager')]
-        if titles:
-            speak(f"Открыто {len(titles)} окон. Например: {', '.join(titles[:3])}")
-        else:
-            speak("Нет открытых окон")
-        return
+        .close-modal:hover {
+            color: var(--primary);
+        }
 
-    # ----- ГРОМКОСТЬ И МЕДИА -----
-    if "громче" in command:
-        pyautogui.press('volumeup')
-        speak("Громкость увеличена")
-        return
-    elif "тише" in command:
-        pyautogui.press('volumedown')
-        speak("Громкость уменьшена")
-        return
-    elif any(word in command for word in ["выключи звук", "без звука"]):
-        pyautogui.press('volumemute')
-        speak("Звук выключен")
-        return
-    elif "максимальная громкость" in command:
-        for _ in range(10):
-            pyautogui.press('volumeup')
-        speak("Громкость на максимуме")
-        return
-    elif "минимальная громкость" in command:
-        for _ in range(10):
-            pyautogui.press('volumedown')
-        speak("Громкость на минимуме")
-        return
-    elif any(word in command for word in ["пауза", "воспроизведи", "продолжить"]):
-        pyautogui.press('playpause')
-        speak("Ок")
-        return
-    elif any(word in command for word in ["следующий трек", "дальше"]):
-        pyautogui.press('nexttrack')
-        speak("Следующий")
-        return
-    elif any(word in command for word in ["предыдущий трек", "назад"]):
-        pyautogui.press('prevtrack')
-        speak("Предыдущий")
-        return
-    elif "стоп" in command and "закрой" not in command and "выход" not in command:
-        pyautogui.press('stop')
-        speak("Остановлено")
-        return
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+        }
 
-    # ----- СКРИНШОТЫ И ФОТО -----
-    if any(word in command for word in ["скриншот", "снимок экрана"]):
-        filename = f"screenshot_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-        pyautogui.screenshot(filename)
-        speak(f"Скриншот сохранён как {filename}")
-        return
-    elif "сделай фото" in command:
-        take_photo()
-        return
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    # ----- УПРАВЛЕНИЕ ПИТАНИЕМ -----
-    if any(word in command for word in ["выключи компьютер", "выключи пк"]):
-        speak("Выключаю компьютер")
-        os.system("shutdown /s /t 5")
-        return
-    elif any(word in command for word in ["перезагрузи", "перезагрузка"]):
-        speak("Перезагружаю компьютер")
-        os.system("shutdown /r /t 5")
-        return
-    elif any(word in command for word in ["спящий режим", "усыпить"]):
-        speak("Перевожу в спящий режим")
-        os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
-        return
-    elif any(word in command for word in ["заблокировать", "блокировка"]):
-        speak("Блокирую экран")
-        subprocess.Popen("rundll32.exe user32.dll,LockWorkStation")
-        return
-    elif "выйти из системы" in command:
-        speak("Выхожу из системы")
-        os.system("shutdown /l")
-        return
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
 
-    # ----- СИСТЕМНАЯ ИНФОРМАЦИЯ -----
-    if any(word in command for word in ["сколько времени", "который час"]):
-        now = datetime.datetime.now()
-        speak(f"Сейчас {now.hour} часов {now.minute} минут")
-        return
-    elif any(word in command for word in ["какая дата", "сегодня число"]):
-        today = datetime.datetime.now().strftime("%d %B %Y")
-        speak(f"Сегодня {today}")
-        return
-    elif any(word in command for word in ["загрузка процессора", "cpu"]):
-        cpu = psutil.cpu_percent(interval=1)
-        speak(f"Загрузка процессора {cpu} процентов")
-        return
-    elif any(word in command for word in ["оперативная память", "ram"]):
-        mem = psutil.virtual_memory()
-        speak(f"Используется {mem.percent:.1f} процентов оперативной памяти")
-        return
-    elif "батарея" in command:
-        battery = psutil.sensors_battery()
-        if battery:
-            percent = battery.percent
-            plug = "в сети" if battery.power_plugged else "не в сети"
-            speak(f"Заряд батареи {percent} процентов, {plug}")
-        else:
-            speak("Нет данных о батарее")
-        return
-    elif "как дела" in command:
-        replies = ["Всё отлично, сэр!", "Работаю в штатном режиме", "Лучше всех, спасибо"]
-        speak(random.choice(replies))
-        return
-    elif any(word in command for word in ["свободное место", "на диске"]):
-        usage = psutil.disk_usage('C:')
-        free_gb = usage.free // (1024**3)
-        speak(f"На диске C свободно {free_gb} гигабайт")
-        return
-    elif any(word in command for word in ["сколько работает компьютер", "время работы"]):
-        uptime_seconds = time.time() - psutil.boot_time()
-        hours = int(uptime_seconds // 3600)
-        minutes = int((uptime_seconds % 3600) // 60)
-        speak(f"Компьютер работает {hours} часов {minutes} минут")
-        return
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+            font-size: 1rem;
+        }
 
-    # ----- ПОГОДА -----
-    if "погода" in command and WEATHER_API_KEY != "твой_ключ":
-        get_weather()
-        return
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
 
-    # ----- РАЗВЛЕЧЕНИЯ -----
-    if any(word in command for word in ["анекдот", "пошути"]):
-        jokes = [
-            "Колобок повесился. Шутка.",
-            "Почему программисты путают Хэллоуин и Рождество? Потому что 31 октября = 25 декабря.",
-            "Встречаются два сисадмина: — Ты зачем клавиатуру в мойку замачиваешь? — А мне коллега посоветовал: перед уходом с работы замачивай клавиатуру в мыльной воде, а утром споласкивай — и как новая. — И что, помогает? — Не знаю, я ещё ни разу не смог её собрать обратно."
-        ]
-        speak(random.choice(jokes))
-        return
-    elif "спасибо" in command:
-        speak("Всегда рад помочь, сэр")
-        return
-    elif any(word in command for word in ["ты кто", "кто ты"]):
-        speak("Я Музафар Ассистент, создан, чтобы помогать вам управлять компьютером и отвечать на вопросы")
-        return
-    elif any(word in command for word in ["пока", "выход", "заверши работу"]):
-        speak("Отключаюсь, сэр. До свидания!")
-        sys.exit(0)
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: var(--darker);
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
 
-    # ----- РАБОТА С ФАЙЛАМИ -----
-    if "создай папку" in command:
-        foldername = command.replace("создай папку", "").strip()
-        if not foldername:
-            foldername = f"Новая папка {datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        path = os.path.join(os.path.expanduser("~"), "Desktop", foldername)
-        try:
-            os.mkdir(path)
-            speak(f"Папка {foldername} создана на рабочем столе")
-        except:
-            speak("Не удалось создать папку")
-        return
-    elif "очисти корзину" in command:
-        try:
-            import winshell
-            winshell.recycle_bin().empty(confirm=False, show_progress=False, sound=False)
-            speak("Корзина очищена")
-        except ImportError:
-            speak("Не установлен модуль winshell")
-        except:
-            speak("Не удалось очистить корзину")
-        return
+        .submit-btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        .admin-submit-btn {
+            background-color: #c0392b !important;
+            color: var(--light) !important;
+        }
+        .admin-submit-btn:hover {
+            background-color: #e74c3c !important;
+        }
 
-    # ----- ОТКРЫТИЕ САЙТОВ И ПРОГРАММ -----
-    if any(word in command for word in ["браузер", "google", "гугл"]):
-        speak("Открываю браузер")
-        webbrowser.open("https://google.com")
-        return
-    elif any(word in command for word in ["youtube", "ютуб", "ютюб"]):
-        speak("Открываю YouTube")
-        webbrowser.open("https://youtube.com")
-        return
-    elif any(word in command for word in ["вк", "vk"]):
-        speak("Открываю ВКонтакте")
-        webbrowser.open("https://vk.com")
-        return
-    elif any(word in command for word in ["телеграм", "telegram", "тг"]):
-        speak("Открываю Telegram")
-        webbrowser.open("https://web.telegram.org")
-        return
-    elif any(word in command for word in ["дискорд", "discord"]):
-        speak("Открываю Discord")
-        webbrowser.open("https://discord.com/app")
-        return
-    elif any(word in command for word in ["новости", "новост"]):
-        speak("Свежие новости")
-        webbrowser.open("https://yandex.ru/news")
-        return
-    elif any(word in command for word in ["калькулятор", "кальк"]):
-        speak("Запускаю калькулятор")
-        subprocess.Popen("calc.exe")
-        return
-    elif any(word in command for word in ["блокнот", "notepad"]):
-        speak("Открываю блокнот")
-        subprocess.Popen("notepad.exe")
-        return
-    elif any(word in command for word in ["проводник", "explorer"]):
-        speak("Открываю проводник")
-        subprocess.Popen("explorer.exe")
-        return
-    elif any(word in command for word in ["командную строку", "cmd"]):
-        speak("Запускаю командную строку")
-        subprocess.Popen("cmd.exe")
-        return
-    elif any(word in command for word in ["диспетчер задач", "taskmgr"]):
-        speak("Открываю диспетчер задач")
-        subprocess.Popen("taskmgr.exe")
-        return
-    elif any(word in command for word in ["настройки", "параметры"]):
-        speak("Открываю настройки Windows")
-        subprocess.Popen("start ms-settings:", shell=True)
-        return
-    elif any(word in command for word in ["панель управления", "control"]):
-        speak("Открываю панель управления")
-        subprocess.Popen("control.exe")
-        return
-    elif "корзину" in command:
-        speak("Открываю корзину")
-        os.startfile("shell:RecycleBinFolder")
-        return
-    elif any(word in command for word in ["мои документы", "документы"]):
-        speak("Открываю папку Документы")
-        subprocess.Popen(r"explorer.exe %userprofile%\Documents")
-        return
-    elif "загрузки" in command:
-        speak("Открываю папку Загрузки")
-        subprocess.Popen(r"explorer.exe %userprofile%\Downloads")
-        return
-    elif "рабочий стол" in command:
-        speak("Открываю папку рабочего стола")
-        subprocess.Popen(r"explorer.exe %userprofile%\Desktop")
-        return
-    elif any(word in command for word in ["мой компьютер", "этот компьютер"]):
-        speak("Открываю Мой компьютер")
-        subprocess.Popen("explorer.exe shell:MyComputerFolder")
-        return
+        /* ФИЛЬТРЫ */
+        .filters {
+            background-color: var(--darker);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
 
-    # Если ничего не подошло
-    speak("Не понял команду, повторите, сэр")
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
 
-def get_weather():
-    try:
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={WEATHER_API_KEY}&units=metric&lang=ru"
-        res = requests.get(url)
-        data = res.json()
-        if data["cod"] == 200:
-            temp = data["main"]["temp"]
-            desc = data["weather"][0]["description"]
-            speak(f"Сейчас в городе {CITY} {temp} градусов, {desc}")
-        else:
-            speak("Не удалось получить погоду")
-    except:
-        speak("Ошибка при запросе погоды")
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
 
-def take_photo():
-    import cv2
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        speak("Камера не доступна")
-        return
-    ret, frame = cap.read()
-    if ret:
-        filename = f"photo_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-        cv2.imwrite(filename, frame)
-        speak(f"Фото сохранено как {filename}")
-    else:
-        speak("Не удалось сделать фото")
-    cap.release()
-    cv2.destroyAllWindows()
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
 
-# ===== ОСНОВНОЙ ЦИКЛ =====
-def main():
-    recognizer = sr.Recognizer()
-    recognizer.energy_threshold = 200
-    recognizer.dynamic_energy_threshold = True
-    recognizer.pause_threshold = 0.8
-    recognizer.phrase_threshold = 0.3
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+        }
 
-    with sr.Microphone() as source:
-        recognizer.adjust_for_ambient_noise(source, duration=1.5)
-        speak("Система готова, сэр. Скажите 'Музафар' для активации")
-        listening_for_command = False
+        .search-box {
+            position: relative;
+            flex: 2;
+        }
 
-        while True:
-            try:
-                text = listen(recognizer, source, timeout=1, phrase_limit=7)
-                if text:
-                    print(f"[LOG] Распознано: {text}")
+        .search-box input {
+            width: 100%;
+            padding: 10px 10px 10px 40px;
+            background-color: var(--gray);
+            border: 1px solid var(--lighter-gray);
+            border-radius: 5px;
+            color: var(--light);
+        }
 
-                    wake_found = None
-                    for wake in WAKE_WORDS:
-                        if wake in text:
-                            wake_found = wake
-                            break
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light);
+        }
 
-                    if wake_found:
-                        command_text = text.replace(wake_found, '', 1).strip()
-                        if command_text:
-                            execute_command(command_text)
-                            listening_for_command = False
-                        else:
-                            speak("Слушаю, сэр")
-                            listening_for_command = True
-                    else:
-                        if listening_for_command:
-                            execute_command(text)
-                            listening_for_command = False
-            except KeyboardInterrupt:
-                speak("Программа остановлена")
-                break
-            except Exception as e:
-                print(f"Ошибка: {e}")
-                continue
+        .apply-filters {
+            background-color: var(--secondary);
+            color: var(--darker);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-if __name__ == "__main__":
-    main()
+        .apply-filters:hover {
+            background-color: #d68910;
+        }
+
+        /* КАРТОЧКИ УСЛУГ */
+        .wishes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+            .wishes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .wish-card {
+            background-color: var(--darker);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .wish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .wish-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray);
+            position: relative;
+        }
+
+        .wish-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .wish-category {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--gray);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--light);
+        }
+
+        .wish-body {
+            padding: 20px;
+        }
+
+        .wish-description {
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .wish-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .wish-bank {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+
+        .wish-bank i {
+            color: var(--primary);
+        }
+        
+        .wish-video-link {
+            display: block;
+            margin-top: 10px;
+            color: #ccc;
+        }
+        .wish-video-link i {
+            margin-right: 5px;
+        }
+
+        .wish-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; 
+            gap: 10px;
+        }
+
+        .copy-card-btn {
+            background-color: var(--primary);
+            color: var(--darker);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .copy-card-btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .delete-wish-btn {
+            background-color: #c0392b; 
+            color: var(--light);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none; 
+        }
+
+        .delete-wish-btn.visible {
+            display: flex;
+        }
+
+        .delete-wish-btn:hover {
+            background-color: #e74c3c;
+        }
+
+        /* ТОСТ И ПУСТОЕ СОСТОЯНИЕ */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: var(--darker);
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #aaa;
+            grid-column: 1 / -1; 
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--lighter-gray);
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ФУТЕР И ЗАГРУЗКА */
+        footer {
+            background-color: var(--darker);
+            padding: 30px 0;
+            margin-top: 50px;
+            text-align: center;
+            color: #aaa;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 50px;
+            grid-column: 1 / -1;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--lighter-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <i class="fas fa-tools"></i>
+                    <h1>MA-Services</h1>
+                </a>
+                <div class="header-buttons">
+                    <button class="btn add-wish-btn" id="openModalBtn">
+                        <i class="fas fa-plus"></i>
+                        Подать **УСЛУГУ**
+                    </button>
+                    <button class="btn admin-btn" id="openAdminModalBtn">
+                        <i class="fas fa-user-shield"></i>
+                        Админ Вход
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="modal" id="wishModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <h2><i class="fas fa-tools"></i> Предложить **Услугу** (Помощь)</h2>
+            <form id="wishForm">
+                <div class="form-group">
+                    <label for="name">Ваше имя (или название услуги)</label>
+                    <input type="text" id="name" required placeholder="Например: Мастер по ремонту кранов">
+                </div>
+                <div class="form-group">
+                    <label for="wish">Описание услуги / помощи</label>
+                    <textarea id="wish" required placeholder="Например: Выполняю мелкий ремонт сантехники, электрики."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="price">Примерная стоимость услуги / Цена (₽)</label>
+                    <input type="number" id="price" required placeholder="Например: 1000 (цена за вызов)">
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Номер для связи (Контакты)</label>
+                    <input type="text" id="cardNumber" required placeholder="Номер телефона или Telegram/WhatsApp">
+                </div>
+                <div class="form-group">
+                    <label for="bank">Способ связи</label>
+                    <select id="bank" required>
+                        <option value="">Выберите основной способ связи</option>
+                        <option value="Телефон">Телефон</option>
+                        <option value="Telegram">Telegram</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="other">Другой</option>
+                    </select>
+                </div>
+                <div class="form-group" id="otherBankGroup" style="display: none;">
+                    <label for="otherBank">Укажите ваш способ/приложение</label>
+                    <input type="text" id="otherBank" placeholder="Уточните">
+                </div>
+                <div class="form-group">
+                    <label for="category">Категория услуги</label>
+                    <select id="category" required>
+                        <option value="">Выберите категорию</option>
+                        <option value="Ремонт">Ремонт</option>
+                        <option value="Садоводство">Садоводство</option>
+                        <option value="Переезд/Транспорт">Переезд/Транспорт</option>
+                        <option value="Медпомощь/Лекарства">Медпомощь/Лекарства</option>
+                        <option value="Продукты/Еда">Продукты/Еда</option>
+                        <option value="Животные">Животные</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="videoLink">Ссылка на Видео/Фото (портфолио, примеры)</label>
+                    <input type="text" id="videoLink" placeholder="Вставьте URL здесь (необязательно)">
+                </div>
+                <button type="submit" class="submit-btn" id="submitWishBtn">
+                    <i class="fas fa-paper-plane"></i> Предложить услугу
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeAdminModalBtn">&times;</span>
+            <h2><i class="fas fa-lock"></i> Вход для Администратора</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail">Email</label>
+                    <input type="email" id="adminEmail" required placeholder="Введите email">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Пароль</label>
+                    <input type="password" id="adminPassword" required placeholder="Введите пароль">
+                </div>
+                <button type="submit" class="submit-btn admin-submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="filters">
+            <div class="filter-row">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск по услугам...">
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="bankFilter">Способ связи</label>
+                    <select id="bankFilter">
+                        <option value="">Все</option>
+                        <option value="Телефон">Телефон</option>
+                        <option value="Telegram">Telegram</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="categoryFilter">Категория</label>
+                    <select id="categoryFilter">
+                        <option value="">Все категории</option>
+                        <option value="Ремонт">Ремонт</option>
+                        <option value="Садоводство">Садоводство</option>
+                        <option value="Переезд/Транспорт">Переезд/Транспорт</option>
+                        <option value="Медпомощь/Лекарства">Медпомощь/Лекарства</option>
+                        <option value="Продукты/Еда">Продукты/Еда</option>
+                        <option value="Животные">Животные</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="minPrice">Цена от (₽)</label>
+                    <input type="number" id="minPrice" placeholder="Мин. сумма">
+                </div>
+                <div class="filter-group">
+                    <label for="maxPrice">Цена до (₽)</label>
+                    <input type="number" id="maxPrice" placeholder="Макс. сумма">
+                </div>
+            </div>
+            <div class="filter-row">
+                <button class="apply-filters" id="applyFiltersBtn">
+                    <i class="fas fa-filter"></i> Применить фильтры
+                </button>
+            </div>
+        </div>
+
+        <div class="wishes-grid" id="wishesContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Контакты скопированы!</div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <i class="fas fa-tools"></i>
+                    <h1>MA-Services</h1>
+                </div>
+                <div class="footer-links">
+                    <a href="is.gd/muzaffar">MAWORLD</a>
+                    <a href="#">Правила: имейте человечность!</a>
+                    <a href="#">Контакты: +992 92-631-0060</a>
+                    <a href="#">Владелец: Шарипов Музаффар Анварович</a>
+                </div>
+                <p>© 2025 MA-Services. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // =========================================================================
+        //                          НАСТРОЙКИ (КОНФИГУРАЦИЯ)
+        // =========================================================================
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAE4zNwMJynqso1XTS1612Kri5RMgVCGmw",
+            authDomain: "dreamfamd.firebaseapp.com",
+            projectId: "dreamfamd",
+            storageBucket: "dreamfamd.appspot.com",
+            messagingSenderId: "15878889443",
+            appId: "1:15878889443:web:62abeaebbf7220ccd14ad6",
+            databaseURL: "https://dreamfamd-default-rtdb.firebaseio.com/"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth(); 
+        
+        // --- АДМИН ---
+        const ADMIN_NAME = "Muzaffar dream";
+        const ADMIN_EMAIL = "muzaffar@dreamfamd.com"; 
+        const ADMIN_PASSWORD = "test123"; 
+
+        // =========================================================================
+        //                          DOM ЭЛЕМЕНТЫ И СОСТОЯНИЕ
+        // =========================================================================
+
+        let isAdminLoggedIn = localStorage.getItem('isAdmin') === 'true';
+        let wishes = [];
+        let filteredWishes = [];
+
+        const wishForm = document.getElementById('wishForm');
+        const bankSelect = document.getElementById('bank');
+        const otherBankGroup = document.getElementById('otherBankGroup');
+        const otherBankInput = document.getElementById('otherBank');
+        const wishesContainer = document.getElementById('wishesContainer');
+        const toast = document.getElementById('toast');
+        const submitWishBtn = document.getElementById('submitWishBtn');
+        const wishModal = document.getElementById('wishModal');
+
+        const searchInput = document.getElementById('searchInput');
+        const bankFilter = document.getElementById('bankFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        
+        const openAdminModalBtn = document.getElementById('openAdminModalBtn');
+        const closeAdminModalBtn = document.getElementById('closeAdminModalBtn');
+        const adminModal = document.getElementById('adminModal');
+        const adminLoginForm = document.getElementById('adminLoginForm');
+
+        // =========================================================================
+        //                          УТИЛИТЫ И АДМИН-ЛОГИКА
+        // =========================================================================
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function formatPrice(price) {
+            if (price === undefined || price === null) return 'По договоренности';
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₽';
+        }
+
+        function closeModal(modalElement) {
+            modalElement.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function deleteWish(wishId) {
+            if (!isAdminLoggedIn) { 
+                showToast('У вас нет прав для удаления!');
+                return;
+            }
+            if (!confirm('Вы уверены, что хотите удалить эту услугу из базы?')) {
+                return;
+            }
+
+            database.ref('wishes/' + wishId).remove()
+                .then(() => {
+                    showToast('Услуга удалена.');
+                })
+                .catch((error) => {
+                    console.error('Ошибка при удалении:', error);
+                    showToast('Ошибка при удалении услуги.');
+                });
+        }
+
+        function updateAdminUI() {
+            const deleteButtons = document.querySelectorAll('.delete-wish-btn');
+            
+            if (isAdminLoggedIn) {
+                openAdminModalBtn.textContent = `${ADMIN_NAME} (Выход)`;
+                openAdminModalBtn.style.backgroundColor = 'var(--secondary)';
+                openAdminModalBtn.style.color = 'var(--darker)';
+                deleteButtons.forEach(btn => btn.classList.add('visible'));
+            } else {
+                openAdminModalBtn.textContent = 'Админ Вход';
+                openAdminModalBtn.style.backgroundColor = '#c0392b';
+                openAdminModalBtn.style.color = 'var(--light)';
+                deleteButtons.forEach(btn => btn.classList.remove('visible'));
+            }
+        }
+        
+        // --- Логика Админ-панели ---
+        openAdminModalBtn.addEventListener('click', () => {
+            if (isAdminLoggedIn) {
+                localStorage.removeItem('isAdmin');
+                isAdminLoggedIn = false;
+                updateAdminUI();
+                showToast('Выход выполнен.');
+                return;
+            }
+            adminModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            // Очищаем поля
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPassword').value = '';
+        });
+
+        closeAdminModalBtn.addEventListener('click', () => {
+            closeModal(adminModal);
+        });
+
+        adminLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                isAdminLoggedIn = true;
+                localStorage.setItem('isAdmin', 'true');
+                showToast(`Вход выполнен как Администратор ${ADMIN_NAME}!`);
+                closeModal(adminModal);
+                updateAdminUI();
+            } else {
+                showToast('Неверный Email или Пароль для Администратора.');
+            }
+        });
+
+        // =========================================================================
+        //                          ЧТЕНИЕ ДАННЫХ ИЗ FIREBASE
+        // =========================================================================
+
+        function loadWishes() {
+            wishesContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            database.ref('wishes').on('value', (snapshot) => {
+                wishes = [];
+                snapshot.forEach((childSnapshot) => {
+                    const wish = childSnapshot.val();
+                    
+                    // !!! КЛЮЧЕВОЙ ФИЛЬТР: ПОКАЗЫВАЕМ ТОЛЬКО ЗАПИСИ ТИПА 'Service' !!!
+                    if (wish.type !== 'Service') {
+                        return; 
+                    }
+                    
+                    wish.id = childSnapshot.key;
+                    wishes.push(wish);
+                });
+
+                wishes.sort((a, b) => b.createdAt - a.createdAt);
+                applyFilters();
+                updateAdminUI();
+            });
+        }
+
+        // Отрисовка услуг
+        function renderWishes(wishesToRender) {
+            wishesContainer.innerHTML = '';
+            
+            if (wishesToRender.length === 0) {
+                wishesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-tools"></i>
+                        <p>Пока нет услуг, соответствующих вашим фильтрам. Попробуйте изменить параметры поиска или <a href="#" id="openModalBtnEmptyState" style="color: var(--primary);">предложите свою услугу</a>.</p>
+                    </div>
+                `;
+                document.getElementById('openModalBtnEmptyState')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('openModalBtn').click();
+                });
+                return;
+            }
+
+            wishesToRender.forEach(wish => {
+                const wishCard = document.createElement('div');
+                wishCard.className = 'wish-card';
+
+                const adminButtonClass = isAdminLoggedIn ? 'visible' : '';
+                const videoHtml = wish.videoLink ? 
+                    `<a class="wish-video-link" href="${wish.videoLink}" target="_blank"><i class="fas fa-video"></i> Портфолио/Видео</a>` : 
+                    '';
+
+                wishCard.innerHTML = `
+                    <div class="wish-header">
+                        <h3 class="wish-name">${wish.name}</h3>
+                        <span class="wish-category">${wish.category}</span>
+                    </div>
+                    <div class="wish-body">
+                        <p class="wish-description">${wish.wish}</p>
+                        <div class="wish-price">Цена: ${formatPrice(wish.price)}</div>
+                        <div class="wish-bank">
+                            <i class="fas fa-phone"></i>
+                            <span>Связь: ${wish.bank}</span>
+                        </div>
+                        ${videoHtml}
+                        <div class="wish-actions" style="margin-top: 20px;">
+                            <button class="copy-card-btn" data-card="${wish.cardNumber}">
+                                <i class="far fa-copy"></i>
+                                Скопировать контакты
+                            </button>
+                            <button class="delete-wish-btn ${adminButtonClass}" data-id="${wish.id}">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        </div>
+                    </div>
+                `;
+                wishesContainer.appendChild(wishCard);
+            });
+
+            document.querySelectorAll('.copy-card-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cardNumber = btn.getAttribute('data-card');
+                    navigator.clipboard.writeText(cardNumber).then(() => {
+                        showToast('Контакты скопированы');
+                    });
+                });
+            });
+            
+            document.querySelectorAll('.delete-wish-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const wishId = btn.getAttribute('data-id');
+                    deleteWish(wishId);
+                });
+            });
+            updateAdminUI(); // Обновляем видимость кнопок удаления после рендера
+        }
+
+        // Применение фильтров
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedBank = bankFilter.value;
+            const selectedCategory = categoryFilter.value;
+            const minPriceValue = minPrice.value ? parseInt(minPrice.value) : 0;
+            const maxPriceValue = maxPrice.value ? parseInt(maxPrice.value) : Infinity;
+
+            filteredWishes = wishes.filter(wish => {
+                const matchesSearch = (wish.name && wish.name.toLowerCase().includes(searchTerm)) ||
+                                     (wish.wish && wish.wish.toLowerCase().includes(searchTerm));
+                
+                const matchesBank = !selectedBank || selectedBank === 'other' || wish.bank === selectedBank || (selectedBank === 'other' && !['Телефон', 'Telegram', 'WhatsApp'].includes(wish.bank));
+                const matchesCategory = !selectedCategory || wish.category === selectedCategory;
+                
+                const price = wish.price ? parseInt(wish.price) : 0;
+                const matchesPrice = price >= minPriceValue && price <= maxPriceValue;
+
+                return matchesSearch && matchesBank && matchesCategory && matchesPrice;
+            });
+
+            renderWishes(filteredWishes);
+        }
+
+        // =========================================================================
+        //                          ЗАПИСЬ ДАННЫХ В FIREBASE
+        // =========================================================================
+
+        wishForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            submitWishBtn.disabled = true;
+            submitWishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+
+            // 1. Сбор данных
+            const name = document.getElementById('name').value;
+            const wishText = document.getElementById('wish').value;
+            const price = document.getElementById('price').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const category = document.getElementById('category').value;
+            const videoLink = document.getElementById('videoLink').value;
+            
+            let bank = bankSelect.value;
+            if (bank === 'other') {
+                bank = otherBankInput.value || 'Другой (уточнять)';
+            }
+            
+            const newWish = {
+                // !!! ГЛАВНОЕ: ОТМЕЧАЕМ ЭТУ ЗАПИСЬ КАК 'Service' !!!
+                type: 'Service', 
+                name: name,
+                wish: wishText,
+                price: price,
+                cardNumber: cardNumber, 
+                bank: bank,
+                category: category,
+                videoLink: videoLink,
+                createdAt: firebase.database.ServerValue.TIMESTAMP 
+            };
+
+            // 2. Отправка в Firebase
+            database.ref('wishes').push(newWish)
+                .then(() => {
+                    showToast('✅ Услуга успешно добавлена!');
+                    wishForm.reset();
+                    closeModal(wishModal);
+                })
+                .catch((error) => {
+                    console.error('Ошибка записи в базу данных:', error);
+                    showToast('❌ Ошибка при добавлении услуги.');
+                })
+                .finally(() => {
+                    submitWishBtn.disabled = false;
+                    submitWishBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Предложить услугу';
+                });
+        });
+
+        // --- Обработчики форм и фильтров ---
+        document.getElementById('openModalBtn').addEventListener('click', () => {
+            wishModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+
+        document.getElementById('closeModalBtn').addEventListener('click', () => {
+            closeModal(wishModal);
+        });
+        
+        bankSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'other') {
+                document.getElementById('otherBankGroup').style.display = 'block';
+                document.getElementById('otherBank').setAttribute('required', 'required');
+            } else {
+                document.getElementById('otherBankGroup').style.display = 'none';
+                document.getElementById('otherBank').removeAttribute('required');
+            }
+        });
+
+        searchInput.addEventListener('input', applyFilters);
+        applyFiltersBtn.addEventListener('click', applyFilters);
+        bankFilter.addEventListener('change', applyFilters);
+        categoryFilter.addEventListener('change', applyFilters);
+        minPrice.addEventListener('input', applyFilters);
+        maxPrice.addEventListener('input', applyFilters);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === wishModal) {
+                closeModal(wishModal);
+            }
+            if (e.target === adminModal) {
+                closeModal(adminModal);
+            }
+        });
+
+
+        // --- Загрузка при старте ---
+        window.addEventListener('DOMContentLoaded', loadWishes);
+    </script>
+</body>
+</html>
