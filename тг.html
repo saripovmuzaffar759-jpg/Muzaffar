@@ -2,121 +2,110 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>MUZAFFARGRAM | FINAL</title>
-    <!-- Подключаем библиотеку напрямую из надежного источника -->
+    <title>MUZAFFARGRAM | ULTRA</title>
+    <!-- Подключаем библиотеку версии 2.0 (стабильная для браузеров) -->
     <script src="https://cdn.jsdelivr.net"></script>
     <style>
-        body { margin: 0; background: #0e1621; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .card { background: #17212b; width: 340px; padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); text-align: center; border: 1px solid #242f3d; }
-        h1 { color: #5288c1; margin: 0 0 15px 0; font-size: 22px; }
+        body { margin: 0; background: #0f1721; color: white; font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .box { background: #17212b; width: 320px; padding: 35px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); text-align: center; border: 1px solid #2b3744; }
+        h2 { color: #5288c1; margin-bottom: 20px; font-weight: 500; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #242f3d; background: #242f3d; border-radius: 8px; color: white; box-sizing: border-box; outline: none; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #5288c1; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:disabled { background: #3c4c5d; opacity: 0.6; }
-        #status { margin-top: 15px; font-size: 13px; color: #7f91a4; min-height: 1.5em; }
+        input:focus { border-color: #5288c1; }
+        button { width: 100%; padding: 12px; background: #5288c1; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; }
+        button:hover { background: #6199d1; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #log { margin-top: 15px; font-size: 12px; color: #7f91a4; min-height: 1.5em; }
         .hidden { display: none; }
-        ul { text-align: left; padding: 0; list-style: none; margin-top: 15px; border-top: 1px solid #242f3d; }
-        li { padding: 8px 0; border-bottom: 1px solid #242f3d; font-size: 14px; }
+        #chats { text-align: left; margin-top: 15px; font-size: 13px; max-height: 150px; overflow-y: auto; color: #aeb7c2; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>MUZAFFARGRAM</h1>
-    <div id="auth-ui">
-        <p id="hint" style="font-size: 14px; color: #7f91a4;">Вход в аккаунт</p>
-        
-        <div id="step-phone">
-            <input type="text" id="phone" placeholder="+992XXXXXXXXX" value="+992">
-            <button id="btn-send" onclick="sendCode()">Получить код</button>
-        </div>
-
-        <div id="step-code" class="hidden">
-            <input type="text" id="code" placeholder="Код подтверждения">
-            <button id="btn-login" onclick="verifyCode()">Войти</button>
-        </div>
-
-        <div id="step-final" class="hidden">
-            <h3 style="color: #4CAF50;">Успешный вход!</h3>
-            <div id="chat-list"></div>
-        </div>
+<div class="box">
+    <h2>MUZAFFARGRAM</h2>
+    <div id="step1">
+        <input type="text" id="phone" placeholder="+992XXXXXXXXX" value="+992">
+        <button id="btn1" onclick="startAuth()">ПОЛУЧИТЬ КОД</button>
     </div>
-    <div id="status">Загрузка модулей...</div>
+    <div id="step2" class="hidden">
+        <input type="text" id="code" placeholder="Код из Telegram">
+        <button id="btn2" onclick="confirmCode()">ВОЙТИ</button>
+    </div>
+    <div id="step3" class="hidden">
+        <h3 style="color: #4CAF50;">ВХОД ВЫПОЛНЕН!</h3>
+        <div id="chats"></div>
+    </div>
+    <div id="log">Загрузка системы...</div>
 </div>
 
 <script>
     const apiId = 39447226;
     const apiHash = "6bc48eb39c020be4d3cbbdda2cae5acf";
-    let client = null;
+    let client;
 
-    // Инициализация при старте
-    async function init() {
-        const status = document.getElementById('status');
+    // Инициализация при загрузке страницы
+    (async () => {
         try {
-            if (typeof window.telegram === 'undefined') {
-                throw new Error("Библиотека не загружена. Проверь интернет.");
-            }
             const { TelegramClient } = window.telegram;
             const { StringSession } = window.telegram.sessions;
-            
-            client = new TelegramClient(new StringSession(""), apiId, apiHash, {
+            client = new TelegramClient(new StringSession(""), apiId, apiHash, { 
                 connectionRetries: 5,
-                // Используем прокси для обхода ограничений браузера
-                useWSS: true 
+                useWSS: true // Критично для работы в браузере через HTTPS
             });
-            status.innerText = "Система готова";
+            document.getElementById('log').innerText = "Система готова к работе";
         } catch (e) {
-            status.style.color = "#ef5350";
-            status.innerText = e.message;
+            document.getElementById('log').innerText = "Ошибка: " + e.message;
         }
-    }
+    })();
 
-    async function sendCode() {
+    async function startAuth() {
         const phone = document.getElementById('phone').value;
-        const btn = document.getElementById('btn-send');
-        const st = document.getElementById('status');
+        const log = document.getElementById('log');
+        const btn = document.getElementById('btn1');
         
         try {
             btn.disabled = true;
-            st.innerText = "Подключение к Telegram...";
+            log.innerText = "Подключение...";
             await client.connect();
+            
+            log.innerText = "Запрос кода...";
             await client.sendCode({ apiId, apiHash }, phone);
             
-            document.getElementById('step-phone').classList.add('hidden');
-            document.getElementById('step-code').classList.remove('hidden');
-            document.getElementById('hint').innerText = "Введите код из чата Telegram";
-            st.innerText = "";
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            log.innerText = "Код отправлен в ваш аккаунт";
         } catch (e) {
             btn.disabled = false;
-            st.innerText = "Ошибка: " + e.message;
+            log.innerText = "Ошибка: " + e.message;
+            console.error(e);
         }
     }
 
-    async function verifyCode() {
+    async function confirmCode() {
         const code = document.getElementById('code').value;
         const phone = document.getElementById('phone').value;
-        const st = document.getElementById('status');
+        const log = document.getElementById('log');
         
         try {
-            st.innerText = "Проверка...";
-            await client.signIn({ phoneNumber: phone, phoneCode: async () => code });
+            log.innerText = "Проверка кода...";
+            await client.signIn({
+                phoneNumber: phone,
+                phoneCode: async () => code
+            });
             
-            document.getElementById('step-code').classList.add('hidden');
-            document.getElementById('step-final').classList.remove('hidden');
-            st.innerText = "Загрузка чатов...";
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            log.innerText = "Загрузка ваших чатов...";
             
             const dialogs = await client.getDialogs({ limit: 10 });
-            let html = '<ul>';
-            dialogs.forEach(d => html += `<li>💬 ${d.title || 'Чат'}</li>`);
-            html += '</ul>';
-            document.getElementById('chat-list').innerHTML = html;
-            st.innerText = "Вы в системе!";
+            const chatDiv = document.getElementById('chats');
+            chatDiv.innerHTML = dialogs.map(d => `<div>• ${d.title || 'Личный чат'}</div>`).join('');
+            log.innerText = "Добро пожаловать!";
         } catch (e) {
-            st.innerText = "Ошибка: " + e.message;
+            log.innerText = "Ошибка входа: " + e.message;
         }
     }
-
-    // Запускаем инициализацию
-    init();
 </script>
+
 </body>
 </html>
