@@ -7,10 +7,11 @@
     <style>
         body { margin: 0; background: #0e1621; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
         .card { background: #17212b; width: 350px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
-        h1 { color: #5288c1; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #242f3d; background: #242f3d; border-radius: 8px; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #5288c1; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        #status { margin-top: 15px; font-size: 13px; color: #ef5350; }
+        h1 { color: #5288c1; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #242f3d; background: #242f3d; border-radius: 8px; color: white; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 12px; background: #5288c1; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:disabled { background: #3c4c5d; cursor: not-allowed; }
+        #status { margin-top: 15px; font-size: 13px; color: #5288c1; min-height: 1.5em; }
         .hidden { display: none; }
     </style>
 </head>
@@ -18,60 +19,74 @@
 
 <div class="card">
     <h1>MUZAFFARGRAM</h1>
-    <p id="sub">Введите номер телефона</p>
+    <p id="sub" style="color: #7f91a4; font-size: 14px;">Вход через официальный API</p>
     
     <div id="step-phone">
-        <input type="text" id="phone" placeholder="+79990000000" value="+">
-        <button onclick="connectAndSend()">Получить код</button>
+        <input type="text" id="phone" placeholder="+992XXXXXXXXX" value="+992">
+        <button id="btn-send" onclick="connectAndSend()">Получить код</button>
     </div>
 
     <div id="step-code" class="hidden">
         <input type="text" id="code" placeholder="Код из Telegram">
-        <button onclick="finishLogin()">Войти</button>
+        <button id="btn-login" onclick="finishLogin()">Войти</button>
     </div>
 
     <div id="step-final" class="hidden">
-        <h2 style="color: #4CAF50;">Вы вошли!</h2>
-        <p>Проверьте консоль (F12) — там ваша сессия.</p>
+        <h2 style="color: #4CAF50;">Успешно!</h2>
+        <p>Вы авторизованы. Список чатов загружается...</p>
+        <ul id="chat-list" style="text-align: left; font-size: 13px; list-style: none; padding: 0;"></ul>
     </div>
 
-    <div id="status"></div>
+    <div id="status">Ожидание инициализации...</div>
 </div>
 
 <script>
-    const { TelegramClient } = window.telegram;
-    const { StringSession } = window.telegram.sessions;
-
+    // Твои данные
     const apiId = 39447226;
     const apiHash = "6bc48eb39c020be4d3cbbdda2cae5acf";
-    const session = new StringSession(""); // Пустая сессия для начала
+    
+    let client = null;
 
-    const client = new TelegramClient(session, apiId, apiHash, { connectionRetries: 5 });
+    // Инициализация при загрузке
+    window.onload = async () => {
+        try {
+            const { TelegramClient } = window.telegram;
+            const { StringSession } = window.telegram.sessions;
+            client = new TelegramClient(new StringSession(""), apiId, apiHash, { connectionRetries: 5 });
+            document.getElementById('status').innerText = "Готов к работе";
+        } catch (e) {
+            document.getElementById('status').innerText = "Ошибка загрузки библиотеки";
+        }
+    };
 
     async function connectAndSend() {
+        if (!client) return;
         const phone = document.getElementById('phone').value;
-        const status = document.getElementById('status');
-        status.style.color = "#5288c1";
-        status.innerText = "Связь с Telegram...";
+        const btn = document.getElementById('btn-send');
+        const st = document.getElementById('status');
 
         try {
+            btn.disabled = true;
+            st.innerText = "Подключение к серверам...";
+            
             await client.connect();
             await client.sendCode({ apiId, apiHash }, phone);
             
             document.getElementById('step-phone').classList.add('hidden');
             document.getElementById('step-code').classList.remove('hidden');
-            document.getElementById('sub').innerText = "Введите код";
-            status.innerText = "";
+            document.getElementById('sub').innerText = "Введите код из приложения Telegram";
+            st.innerText = "";
         } catch (e) {
-            status.style.color = "#ef5350";
-            status.innerText = "Ошибка: " + e.message;
+            btn.disabled = false;
+            st.style.color = "#ef5350";
+            st.innerText = "Ошибка: " + e.message;
         }
     }
 
     async function finishLogin() {
         const code = document.getElementById('code').value;
         const phone = document.getElementById('phone').value;
-        const status = document.getElementById('status');
+        const st = document.getElementById('status');
 
         try {
             await client.signIn({
@@ -81,10 +96,22 @@
 
             document.getElementById('step-code').classList.add('hidden');
             document.getElementById('step-final').classList.remove('hidden');
-            status.innerText = "Авторизация успешна!";
-            console.log("Твоя сессия (сохрани её):", client.session.save());
+            st.innerText = "Загрузка данных...";
+
+            // Загружаем пару чатов для теста
+            const dialogs = await client.getDialogs({ limit: 5 });
+            const list = document.getElementById('chat-list');
+            dialogs.forEach(d => {
+                const li = document.createElement('li');
+                li.style.padding = "5px 0";
+                li.style.borderBottom = "1px solid #242f3d";
+                li.innerText = "💬 " + (d.title || "Личный чат");
+                list.appendChild(li);
+            });
+            st.innerText = "";
         } catch (e) {
-            status.innerText = "Ошибка кода: " + e.message;
+            st.style.color = "#ef5350";
+            st.innerText = "Ошибка: " + e.message;
         }
     }
 </script>
