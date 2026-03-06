@@ -2,110 +2,50 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>MUZAFFARGRAM | ULTRA</title>
-    <!-- Подключаем библиотеку версии 2.0 (стабильная для браузеров) -->
-    <script src="https://cdn.jsdelivr.net"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUZAFFARGRAM | Powered by Telegram</title>
+    <script src="https://telegram.org"></script>
     <style>
-        body { margin: 0; background: #0f1721; color: white; font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .box { background: #17212b; width: 320px; padding: 35px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); text-align: center; border: 1px solid #2b3744; }
-        h2 { color: #5288c1; margin-bottom: 20px; font-weight: 500; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #242f3d; background: #242f3d; border-radius: 8px; color: white; box-sizing: border-box; outline: none; font-size: 16px; }
-        input:focus { border-color: #5288c1; }
-        button { width: 100%; padding: 12px; background: #5288c1; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; }
-        button:hover { background: #6199d1; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        #log { margin-top: 15px; font-size: 12px; color: #7f91a4; min-height: 1.5em; }
-        .hidden { display: none; }
-        #chats { text-align: left; margin-top: 15px; font-size: 13px; max-height: 150px; overflow-y: auto; color: #aeb7c2; }
+        body { margin: 0; background: #0e1621; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+        .container { background: #17212b; width: 90%; max-width: 350px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #242f3d; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #5288c1; margin-bottom: 15px; background: #242f3d; }
+        h1 { color: #5288c1; font-size: 22px; margin: 10px 0; }
+        .user-id { color: #7f91a4; font-size: 14px; margin-bottom: 20px; }
+        .btn { background: #5288c1; color: white; padding: 12px; border: none; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background: #6099d4; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>MUZAFFARGRAM</h2>
-    <div id="step1">
-        <input type="text" id="phone" placeholder="+992XXXXXXXXX" value="+992">
-        <button id="btn1" onclick="startAuth()">ПОЛУЧИТЬ КОД</button>
-    </div>
-    <div id="step2" class="hidden">
-        <input type="text" id="code" placeholder="Код из Telegram">
-        <button id="btn2" onclick="confirmCode()">ВОЙТИ</button>
-    </div>
-    <div id="step3" class="hidden">
-        <h3 style="color: #4CAF50;">ВХОД ВЫПОЛНЕН!</h3>
-        <div id="chats"></div>
-    </div>
-    <div id="log">Загрузка системы...</div>
+<div class="container">
+    <img id="photo" class="avatar" src="https://via.placeholder.com" alt="Avatar">
+    <h1 id="name">Загрузка...</h1>
+    <div id="id-box" class="user-id">Подключение к базе данных...</div>
+    <button class="btn" onclick="tg.close()">ВЕРНУТЬСЯ В ЧАТ</button>
 </div>
 
 <script>
-    const apiId = 39447226;
-    const apiHash = "6bc48eb39c020be4d3cbbdda2cae5acf";
-    let client;
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
 
-    // Инициализация при загрузке страницы
-    (async () => {
-        try {
-            const { TelegramClient } = window.telegram;
-            const { StringSession } = window.telegram.sessions;
-            client = new TelegramClient(new StringSession(""), apiId, apiHash, { 
-                connectionRetries: 5,
-                useWSS: true // Критично для работы в браузере через HTTPS
-            });
-            document.getElementById('log').innerText = "Система готова к работе";
-        } catch (e) {
-            document.getElementById('log').innerText = "Ошибка: " + e.message;
-        }
-    })();
+    const user = tg.initDataUnsafe?.user;
 
-    async function startAuth() {
-        const phone = document.getElementById('phone').value;
-        const log = document.getElementById('log');
-        const btn = document.getElementById('btn1');
+    if (user) {
+        // Данные подтягиваются из РЕАЛЬНОЙ базы Telegram того, кто открыл апп
+        document.getElementById('name').innerText = `${user.first_name} ${user.last_name || ''}`;
+        document.getElementById('id-box').innerText = `ID: ${user.id} | @${user.username || 'hidden'}`;
         
-        try {
-            btn.disabled = true;
-            log.innerText = "Подключение...";
-            await client.connect();
-            
-            log.innerText = "Запрос кода...";
-            await client.sendCode({ apiId, apiHash }, phone);
-            
-            document.getElementById('step1').classList.add('hidden');
-            document.getElementById('step2').classList.remove('hidden');
-            log.innerText = "Код отправлен в ваш аккаунт";
-        } catch (e) {
-            btn.disabled = false;
-            log.innerText = "Ошибка: " + e.message;
-            console.error(e);
+        if (user.photo_url) {
+            document.getElementById('photo').src = user.photo_url;
         }
-    }
-
-    async function confirmCode() {
-        const code = document.getElementById('code').value;
-        const phone = document.getElementById('phone').value;
-        const log = document.getElementById('log');
         
-        try {
-            log.innerText = "Проверка кода...";
-            await client.signIn({
-                phoneNumber: phone,
-                phoneCode: async () => code
-            });
-            
-            document.getElementById('step2').classList.add('hidden');
-            document.getElementById('step3').classList.remove('hidden');
-            log.innerText = "Загрузка ваших чатов...";
-            
-            const dialogs = await client.getDialogs({ limit: 10 });
-            const chatDiv = document.getElementById('chats');
-            chatDiv.innerHTML = dialogs.map(d => `<div>• ${d.title || 'Личный чат'}</div>`).join('');
-            log.innerText = "Добро пожаловать!";
-        } catch (e) {
-            log.innerText = "Ошибка входа: " + e.message;
-        }
+        // Устанавливаем цвет кнопки как в теме юзера
+        document.querySelector('.btn').style.backgroundColor = tg.themeParams.button_color || '#5288c1';
+    } else {
+        document.getElementById('name').innerText = "MUZAFFARGRAM";
+        document.getElementById('id-box').innerText = "Открой через своего бота!";
     }
 </script>
-
 </body>
 </html>
