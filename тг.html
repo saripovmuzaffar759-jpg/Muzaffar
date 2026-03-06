@@ -2,50 +2,61 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUZAFFARGRAM | Powered by Telegram</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MUZAFFARGRAM | LIVE</title>
+    <!-- Подключаем базу данных напрямую -->
     <script src="https://telegram.org"></script>
     <style>
-        body { margin: 0; background: #0e1621; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-        .container { background: #17212b; width: 90%; max-width: 350px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #242f3d; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #5288c1; margin-bottom: 15px; background: #242f3d; }
-        h1 { color: #5288c1; font-size: 22px; margin: 10px 0; }
-        .user-id { color: #7f91a4; font-size: 14px; margin-bottom: 20px; }
-        .btn { background: #5288c1; color: white; padding: 12px; border: none; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn:hover { background: #6099d4; }
+        body { margin: 0; background: #0e1621; color: white; font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .container { background: #17212b; width: 320px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); text-align: center; border: 1px solid #242f3d; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #5288c1; margin-bottom: 15px; background: #242f3d; object-fit: cover; }
+        h1 { color: #5288c1; font-size: 24px; margin: 5px 0; }
+        .status-box { color: #7f91a4; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+        .btn { background: #5288c1; color: white; padding: 14px; border: none; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <img id="photo" class="avatar" src="https://via.placeholder.com" alt="Avatar">
-    <h1 id="name">Загрузка...</h1>
-    <div id="id-box" class="user-id">Подключение к базе данных...</div>
-    <button class="btn" onclick="tg.close()">ВЕРНУТЬСЯ В ЧАТ</button>
+    <img id="user-pic" class="avatar" src="https://ui-avatars.com" alt="">
+    <h1 id="user-name">MUZAFFARGRAM</h1>
+    <div id="user-info" class="status-box">Подключение к облаку...</div>
+    <button class="btn" onclick="window.Telegram.WebApp.close()">ЗАКРЫТЬ КЛИЕНТ</button>
 </div>
 
 <script>
+    // Инициализация базы данных
     const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    
+    function initApp() {
+        tg.ready();
+        tg.expand();
 
-    const user = tg.initDataUnsafe?.user;
+        const user = tg.initDataUnsafe?.user;
 
-    if (user) {
-        // Данные подтягиваются из РЕАЛЬНОЙ базы Telegram того, кто открыл апп
-        document.getElementById('name').innerText = `${user.first_name} ${user.last_name || ''}`;
-        document.getElementById('id-box').innerText = `ID: ${user.id} | @${user.username || 'hidden'}`;
-        
-        if (user.photo_url) {
-            document.getElementById('photo').src = user.photo_url;
+        if (user) {
+            // Если база отдала данные
+            document.getElementById('user-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+            document.getElementById('user-info').innerHTML = `
+                <b>ID:</b> ${user.id}<br>
+                <b>Username:</b> @${user.username || 'не указан'}<br>
+                <b>Язык:</b> ${user.language_code || 'ru'}
+            `;
+            
+            if (user.photo_url) {
+                document.getElementById('user-pic').src = user.photo_url;
+            }
+            
+            // Красим кнопку в цвет темы пользователя
+            document.querySelector('.btn').style.backgroundColor = tg.themeParams.button_color || '#5288c1';
+        } else {
+            // Если открыто не через Telegram
+            document.getElementById('user-info').innerText = "Ошибка: Открой ссылку внутри Telegram!";
         }
-        
-        // Устанавливаем цвет кнопки как в теме юзера
-        document.querySelector('.btn').style.backgroundColor = tg.themeParams.button_color || '#5288c1';
-    } else {
-        document.getElementById('name').innerText = "MUZAFFARGRAM";
-        document.getElementById('id-box').innerText = "Открой через своего бота!";
     }
+
+    // Запускаем через 500мс, чтобы база успела прогрузиться
+    setTimeout(initApp, 500);
 </script>
 </body>
 </html>
