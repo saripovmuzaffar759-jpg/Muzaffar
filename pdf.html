@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerPoint Web — полный функционал</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #2c2c2c;
+        }
+
+        #root {
+            height: 100%;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: all 0.2s;
+        }
+
+        .app.light {
+            background: #f3f2f1;
+            color: #1e1e1e;
+        }
+
+        .app.dark {
+            background: #1e1e1e;
+            color: #f3f2f1;
+        }
+
+        /* Лента как в PowerPoint 365 */
+        .ribbon {
+            background: linear-gradient(180deg, #f6f6f6 0%, #e8e8e8 100%);
+            border-bottom: 1px solid #bbb;
+            padding: 4px 8px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .dark .ribbon {
+            background: linear-gradient(180deg, #3c3c3c 0%, #2d2d2d 100%);
+            border-bottom-color: #555;
+        }
+
+        .ribbon-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 12px;
+            border-right: 1px solid #aaa;
+        }
+
+        .ribbon-group:last-child {
+            border-right: none;
+        }
+
+        .ribbon button, .ribbon select, .ribbon input[type="color"], .ribbon input[type="range"] {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.1s;
+            color: inherit;
+            min-width: 32px;
+        }
+
+        .ribbon button:hover, .ribbon select:hover {
+            background: rgba(0, 120, 212, 0.1);
+            border-color: #aaa;
+        }
+
+        .ribbon button i {
+            font-size: 16px;
+        }
+
+        .dark .ribbon button, .dark .ribbon select {
+            background: #3a3a3a;
+            border-color: #555;
+        }
+
+        /* Рабочая область */
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Миниатюры */
+        .slide-thumbnails {
+            width: 240px;
+            border-right: 1px solid #bbb;
+            overflow-y: auto;
+            padding: 16px;
+            background: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .thumbnail {
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+            aspect-ratio: 16/9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .thumbnail.selected {
+            border-color: #0078d4;
+            box-shadow: 0 0 0 2px #0078d4;
+        }
+
+        .thumbnail canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail .slide-number {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .thumbnail .delete-slide-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .thumbnail:hover .delete-slide-btn {
+            opacity: 1;
+        }
+
+        /* Основная область */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: auto;
+            background: inherit;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 4px 16px;
+            background: rgba(128,128,128,0.1);
+            border-radius: 30px;
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 0;
+        }
+
+        .slide {
+            position: relative;
+            width: 960px;
+            height: 540px;
+            background: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .slide[data-grid="true"] {
+            background-image: 
+                linear-gradient(to right, #e0e0e0 1px, transparent 1px),
+                linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Элементы */
+        .element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            border: 1px solid transparent;
+        }
+
+        .element.selected {
+            border: 1px solid #0078d4;
+            outline: 2px solid #0078d4;
+        }
+
+        .element.locked {
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        .element .delete-btn {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+
+        .element.selected .delete-btn {
+            opacity: 1;
+        }
+
+        .element .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0078d4;
+            border: 2px solid white;
+            border-radius: 2px;
+            z-index: 10;
+        }
+
+        .resize-handle.nw { top: -5px; left: -5px; cursor: nw-resize; }
+        .resize-handle.ne { top: -5px; right: -5px; cursor: ne-resize; }
+        .resize-handle.sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+        .resize-handle.se { bottom: -5px; right: -5px; cursor: se-resize; }
+
+        .text-element {
+            width: 100%;
+            height: 100%;
+            outline: none;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+            resize: none;
+            overflow: auto;
+            padding: 8px;
+        }
+
+        .shape-element {
+            width: 100%;
+            height: 100%;
+        }
+
+        .image-element, .video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .table-element {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .table-element td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            min-width: 40px;
+        }
+
+        .arrow-element {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .arrow-element::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: currentColor;
+            clip-path: polygon(0% 0%, 70% 0%, 70% 0%, 100% 50%, 70% 100%, 70% 100%, 0% 100%);
+        }
+
+        /* Панель свойств */
+        .properties-panel {
+            width: 320px;
+            border-left: 1px solid #bbb;
+            padding: 20px;
+            overflow-y: auto;
+            background: inherit;
+        }
+
+        .properties-panel h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .property-section {
+            margin-bottom: 24px;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 16px;
+        }
+
+        .property-section label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .dark .property-section label {
+            color: #aaa;
+        }
+
+        .property-section input, .property-section select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            background: white;
+        }
+
+        .dark .property-section input, .dark .property-section select {
+            background: #2d2d2d;
+            color: #f0f0f0;
+            border-color: #555;
+        }
+
+        .color-input {
+            height: 40px;
+            padding: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 8px;
+            background: transparent;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            cursor: pointer;
+            color: inherit;
+            min-width: 40px;
+        }
+
+        .button-group button:hover {
+            background: rgba(0,120,212,0.1);
+        }
+
+        .button-group button.active {
+            background: #0078d4;
+            color: white;
+            border-color: #0078d4;
+        }
+
+        /* Анимации переходов */
+        .slide-transition {
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+
+        .transition-fade { animation-name: fade; }
+        .transition-slide-left { animation-name: slideLeft; }
+        .transition-slide-right { animation-name: slideRight; }
+        .transition-slide-up { animation-name: slideUp; }
+        .transition-slide-down { animation-name: slideDown; }
+        .transition-zoom { animation-name: zoom; }
+        .transition-flip { animation-name: flip; }
+        .transition-rotate { animation-name: rotate; }
+
+        @keyframes fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideLeft {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideRight {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes zoom {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes flip {
+            from { transform: perspective(400px) rotateY(90deg); opacity: 0; }
+            to { transform: perspective(400px) rotateY(0); opacity: 1; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(-180deg) scale(0.5); opacity: 0; }
+            to { transform: rotate(0) scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        const generateId = () => Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
+        // Все доступные переходы
+        const transitions = [
+            'fade', 'slide-left', 'slide-right', 'slide-up', 'slide-down', 
+            'zoom', 'flip', 'rotate'
+        ];
+
+        // Все доступные шрифты
+        const fonts = [
+            'Arial', 'Verdana', 'Times New Roman', 'Courier New', 
+            'Georgia', 'Palatino', 'Garamond', 'Comic Sans MS',
+            'Trebuchet MS', 'Arial Black', 'Impact', 'Tahoma'
+        ];
+
+        // Размеры шрифта
+        const fontSizes = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72];
+
+        const createDefaultSlide = () => ({
+            id: generateId(),
+            background: '#ffffff',
+            transition: { type: 'fade', duration: 500 },
+            elements: []
+        });
+
+        const createDefaultPresentation = (title = 'Новая презентация') => ({
+            id: generateId(),
+            title,
+            slides: [createDefaultSlide()],
+            currentSlideIndex: 0
+        });
+
+        function App() {
+            const [presentation, setPresentation] = useState(createDefaultPresentation());
+            const [selectedElementId, setSelectedElementId] = useState(null);
+            const [theme, setTheme] = useState('light');
+            const [zoom, setZoom] = useState(1);
+            const [gridEnabled, setGridEnabled] = useState(false);
+            const [snapToGrid, setSnapToGrid] = useState(true);
+            const [gridSize, setGridSize] = useState(20);
+            const [history, setHistory] = useState([presentation]);
+            const [historyIndex, setHistoryIndex] = useState(0);
+            const [isDragging, setIsDragging] = useState(false);
+            const [resizing, setResizing] = useState(null);
+            const [transitioning, setTransitioning] = useState(false);
+
+            const currentSlide = presentation.slides[presentation.currentSlideIndex];
+
+            // Автосохранение
+            useEffect(() => {
+                localStorage.setItem('presentation', JSON.stringify(presentation));
+            }, [presentation]);
+
+            // Загрузка из localStorage
+            useEffect(() => {
+                const saved = localStorage.getItem('presentation');
+                if (saved) {
+                    try {
+                        setPresentation(JSON.parse(saved));
+                    } catch (e) {}
+                }
+            }, []);
+
+            // История
+            const pushHistory = useCallback((newPresentation) => {
+                setHistory(prev => [...prev.slice(0, historyIndex + 1), newPresentation]);
+                setHistoryIndex(prev => prev + 1);
+            }, [historyIndex]);
+
+            const updatePresentation = (newPresentation) => {
+                setPresentation(newPresentation);
+                pushHistory(newPresentation);
+            };
+
+            const undo = () => {
+                if (historyIndex > 0) {
+                    setHistoryIndex(prev => prev - 1);
+                    setPresentation(history[historyIndex - 1]);
+                }
+            };
+
+            const redo = () => {
+                if (historyIndex < history.length - 1) {
+                    setHistoryIndex(prev => prev + 1);
+                    setPresentation(history[historyIndex + 1]);
+                }
+            };
+
+            // Горячие клавиши
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.key === 'z') { e.preventDefault(); undo(); }
+                        if (e.key === 'y') { e.preventDefault(); redo(); }
+                        if (e.key === 's') { e.preventDefault(); exportJSON(); }
+                        if (e.key === 'c') { copyElement(); }
+                        if (e.key === 'v') { pasteElement(); }
+                        if (e.key === 'd') { e.preventDefault(); duplicateElement(); }
+                    } else if (e.key === 'Delete' || e.key === 'Del') {
+                        if (selectedElementId) deleteElement(selectedElementId);
+                    }
+                };
+                document.addEventListener('keydown', handleKeyDown);
+                return () => document.removeEventListener('keydown', handleKeyDown);
+            }, [selectedElementId, currentSlide]);
+
+            // Копирование
+            const copyElement = () => {
+                if (!selectedElementId) return;
+                const el = currentSlide.elements.find(e => e.id === selectedElementId);
+                if (el) localStorage.setItem('clipboard', JSON.stringify(el));
+            };
+
+            const pasteElement = () => {
+                const data = localStorage.getItem('clipboard');
+                if (!data) return;
+                try {
+                    const el = JSON.parse(data);
+                    const newEl = { ...el, id: generateId(), x: el.x + 30, y: el.y + 30 };
+                    addElement(newEl);
+                } catch (e) {}
+            };
+
+            const duplicateElement = () => {
+                if (!selectedElementId) return;
+                const el = currentSlide.elements.find(e => e.id === selectedElementId);
+                if (el) {
+                    const newEl = { ...el, id: generateId(), x: el.x + 30, y: el.y + 30 };
+                    addElement(newEl);
+                }
+            };
+
+            // Операции со слайдами
+            const addSlide = () => {
+                const newSlide = createDefaultSlide();
+                const newPresentation = {
+                    ...presentation,
+                    slides: [...presentation.slides, newSlide],
+                    currentSlideIndex: presentation.slides.length
+                };
+                updatePresentation(newPresentation);
+            };
+
+            const deleteSlide = (slideId) => {
+                if (presentation.slides.length === 1) return;
+                const newSlides = presentation.slides.filter(s => s.id !== slideId);
+                const newIndex = Math.min(presentation.currentSlideIndex, newSlides.length - 1);
+                const newPresentation = { ...presentation, slides: newSlides, currentSlideIndex: newIndex };
+                updatePresentation(newPresentation);
+                setSelectedElementId(null);
+            };
+
+            const duplicateSlide = () => {
+                const slide = presentation.slides[presentation.currentSlideIndex];
+                const newSlide = { ...slide, id: generateId(), elements: slide.elements.map(el => ({ ...el, id: generateId() })) };
+                const newSlides = [...presentation.slides.slice(0, presentation.currentSlideIndex + 1), newSlide, ...presentation.slides.slice(presentation.currentSlideIndex + 1)];
+                const newPresentation = { ...presentation, slides: newSlides, currentSlideIndex: presentation.currentSlideIndex + 1 };
+                updatePresentation(newPresentation);
+            };
+
+            const changeSlide = (index) => {
+                if (index === presentation.currentSlideIndex) return;
+                setTransitioning(true);
+                setTimeout(() => {
+                    const newPresentation = { ...presentation, currentSlideIndex: index };
+                    setPresentation(newPresentation);
+                    setSelectedElementId(null);
+                    setTimeout(() => setTransitioning(false), 300);
+                }, 200);
+            };
+
+            // Элементы
+            const addElement = (element) => {
+                const newElements = [...currentSlide.elements, element];
+                const newSlide = { ...currentSlide, elements: newElements };
+                const newSlides = [...presentation.slides];
+                newSlides[presentation.currentSlideIndex] = newSlide;
+                updatePresentation({ ...presentation, slides: newSlides });
+                setSelectedElementId(element.id);
+            };
+
+            const updateElement = (elementId, updates) => {
+                const newElements = currentSlide.elements.map(el => el.id === elementId ? { ...el, ...updates } : el);
+                const newSlide = { ...currentSlide, elements: newElements };
+                const newSlides = [...presentation.slides];
+                newSlides[presentation.currentSlideIndex] = newSlide;
+                updatePresentation({ ...presentation, slides: newSlides });
+            };
+
+            const deleteElement = (elementId) => {
+                const newElements = currentSlide.elements.filter(el => el.id !== elementId);
+                const newSlide = { ...currentSlide, elements: newElements };
+                const newSlides = [...presentation.slides];
+                newSlides[presentation.currentSlideIndex] = newSlide;
+                updatePresentation({ ...presentation, slides: newSlides });
+                setSelectedElementId(null);
+            };
+
+            // Создание элементов
+            const addText = () => addElement({
+                id: generateId(), type: 'text', x: 100, y: 100, width: 250, height: 80,
+                content: 'Новый текст', fontSize: 24, fontFamily: 'Arial', color: '#000000',
+                fontWeight: 'normal', fontStyle: 'normal', textDecoration: 'none',
+                textAlign: 'left', locked: false, zIndex: currentSlide.elements.length + 1
+            });
+
+            const addShape = (shape) => addElement({
+                id: generateId(), type: 'shape', shape, x: 100, y: 100, width: 120, height: 120,
+                fill: '#0078d4', locked: false, zIndex: currentSlide.elements.length + 1
+            });
+
+            const addArrow = () => addElement({
+                id: generateId(), type: 'arrow', x: 100, y: 100, width: 150, height: 80,
+                color: '#000000', locked: false, zIndex: currentSlide.elements.length + 1
+            });
+
+            const addImage = () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => addElement({
+                        id: generateId(), type: 'image', x: 100, y: 100, width: 300, height: 200,
+                        src: event.target.result, locked: false, zIndex: currentSlide.elements.length + 1
+                    });
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            };
+
+            const addVideo = () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'video/*';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => addElement({
+                        id: generateId(), type: 'video', x: 100, y: 100, width: 400, height: 225,
+                        src: event.target.result, locked: false, zIndex: currentSlide.elements.length + 1
+                    });
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            };
+
+            const addTable = () => addElement({
+                id: generateId(), type: 'table', x: 100, y: 100, width: 400, height: 200,
+                rows: 3, cols: 3, locked: false, zIndex: currentSlide.elements.length + 1
+            });
+
+            // Drag & Drop
+            const handleDragStart = () => setIsDragging(true);
+            const handleDrag = (elementId, newX, newY) => {
+                if (!isDragging) return;
+                if (snapToGrid) {
+                    newX = Math.round(newX / gridSize) * gridSize;
+                    newY = Math.round(newY / gridSize) * gridSize;
+                }
+                const el = currentSlide.elements.find(e => e.id === elementId);
+                if (!el || el.locked) return;
+                const boundedX = Math.max(0, Math.min(newX, 960 - el.width));
+                const boundedY = Math.max(0, Math.min(newY, 540 - el.height));
+                updateElement(elementId, { x: boundedX, y: boundedY });
+            };
+            const handleDragEnd = () => setIsDragging(false);
+
+            // Resize
+            const handleResizeStart = (e, elementId, handle) => {
+                e.stopPropagation();
+                const el = currentSlide.elements.find(e => e.id === elementId);
+                if (!el || el.locked) return;
+                setResizing({ elementId, handle, startX: e.clientX, startY: e.clientY, startWidth: el.width, startHeight: el.height, startLeft: el.x, startTop: el.y });
+            };
+
+            useEffect(() => {
+                if (!resizing) return;
+                const handleMouseMove = (e) => {
+                    const { elementId, handle, startX, startY, startWidth, startHeight, startLeft, startTop } = resizing;
+                    let deltaX = e.clientX - startX;
+                    let deltaY = e.clientY - startY;
+                    if (snapToGrid) {
+                        deltaX = Math.round(deltaX / gridSize) * gridSize;
+                        deltaY = Math.round(deltaY / gridSize) * gridSize;
+                    }
+                    let newWidth = startWidth, newHeight = startHeight, newX = startLeft, newY = startTop;
+                    if (handle.includes('e')) newWidth = Math.max(30, startWidth + deltaX);
+                    if (handle.includes('w')) { newWidth = Math.max(30, startWidth - deltaX); newX = startLeft + deltaX; }
+                    if (handle.includes('s')) newHeight = Math.max(30, startHeight + deltaY);
+                    if (handle.includes('n')) { newHeight = Math.max(30, startHeight - deltaY); newY = startTop + deltaY; }
+                    if (newX < 0) newX = 0;
+                    if (newY < 0) newY = 0;
+                    if (newX + newWidth > 960) newX = 960 - newWidth;
+                    if (newY + newHeight > 540) newY = 540 - newHeight;
+                    updateElement(elementId, { x: newX, y: newY, width: newWidth, height: newHeight });
+                };
+                const handleMouseUp = () => setResizing(null);
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+                return () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                };
+            }, [resizing, snapToGrid, gridSize]);
+
+            // Выравнивание
+            const alignElement = (type) => {
+                if (!selectedElementId) return;
+                const el = currentSlide.elements.find(e => e.id === selectedElementId);
+                if (!el || el.locked) return;
+                let newX = el.x, newY = el.y;
+                if (type === 'left') newX = 0;
+                if (type === 'center') newX = (960 - el.width) / 2;
+                if (type === 'right') newX = 960 - el.width;
+                if (type === 'top') newY = 0;
+                if (type === 'middle') newY = (540 - el.height) / 2;
+                if (type === 'bottom') newY = 540 - el.height;
+                updateElement(el.id, { x: newX, y: newY });
+            };
+
+            // Фон слайда
+            const setSlideBackground = (bg) => {
+                const newSlide = { ...currentSlide, background: bg };
+                const newSlides = [...presentation.slides];
+                newSlides[presentation.currentSlideIndex] = newSlide;
+                updatePresentation({ ...presentation, slides: newSlides });
+            };
+
+            // Переход слайда
+            const setSlideTransition = (type) => {
+                const newSlide = { ...currentSlide, transition: { ...currentSlide.transition, type } };
+                const newSlides = [...presentation.slides];
+                newSlides[presentation.currentSlideIndex] = newSlide;
+                updatePresentation({ ...presentation, slides: newSlides });
+            };
+
+            // Экспорт
+            const exportJSON = () => {
+                const dataStr = JSON.stringify(presentation, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${presentation.title}.json`;
+                a.click();
+            };
+
+            const importJSON = () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const newPres = JSON.parse(event.target.result);
+                            setPresentation(newPres);
+                            pushHistory(newPres);
+                        } catch (error) {
+                            alert('Ошибка загрузки файла');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            };
+
+            const exportPDF = async () => {
+                const slideEl = document.querySelector('.slide');
+                if (!slideEl) return;
+                try {
+                    const canvas = await html2canvas(slideEl, { scale: 2 });
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                    pdf.save(`${presentation.title}.pdf`);
+                } catch (err) {
+                    alert('Ошибка при создании PDF');
+                }
+            };
+
+            // Рендер элемента
+            const renderElement = (el) => (
+                <ElementComponent
+                    key={el.id}
+                    element={el}
+                    isSelected={selectedElementId === el.id && !el.locked}
+                    onSelect={setSelectedElementId}
+                    onUpdate={updateElement}
+                    onDelete={deleteElement}
+                    onDragStart={handleDragStart}
+                    onDrag={handleDrag}
+                    onDragEnd={handleDragEnd}
+                    onResizeStart={handleResizeStart}
+                />
+            );
+
+            return (
+                <div className={`app ${theme}`}>
+                    {/* Лента */}
+                    <div className="ribbon">
+                        <div className="ribbon-group">
+                            <button onClick={addSlide}><i className="fas fa-plus-circle"></i> Слайд</button>
+                            <button onClick={duplicateSlide}><i className="fas fa-copy"></i></button>
+                        </div>
+                        
+                        {/* Фигуры */}
+                        <div className="ribbon-group">
+                            <button onClick={addText}><i className="fas fa-font"></i></button>
+                            <button onClick={() => addShape('square')}><i className="fas fa-square"></i></button>
+                            <button onClick={() => addShape('circle')}><i className="fas fa-circle"></i></button>
+                            <button onClick={() => addShape('triangle')}><i className="fas fa-play"></i></button>
+                            <button onClick={() => addShape('rectangle')}><i className="fas fa-stop"></i></button>
+                            <button onClick={addArrow}><i className="fas fa-arrow-right"></i></button>
+                            <button onClick={addImage}><i className="fas fa-image"></i></button>
+                            <button onClick={addVideo}><i className="fas fa-video"></i></button>
+                            <button onClick={addTable}><i className="fas fa-table"></i></button>
+                        </div>
+
+                        {/* Шрифты и размеры */}
+                        <div className="ribbon-group">
+                            <select 
+                                value={selectedElementId ? currentSlide.elements.find(e => e.id === selectedElementId)?.fontFamily || 'Arial' : 'Arial'}
+                                onChange={(e) => selectedElementId && updateElement(selectedElementId, { fontFamily: e.target.value })}
+                                style={{ width: '120px' }}
+                            >
+                                {fonts.map(f => <option key={f} value={f}>{f}</option>)}
+                            </select>
+                            <select 
+                                value={selectedElementId ? currentSlide.elements.find(e => e.id === selectedElementId)?.fontSize || 24 : 24}
+                                onChange={(e) => selectedElementId && updateElement(selectedElementId, { fontSize: parseInt(e.target.value) })}
+                                style={{ width: '70px' }}
+                            >
+                                {fontSizes.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <input 
+                                type="color" 
+                                value={selectedElementId ? currentSlide.elements.find(e => e.id === selectedElementId)?.color || '#000000' : '#000000'}
+                                onChange={(e) => selectedElementId && updateElement(selectedElementId, { color: e.target.value })}
+                                style={{ width: '40px', height: '32px' }}
+                            />
+                            <button onClick={() => selectedElementId && updateElement(selectedElementId, { fontWeight: 'bold' })}>
+                                <i className="fas fa-bold"></i>
+                            </button>
+                            <button onClick={() => selectedElementId && updateElement(selectedElementId, { fontStyle: 'italic' })}>
+                                <i className="fas fa-italic"></i>
+                            </button>
+                            <button onClick={() => selectedElementId && updateElement(selectedElementId, { textDecoration: 'underline' })}>
+                                <i className="fas fa-underline"></i>
+                            </button>
+                        </div>
+
+                        {/* Переходы */}
+                        <div className="ribbon-group">
+                            <select 
+                                value={currentSlide?.transition?.type || 'fade'}
+                                onChange={(e) => setSlideTransition(e.target.value)}
+                                style={{ width: '130px' }}
+                            >
+                                <option value="fade">Затухание</option>
+                                <option value="slide-left">Слева</option>
+                                <option value="slide-right">Справа</option>
+                                <option value="slide-up">Сверху</option>
+                                <option value="slide-down">Снизу</option>
+                                <option value="zoom">Увеличение</option>
+                                <option value="flip">Переворот</option>
+                                <option value="rotate">Вращение</option>
+                            </select>
+                        </div>
+
+                        <div className="ribbon-group">
+                            <button onClick={undo}><i className="fas fa-undo-alt"></i></button>
+                            <button onClick={redo}><i className="fas fa-redo-alt"></i></button>
+                            <button onClick={exportJSON}><i className="fas fa-save"></i></button>
+                            <button onClick={importJSON}><i className="fas fa-folder-open"></i></button>
+                            <button onClick={exportPDF}><i className="fas fa-file-pdf"></i></button>
+                        </div>
+
+                        <div className="ribbon-group">
+                            <input type="color" value={currentSlide?.background || '#ffffff'} onChange={(e) => setSlideBackground(e.target.value)} />
+                            <button onClick={() => setGridEnabled(!gridEnabled)}><i className="fas fa-border-all"></i></button>
+                            <button onClick={() => setSnapToGrid(!snapToGrid)}><i className="fas fa-magnet"></i></button>
+                            <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+                                <i className={`fas fa-${theme === 'light' ? 'moon' : 'sun'}`}></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="workspace">
+                        {/* Миниатюры */}
+                        <div className="slide-thumbnails">
+                            {presentation.slides.map((slide, index) => (
+                                <div
+                                    key={slide.id}
+                                    className={`thumbnail ${index === presentation.currentSlideIndex ? 'selected' : ''}`}
+                                    onClick={() => changeSlide(index)}
+                                >
+                                    <canvas ref={canvas => {
+                                        if (canvas) {
+                                            canvas.width = 160;
+                                            canvas.height = 90;
+                                            const ctx = canvas.getContext('2d');
+                                            ctx.fillStyle = slide.background;
+                                            ctx.fillRect(0, 0, 160, 90);
+                                            ctx.fillStyle = '#000';
+                                            ctx.font = '12px Arial';
+                                            ctx.fillText(`Слайд ${index + 1}`, 10, 20);
+                                            ctx.fillStyle = '#0078d4';
+                                            ctx.fillText(`Переход: ${slide.transition?.type || 'fade'}`, 10, 40);
+                                        }
+                                    }} />
+                                    <span className="slide-number">{index + 1}</span>
+                                    <button className="delete-slide-btn" onClick={(e) => { e.stopPropagation(); deleteSlide(slide.id); }}>
+                                        <i className="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Основной слайд */}
+                        <div className="main-area">
+                            <div className="zoom-controls">
+                                <i className="fas fa-search-minus" onClick={() => setZoom(Math.max(0.2, zoom - 0.1))}></i>
+                                <span>{Math.round(zoom * 100)}%</span>
+                                <i className="fas fa-search-plus" onClick={() => setZoom(Math.min(2, zoom + 0.1))}></i>
+                                <select value={zoom} onChange={(e) => setZoom(parseFloat(e.target.value))}>
+                                    <option value="0.5">50%</option>
+                                    <option value="0.75">75%</option>
+                                    <option value="1">100%</option>
+                                    <option value="1.5">150%</option>
+                                    <option value="2">200%</option>
+                                </select>
+                            </div>
+                            <div className="slide-container">
+                                <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }}>
+                                    {currentSlide && (
+                                        <div 
+                                            className={`slide ${transitioning ? `transition-${currentSlide.transition?.type || 'fade'}` : ''}`}
+                                            style={{ background: currentSlide.background }}
+                                            data-grid={gridEnabled}
+                                        >
+                                            {currentSlide.elements.map(el => renderElement(el))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Панель свойств */}
+                        <div className="properties-panel">
+                            <h3><i className="fas fa-paint-brush"></i> Свойства</h3>
+                            {selectedElementId ? (
+                                (() => {
+                                    const el = currentSlide.elements.find(e => e.id === selectedElementId);
+                                    if (!el) return <p>Элемент не найден</p>;
+                                    return (
+                                        <>
+                                            <div className="property-section">
+                                                <label>Тип элемента</label>
+                                                <div className="button-group">
+                                                    <button disabled>{el.type}</button>
+                                                    <button onClick={() => deleteElement(el.id)} style={{ background: '#ff4444', color: 'white' }}>
+                                                        <i className="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {el.type === 'text' && (
+                                                <>
+                                                    <div className="property-section">
+                                                        <label>Текст</label>
+                                                        <input type="text" value={el.content} onChange={(e) => updateElement(el.id, { content: e.target.value })} />
+                                                    </div>
+                                                    <div className="property-section">
+                                                        <label>Шрифт</label>
+                                                        <select value={el.fontFamily} onChange={(e) => updateElement(el.id, { fontFamily: e.target.value })}>
+                                                            {fonts.map(f => <option key={f} value={f}>{f}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div className="property-section">
+                                                        <label>Размер</label>
+                                                        <select value={el.fontSize} onChange={(e) => updateElement(el.id, { fontSize: parseInt(e.target.value) })}>
+                                                            {fontSizes.map(s => <option key={s} value={s}>{s}px</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div className="property-section">
+                                                        <label>Цвет</label>
+                                                        <input type="color" className="color-input" value={el.color} onChange={(e) => updateElement(el.id, { color: e.target.value })} />
+                                                    </div>
+                                                    <div className="property-section">
+                                                        <label>Стиль</label>
+                                                        <div className="button-group">
+                                                            <button className={el.fontWeight === 'bold' ? 'active' : ''} onClick={() => updateElement(el.id, { fontWeight: el.fontWeight === 'bold' ? 'normal' : 'bold' })}>
+                                                                <i className="fas fa-bold"></i>
+                                                            </button>
+                                                            <button className={el.fontStyle === 'italic' ? 'active' : ''} onClick={() => updateElement(el.id, { fontStyle: el.fontStyle === 'italic' ? 'normal' : 'italic' })}>
+                                                                <i className="fas fa-italic"></i>
+                                                            </button>
+                                                            <button className={el.textDecoration === 'underline' ? 'active' : ''} onClick={() => updateElement(el.id, { textDecoration: el.textDecoration === 'underline' ? 'none' : 'underline' })}>
+                                                                <i className="fas fa-underline"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="property-section">
+                                                        <label>Выравнивание</label>
+                                                        <div className="button-group">
+                                                            <button className={el.textAlign === 'left' ? 'active' : ''} onClick={() => updateElement(el.id, { textAlign: 'left' })}>
+                                                                <i className="fas fa-align-left"></i>
+                                                            </button>
+                                                            <button className={el.textAlign === 'center' ? 'active' : ''} onClick={() => updateElement(el.id, { textAlign: 'center' })}>
+                                                                <i className="fas fa-align-center"></i>
+                                                            </button>
+                                                            <button className={el.textAlign === 'right' ? 'active' : ''} onClick={() => updateElement(el.id, { textAlign: 'right' })}>
+                                                                <i className="fas fa-align-right"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {el.type === 'shape' && (
+                                                <div className="property-section">
+                                                    <label>Цвет заливки</label>
+                                                    <input type="color" className="color-input" value={el.fill} onChange={(e) => updateElement(el.id, { fill: e.target.value })} />
+                                                </div>
+                                            )}
+
+                                            {el.type === 'arrow' && (
+                                                <div className="property-section">
+                                                    <label>Цвет стрелки</label>
+                                                    <input type="color" className="color-input" value={el.color} onChange={(e) => updateElement(el.id, { color: e.target.value })} />
+                                                </div>
+                                            )}
+
+                                            <div className="property-section">
+                                                <label>Позиция</label>
+                                                <div className="button-group">
+                                                    <button onClick={() => alignElement('left')}><i className="fas fa-align-left"></i></button>
+                                                    <button onClick={() => alignElement('center')}><i className="fas fa-align-center"></i></button>
+                                                    <button onClick={() => alignElement('right')}><i className="fas fa-align-right"></i></button>
+                                                    <button onClick={() => alignElement('top')}><i className="fas fa-arrow-up"></i></button>
+                                                    <button onClick={() => alignElement('middle')}><i className="fas fa-arrows-alt-v"></i></button>
+                                                    <button onClick={() => alignElement('bottom')}><i className="fas fa-arrow-down"></i></button>
+                                                </div>
+                                            </div>
+
+                                            <div className="property-section">
+                                                <label>Координаты</label>
+                                                <input type="number" value={el.x} onChange={(e) => updateElement(el.id, { x: parseInt(e.target.value) })} placeholder="X" />
+                                                <input type="number" value={el.y} onChange={(e) => updateElement(el.id, { y: parseInt(e.target.value) })} placeholder="Y" />
+                                            </div>
+
+                                            <div className="property-section">
+                                                <label>Размеры</label>
+                                                <input type="number" value={el.width} onChange={(e) => updateElement(el.id, { width: parseInt(e.target.value) })} placeholder="Ширина" />
+                                                <input type="number" value={el.height} onChange={(e) => updateElement(el.id, { height: parseInt(e.target.value) })} placeholder="Высота" />
+                                            </div>
+
+                                            <div className="property-section">
+                                                <label>Порядок</label>
+                                                <input type="number" value={el.zIndex} onChange={(e) => updateElement(el.id, { zIndex: parseInt(e.target.value) })} />
+                                            </div>
+
+                                            <div className="property-section">
+                                                <label>Блокировка</label>
+                                                <input type="checkbox" checked={el.locked} onChange={() => updateElement(el.id, { locked: !el.locked })} />
+                                            </div>
+                                        </>
+                                    );
+                                })()
+                            ) : (
+                                <div className="property-section">
+                                    <p>Выберите элемент на слайде</p>
+                                    <div className="button-group">
+                                        <button onClick={addText}><i className="fas fa-font"></i></button>
+                                        <button onClick={() => addShape('square')}><i className="fas fa-square"></i></button>
+                                        <button onClick={addImage}><i className="fas fa-image"></i></button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Компонент элемента
+        function ElementComponent({ element, isSelected, onSelect, onUpdate, onDelete, onDragStart, onDrag, onDragEnd, onResizeStart }) {
+            const elementRef = useRef(null);
+            const [isDragging, setIsDragging] = useState(false);
+            const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+            const handleMouseDown = (e) => {
+                e.stopPropagation();
+                if (element.locked) return;
+                onSelect(element.id);
+                if (e.target.classList.contains('resize-handle')) {
+                    const handle = e.target.dataset.handle;
+                    onResizeStart(e, element.id, handle);
+                } else {
+                    const rect = elementRef.current.getBoundingClientRect();
+                    const slideRect = document.querySelector('.slide').getBoundingClientRect();
+                    setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+                    setIsDragging(true);
+                    onDragStart(element.id);
+                }
+            };
+
+            useEffect(() => {
+                if (!isDragging) return;
+                const handleMouseMove = (e) => {
+                    const slideRect = document.querySelector('.slide').getBoundingClientRect();
+                    let newX = e.clientX - slideRect.left - dragOffset.x;
+                    let newY = e.clientY - slideRect.top - dragOffset.y;
+                    onDrag(element.id, newX, newY);
+                };
+                const handleMouseUp = () => {
+                    setIsDragging(false);
+                    onDragEnd();
+                };
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+                return () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                };
+            }, [isDragging, dragOffset]);
+
+            const style = {
+                left: element.x,
+                top: element.y,
+                width: element.width,
+                height: element.height,
+                zIndex: element.zIndex,
+                backgroundColor: element.type === 'shape' ? element.fill : 'transparent',
+                borderRadius: element.shape === 'circle' ? '50%' : 
+                             element.shape === 'triangle' ? '0' : '0',
+                clipPath: element.shape === 'triangle' ? 'polygon(50% 0%, 0% 100%, 100% 100%)' : 'none',
+                color: element.color,
+                fontSize: element.fontSize,
+                fontFamily: element.fontFamily,
+                fontWeight: element.fontWeight,
+                fontStyle: element.fontStyle,
+                textDecoration: element.textDecoration,
+                textAlign: element.textAlign,
+                cursor: element.locked ? 'default' : 'move',
+            };
+
+            const renderContent = () => {
+                switch (element.type) {
+                    case 'text':
+                        return (
+                            <div
+                                contentEditable={!element.locked}
+                                suppressContentEditableWarning
+                                className="text-element"
+                                style={style}
+                                onBlur={(e) => onUpdate(element.id, { content: e.currentTarget.innerText })}
+                            >
+                                {element.content}
+                            </div>
+                        );
+                    case 'shape':
+                        return <div className="shape-element" style={{ backgroundColor: element.fill }} />;
+                    case 'arrow':
+                        return <div className="arrow-element" style={{ color: element.color }} />;
+                    case 'image':
+                        return <img src={element.src} alt="" className="image-element" />;
+                    case 'video':
+                        return <video src={element.src} controls className="video-element" />;
+                    case 'table':
+                        return (
+                            <table className="table-element">
+                                {Array(element.rows).fill(0).map((_, ri) => (
+                                    <tr key={ri}>
+                                        {Array(element.cols).fill(0).map((_, ci) => (
+                                            <td key={ci} contentEditable={!element.locked} suppressContentEditableWarning></td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </table>
+                        );
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div
+                    ref={elementRef}
+                    className={`element ${isSelected ? 'selected' : ''} ${element.locked ? 'locked' : ''}`}
+                    style={style}
+                    onMouseDown={handleMouseDown}
+                >
+                    {renderContent()}
+                    {isSelected && !element.locked && (
+                        <>
+                            <button className="delete-btn" onClick={(e) => { e.stopPropagation(); onDelete(element.id); }}>
+                                <i className="fas fa-times"></i>
+                            </button>
+                            <div className="resize-handle nw" data-handle="nw" onMouseDown={(e) => onResizeStart(e, element.id, 'nw')} />
+                            <div className="resize-handle ne" data-handle="ne" onMouseDown={(e) => onResizeStart(e, element.id, 'ne')} />
+                            <div className="resize-handle sw" data-handle="sw" onMouseDown={(e) => onResizeStart(e, element.id, 'sw')} />
+                            <div className="resize-handle se" data-handle="se" onMouseDown={(e) => onResizeStart(e, element.id, 'se')} />
+                        </>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
