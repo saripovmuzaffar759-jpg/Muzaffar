@@ -1,0 +1,505 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR-расписание с веб-страницей | MAWORLD</title>
+  
+  <!-- Используем библиотеку qrcode-generator -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      margin: 20px 0;
+    }
+    
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: #764ba2;
+      margin-bottom: 30px;
+    }
+    
+    .schedule-input {
+      width: 100%;
+      height: 250px;
+      padding: 15px;
+      border: 2px solid #667eea;
+      border-radius: 15px;
+      font-size: 16px;
+      font-family: monospace;
+      resize: vertical;
+      margin: 20px 0;
+    }
+    
+    .schedule-input:focus {
+      outline: none;
+      border-color: #764ba2;
+    }
+    
+    .example {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1em;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #764ba2;
+    }
+    
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #218838;
+    }
+    
+    .btn-info {
+      background: #17a2b8;
+      color: white;
+    }
+    
+    .btn-info:hover {
+      background: #138496;
+    }
+    
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .qr-container {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    #qrcode {
+      margin: 20px 0;
+    }
+    
+    #qrcode canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .preview {
+      background: #e8f0fe;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+    }
+    
+    .error-message {
+      color: #dc3545;
+      margin: 10px 0;
+      display: none;
+    }
+    
+    .success-message {
+      color: #28a745;
+      margin: 10px 0;
+      display: none;
+    }
+    
+    .info {
+      color: #666;
+      font-size: 0.9em;
+      margin: 15px 0;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    
+    .url-box {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      word-break: break-all;
+      font-family: monospace;
+      font-size: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📅 QR-расписание</h1>
+    <p class="subtitle">Сканируйте QR-код - увидите красивое расписание</p>
+    
+    <!-- Текстовое поле для ввода расписания -->
+    <textarea id="schedule-text" class="schedule-input" placeholder="Введите ваше расписание...">ПОНЕДЕЛЬНИК:
+08:00 - 09:30 - Математика (ауд. 301)
+09:45 - 11:15 - Физика (ауд. 205)
+11:30 - 13:00 - История (ауд. 110)
+
+ВТОРНИК:
+08:00 - 09:30 - Английский язык (ауд. 408)
+09:45 - 11:15 - Информатика (ауд. 315)
+
+СРЕДА:
+11:30 - 13:00 - Химия (ауд. 225)
+13:30 - 15:00 - Биология (ауд. 118)</textarea>
+    
+    <!-- Пример -->
+    <div class="example">
+      <strong>📋 Формат:</strong> ДЕНЬ: время - предмет (аудитория)
+    </div>
+    
+    <!-- Кнопки -->
+    <div class="button-group">
+      <button class="btn btn-primary" onclick="generateQR()">Создать QR-код</button>
+      <button class="btn btn-success" onclick="downloadQR()" id="download-btn" disabled>Скачать PNG</button>
+      <button class="btn btn-info" onclick="testQR()" id="test-btn" disabled>Проверить</button>
+    </div>
+    
+    <!-- Предпросмотр -->
+    <div class="preview" id="preview"></div>
+    
+    <!-- URL (скрыт) -->
+    <div class="url-box" id="url-box"></div>
+    
+    <!-- QR-код -->
+    <div class="qr-container">
+      <div id="qrcode"></div>
+      <div id="error" class="error-message"></div>
+      <div id="success" class="success-message"></div>
+    </div>
+    
+    <div class="info">
+      📱 <strong>Как это работает:</strong><br>
+      1. Введите расписание<br>
+      2. Нажмите "Создать QR-код"<br>
+      3. QR-код содержит ссылку на красивую страницу с расписанием<br>
+      4. При сканировании откроется веб-страница с вашим расписанием
+    </div>
+  </div>
+
+  <script>
+    let currentCanvas = null;
+    let currentURL = '';
+    
+    // Функция для создания HTML страницы с расписанием
+    function createSchedulePage(text) {
+      // Разбираем текст на строки
+      const lines = text.split('\n');
+      
+      // Создаём HTML
+      let html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Расписание</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin: 20px 0;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #667eea;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 2em;
+    }
+    .schedule {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+    }
+    .day {
+      margin-bottom: 25px;
+    }
+    .day-title {
+      color: #667eea;
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 5px;
+    }
+    .lesson {
+      display: grid;
+      grid-template-columns: 120px 1fr 100px;
+      gap: 10px;
+      padding: 8px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .time {
+      color: #764ba2;
+      font-weight: bold;
+    }
+    .subject {
+      color: #333;
+    }
+    .room {
+      color: #28a745;
+      text-align: right;
+    }
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+    }
+    @media (max-width: 600px) {
+      .lesson {
+        grid-template-columns: 1fr;
+        gap: 5px;
+      }
+      .room { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📅 Расписание</h1>
+    <div class="schedule">`;
+      
+      // Добавляем строки расписания
+      lines.forEach(line => {
+        if (line.trim() === '') {
+          html += '<br>';
+        } else if (line.includes(':')) {
+          html += `<div class="day-title">${line}</div>`;
+        } else {
+          html += `<div class="lesson">${line}</div>`;
+        }
+      });
+      
+      html += `
+    </div>
+    <div class="footer">
+      Сгенерировано с MAWORLD
+    </div>
+  </div>
+</body>
+</html>`;
+      
+      return html;
+    }
+    
+    // Функция для обновления предпросмотра
+    function updatePreview() {
+      const text = document.getElementById('schedule-text').value;
+      const preview = document.getElementById('preview');
+      
+      if (text.trim() === '') {
+        preview.innerHTML = 'Расписание пустое';
+      } else {
+        preview.innerHTML = text.replace(/\n/g, '<br>');
+      }
+    }
+    
+    // Функция для генерации QR-кода
+    function generateQR() {
+      const text = document.getElementById('schedule-text').value.trim();
+      
+      if (text === '') {
+        showError('Введите расписание');
+        return;
+      }
+      
+      // Создаём HTML страницу
+      const html = createSchedulePage(text);
+      
+      // Кодируем HTML в base64
+      const base64 = btoa(unescape(encodeURIComponent(html)));
+      
+      // Создаём data URL
+      const dataUrl = 'data:text/html;charset=utf-8;base64,' + base64;
+      
+      // Показываем URL (для отладки)
+      document.getElementById('url-box').style.display = 'block';
+      document.getElementById('url-box').textContent = dataUrl;
+      
+      currentURL = dataUrl;
+      
+      // Очищаем предыдущий QR
+      document.getElementById('qrcode').innerHTML = '';
+      hideMessages();
+      
+      try {
+        // Создаём QR-код с URL
+        const qr = qrcode(0, 'H');
+        qr.addData(dataUrl);
+        qr.make();
+        
+        // Размер QR-кода
+        const cells = qr.getModuleCount();
+        const size = 400;
+        
+        // Создаём canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        
+        // Белый фон
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, size, size);
+        
+        // Чёрный QR
+        ctx.fillStyle = '#000000';
+        const cellSize = size / cells;
+        
+        // Рисуем QR-код
+        for (let row = 0; row < cells; row++) {
+          for (let col = 0; col < cells; col++) {
+            if (qr.isDark(row, col)) {
+              ctx.fillRect(
+                col * cellSize,
+                row * cellSize,
+                cellSize,
+                cellSize
+              );
+            }
+          }
+        }
+        
+        // Добавляем canvas на страницу
+        document.getElementById('qrcode').appendChild(canvas);
+        
+        // Сохраняем для скачивания
+        currentCanvas = canvas;
+        
+        // Активируем кнопки
+        document.getElementById('download-btn').disabled = false;
+        document.getElementById('test-btn').disabled = false;
+        
+        showSuccess('QR-код создан! Теперь его можно скачать или проверить');
+        
+      } catch(error) {
+        showError('Ошибка создания QR-кода: ' + error.message);
+        console.error(error);
+      }
+    }
+    
+    // Функция для проверки QR-кода
+    function testQR() {
+      if (currentURL) {
+        window.open(currentURL, '_blank');
+      }
+    }
+    
+    // Функция для скачивания QR-кода
+    function downloadQR() {
+      if (!currentCanvas) {
+        showError('Сначала создайте QR-код');
+        return;
+      }
+      
+      try {
+        const link = document.createElement('a');
+        link.download = 'schedule-qr.png';
+        link.href = currentCanvas.toDataURL('image/png');
+        link.click();
+        showSuccess('QR-код скачан!');
+      } catch(error) {
+        showError('Ошибка при скачивании');
+      }
+    }
+    
+    function showError(msg) {
+      document.getElementById('error').textContent = msg;
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('success').style.display = 'none';
+    }
+    
+    function showSuccess(msg) {
+      document.getElementById('success').textContent = msg;
+      document.getElementById('success').style.display = 'block';
+      document.getElementById('error').style.display = 'none';
+    }
+    
+    function hideMessages() {
+      document.getElementById('error').style.display = 'none';
+      document.getElementById('success').style.display = 'none';
+    }
+    
+    // Обновляем предпросмотр при загрузке
+    window.onload = function() {
+      updatePreview();
+      document.getElementById('schedule-text').addEventListener('input', updatePreview);
+    };
+  </script>
+</body>
+</html>
