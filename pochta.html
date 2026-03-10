@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МОЯ ПОЧТА - РАБОТАЕТ 100%</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: #0f172a;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #334155;
+        }
+        
+        h1 {
+            color: #38bdf8;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        
+        .my-email {
+            background: #0f172a;
+            border: 2px solid #38bdf8;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        #myEmail {
+            font-size: 24px;
+            color: #38bdf8;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #38bdf8;
+            outline: none;
+        }
+        
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        
+        button {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+        
+        button:hover {
+            background: #7dd3fc;
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .test-btn {
+            background: #1e293b;
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            width: auto;
+            padding: 10px 20px;
+        }
+        
+        .inbox {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .message {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .message-from {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+        
+        .message-date {
+            color: #94a3b8;
+            font-size: 12px;
+            float: right;
+        }
+        
+        .message-body {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: #ddd;
+        }
+        
+        .status {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: none;
+            text-align: center;
+        }
+        
+        .success {
+            display: block;
+            background: #059669;
+            color: white;
+        }
+        
+        .error {
+            display: block;
+            background: #dc2626;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 МОЯ ПОЧТА</h1>
+        
+        <!-- ТВОЙ EMAIL -->
+        <div class="my-email">
+            <h2 style="color: #38bdf8;">ТВОЙ EMAIL АДРЕС</h2>
+            <div style="display: flex; gap: 10px; margin: 15px 0;">
+                <input type="text" id="login" value="muzaffar" placeholder="Логин">
+                <span style="color: #38bdf8; font-size: 20px;">@</span>
+                <select id="domain">
+                    <option value="1secmail.com">1secmail.com</option>
+                    <option value="1secmail.net">1secmail.net</option>
+                    <option value="1secmail.org">1secmail.org</option>
+                </select>
+                <button onclick="createEmail()" style="width: auto;">Создать</button>
+            </div>
+            <div id="myEmail">muzaffar@1secmail.com</div>
+            <p style="color: #94a3b8; margin-top: 10px;">✅ На этот адрес можно получать письма</p>
+        </div>
+        
+        <!-- ОТПРАВКА ЧЕРЕЗ FORMSUBMIT -->
+        <div style="background: #0f172a; border: 1px solid #334155; border-radius: 15px; padding: 25px;">
+            <h2 style="color: #38bdf8; margin-bottom: 20px;">✉️ НАПИСАТЬ ПИСЬМО</h2>
+            
+            <form action="https://formsubmit.co/ms8096181@gmail.com" method="POST" target="_blank">
+                <input type="hidden" name="_subject" value="Новое письмо с твоей почты!">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_captcha" value="false">
+                
+                <div class="form-group">
+                    <label>От кого (твой email):</label>
+                    <input type="email" name="email" value="muzaffar@1secmail.com" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Кому:</label>
+                    <input type="email" name="to_email" id="toEmail" placeholder="friend@gmail.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Тема:</label>
+                    <input type="text" name="_subject" value="Привет от Muzaffar">
+                </div>
+                
+                <div class="form-group">
+                    <label>Сообщение:</label>
+                    <textarea name="message" required>Привет! Это письмо с моей личной почты muzaffar@1secmail.com</textarea>
+                </div>
+                
+                <button type="submit">📨 ОТПРАВИТЬ ПИСЬМО</button>
+            </form>
+        </div>
+        
+        <!-- ВХОДЯЩИЕ -->
+        <div class="inbox">
+            <h2 style="color: #38bdf8;">📥 ВХОДЯЩИЕ ПИСЬМА</h2>
+            <button onclick="checkInbox()" style="margin-bottom: 20px;">🔄 ПРОВЕРИТЬ ПОЧТУ</button>
+            <div id="inbox">
+                <div style="text-align: center; color: #94a3b8;">📭 Нажми "ПРОВЕРИТЬ ПОЧТУ"</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 1SECMAIL - ПОЛУЧЕНИЕ ПИСЕМ
+        // ============================================
+        
+        let myLogin = 'muzaffar';
+        let myDomain = '1secmail.com';
+        let myEmail = 'muzaffar@1secmail.com';
+        
+        function createEmail() {
+            myLogin = document.getElementById('login').value.trim();
+            myDomain = document.getElementById('domain').value;
+            
+            if (!myLogin) {
+                alert('Введи логин!');
+                return;
+            }
+            
+            myEmail = myLogin + '@' + myDomain;
+            document.getElementById('myEmail').textContent = myEmail;
+            document.querySelector('input[name="email"]').value = myEmail;
+            alert('Email создан: ' + myEmail);
+        }
+        
+        async function checkInbox() {
+            const inbox = document.getElementById('inbox');
+            inbox.innerHTML = '<div style="text-align: center; padding: 20px;">⏳ Проверяю...</div>';
+            
+            try {
+                const res = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${myLogin}&domain=${myDomain}`);
+                const msgs = await res.json();
+                
+                if (!msgs || msgs.length === 0) {
+                    inbox.innerHTML = '<div style="text-align: center; color: #94a3b8;">📭 Нет писем на ' + myEmail + '</div>';
+                    return;
+                }
+                
+                let html = '';
+                for (const msg of msgs) {
+                    const d = await fetch(`https://www.1secmail.com/api/v1/?action=readMessage&login=${myLogin}&domain=${myDomain}&id=${msg.id}`);
+                    const full = await d.json();
+                    
+                    html += `
+                        <div class="message">
+                            <div>
+                                <span class="message-from">📨 ${full.from}</span>
+                                <span class="message-date">${new Date(full.date).toLocaleString()}</span>
+                            </div>
+                            <div style="margin: 10px 0;"><strong>${full.subject || 'Без темы'}</strong></div>
+                            <div class="message-body">${full.textBody || full.htmlBody || ''}</div>
+                        </div>
+                    `;
+                }
+                inbox.innerHTML = html;
+            } catch {
+                inbox.innerHTML = '<div style="text-align: center; color: #94a3b8;">⏳ Ещё раз...</div>';
+            }
+        }
+        
+        createEmail();
+    </script>
+</body>
+</html>
