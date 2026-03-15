@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Супер-легкая доска — текст, фигуры, рисунок</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #1e2b38;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .board-container {
+            background: #2f4052;
+            border-radius: 36px;
+            padding: 22px;
+            box-shadow: 0 30px 45px -12px #0f1a24;
+            border: 1px solid #4d6b84;
+        }
+
+        /* Панель — максимально простая и понятная */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            background: #233441;
+            padding: 10px 16px;
+            border-radius: 60px;
+            margin-bottom: 18px;
+            box-shadow: inset 0 2px 5px #15222e, 0 6px 10px rgba(0,0,0,0.3);
+        }
+
+        .tool-group {
+            display: flex;
+            background: #1d2d3b;
+            border-radius: 40px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .tool-btn {
+            background: #2d4356;
+            border: none;
+            color: #d6eaff;
+            font-size: 1.3rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 3px 0 #1b2a38;
+            border-bottom: 2px solid #1e3140;
+        }
+
+        .tool-btn.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 0 #1d4ed8;
+            transform: translateY(1px);
+        }
+
+        .tool-btn:hover {
+            background: #3e5a74;
+        }
+
+        .color-size-panel {
+            display: flex;
+            align-items: center;
+            background: #1d2d3b;
+            border-radius: 40px;
+            padding: 4px 15px 4px 10px;
+            gap: 15px;
+        }
+
+        .color-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #colorPicker {
+            width: 40px;
+            height: 34px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 30px;
+        }
+        #colorPicker::-webkit-color-swatch {
+            border: 2px solid #4b6f8f;
+            border-radius: 30px;
+        }
+
+        .size-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+
+        #sizeRange {
+            width: 100px;
+            height: 5px;
+            background: #2f4d68;
+            border-radius: 10px;
+            -webkit-appearance: none;
+        }
+        #sizeRange::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        #clearBtn {
+            background: #b13e3e;
+            color: white;
+            border-bottom-color: #712a2a;
+            padding: 0 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: auto;
+        }
+
+        /* Холст с мягкими углами */
+        .canvas-wrapper {
+            position: relative;
+            width: 1100px;
+            height: 580px;
+            background: white;
+            border-radius: 28px;
+            box-shadow: inset 0 0 0 2px #6485a0, 0 15px 25px -8px black;
+            overflow: hidden;
+        }
+
+        #backgroundCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: none;
+            background: white;
+            z-index: 1;
+        }
+
+        #interactionCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 2;
+            cursor: crosshair;
+            background: transparent;
+        }
+
+        /* Подсказки — теперь прямо на панели */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            color: #c1d9f0;
+            font-size: 0.9rem;
+            padding: 0 8px;
+        }
+
+        .hint-badge {
+            background: #1e313f;
+            padding: 4px 16px;
+            border-radius: 40px;
+            border: 1px solid #3e607b;
+        }
+    </style>
+</head>
+<body>
+<div class="board-container">
+    <!-- Панель с понятными иконками -->
+    <div class="toolbar">
+        <div class="tool-group">
+            <button class="tool-btn" id="selectBtn" title="Перемещать (V)">🖱️</button>
+            <button class="tool-btn" id="penBtn" title="Рисовать (P)">✏️</button>
+            <button class="tool-btn active" id="textBtn" title="Текст (T)">🔤</button>
+            <button class="tool-btn" id="stickerBtn" title="Стикер (S)">📌</button>
+        </div>
+        <div class="tool-group">
+            <button class="tool-btn" id="rectBtn" title="Квадрат (R)">⬜</button>
+            <button class="tool-btn" id="circleBtn" title="Круг (C)">⭕</button>
+            <button class="tool-btn" id="arrowBtn" title="Стрелка (A)">➡️</button>
+        </div>
+
+        <div class="color-size-panel">
+            <div class="color-wrap">
+                <input type="color" id="colorPicker" value="#2563eb">
+                <span style="color:white;">🎨</span>
+            </div>
+            <div class="size-wrap">
+                <span>🔵</span>
+                <input type="range" id="sizeRange" min="2" max="50" value="12">
+                <span id="sizeValue">12</span>
+            </div>
+        </div>
+
+        <button class="tool-btn" id="clearBtn">Очистить</button>
+    </div>
+
+    <!-- Два холста (фон + интерактив) -->
+    <div class="canvas-wrapper">
+        <canvas id="backgroundCanvas" width="1100" height="580"></canvas>
+        <canvas id="interactionCanvas" width="1100" height="580"></canvas>
+    </div>
+
+    <!-- Понятные подсказки прямо под доской -->
+    <div class="status-bar">
+        <span class="hint-badge">👆 Клик: создать текст/стикер</span>
+        <span class="hint-badge">🖱️ Тащи: переместить</span>
+        <span class="hint-badge">✏️ Двойной клик: править текст</span>
+        <span class="hint-badge">⌨️ V P T S R C A</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- canvas -----
+        const bgCanvas = document.getElementById('backgroundCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        const iCanvas = document.getElementById('interactionCanvas');
+        const iCtx = iCanvas.getContext('2d');
+
+        // ----- кнопки -----
+        const selectBtn = document.getElementById('selectBtn');
+        const penBtn = document.getElementById('penBtn');
+        const textBtn = document.getElementById('textBtn');
+        const stickerBtn = document.getElementById('stickerBtn');
+        const rectBtn = document.getElementById('rectBtn');
+        const circleBtn = document.getElementById('circleBtn');
+        const arrowBtn = document.getElementById('arrowBtn');
+        const colorPicker = document.getElementById('colorPicker');
+        const sizeRange = document.getElementById('sizeRange');
+        const sizeSpan = document.getElementById('sizeValue');
+        const clearBtn = document.getElementById('clearBtn');
+
+        // ----- состояние -----
+        let objects = [];          // все объекты (текст, стикеры, фигуры)
+        let penStrokes = [];       // линии кисти
+
+        let currentTool = 'text';   // по умолчанию текст — проще всего начать
+        let currentColor = colorPicker.value;
+        let currentSize = parseInt(sizeRange.value, 10);
+
+        // Перемещение
+        let selectedObjectIndex = -1;
+        let dragOffsetX = 0, dragOffsetY = 0;
+        let isDragging = false;
+
+        // Рисование кистью
+        let isPenDrawing = false;
+        let lastPenX = 0, lastPenY = 0;
+
+        // Фигуры (предпросмотр)
+        let shapeStartX = 0, shapeStartY = 0;
+        let isDrawingShape = false;
+        let previewShape = null;
+
+        // ----- Несколько объектов для примера (чтобы сразу было с чем играть) -----
+        objects.push({ type: 'text', x: 200, y: 150, text: 'Привет!', color: '#1e293b', fontSize: 36 });
+        objects.push({ type: 'sticker', x: 450, y: 200, w: 150, h: 100, text: 'стикер', color: '#fbbf24' });
+        objects.push({ type: 'rect', x: 750, y: 300, w: 120, h: 80, color: '#3b82f6' });
+        objects.push({ type: 'circle', x: 300, y: 400, radius: 45, color: '#ef4444' });
+        objects.push({ type: 'arrow', x: 600, y: 450, toX: 800, toY: 500, color: '#10b981', width: 6 });
+
+        // ----- Отрисовка фона (все объекты и штрихи) -----
+        function redrawBackground() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            // Штрихи пера
+            bgCtx.save();
+            bgCtx.lineCap = 'round';
+            bgCtx.lineJoin = 'round';
+            penStrokes.forEach(stroke => {
+                if (stroke.points.length < 2) return;
+                bgCtx.beginPath();
+                bgCtx.strokeStyle = stroke.color;
+                bgCtx.lineWidth = stroke.size;
+                bgCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                for (let i = 1; i < stroke.points.length; i++) {
+                    bgCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                }
+                bgCtx.stroke();
+            });
+            bgCtx.restore();
+
+            // Объекты
+            objects.forEach(obj => {
+                bgCtx.save();
+                if (obj.type === 'sticker') {
+                    bgCtx.fillStyle = obj.color;
+                    bgCtx.shadowColor = 'rgba(0,0,0,0.15)';
+                    bgCtx.shadowBlur = 8;
+                    bgCtx.shadowOffsetY = 3;
+                    bgCtx.beginPath();
+                    roundRect(bgCtx, obj.x, obj.y, obj.w, obj.h, 16);
+                    bgCtx.fill();
+                    bgCtx.shadowBlur = 0;
+                    bgCtx.fillStyle = '#1e293b';
+                    bgCtx.font = 'bold 22px "Segoe UI", Inter, sans-serif';
+                    bgCtx.fillText(obj.text || '📌', obj.x + 25, obj.y + 60);
+                } else if (obj.type === 'text') {
+                    bgCtx.font = `bold ${obj.fontSize || 32}px 'Segoe UI', Inter, sans-serif`;
+                    bgCtx.fillStyle = obj.color;
+                    bgCtx.shadowColor = 'rgba(0,0,0,0.1)';
+                    bgCtx.shadowBlur = 5;
+                    bgCtx.shadowOffsetY = 2;
+                    bgCtx.fillText(obj.text, obj.x, obj.y);
+                } else if (obj.type === 'rect') {
+                    bgCtx.strokeStyle = obj.color;
+                    bgCtx.lineWidth = 4;
+                    bgCtx.shadowColor = 'rgba(0,0,0,0.15)';
+                    bgCtx.shadowBlur = 6;
+                    bgCtx.shadowOffsetY = 3;
+                    bgCtx.strokeRect(obj.x, obj.y, obj.w, obj.h);
+                } else if (obj.type === 'circle') {
+                    bgCtx.strokeStyle = obj.color;
+                    bgCtx.lineWidth = 4;
+                    bgCtx.shadowColor = 'rgba(0,0,0,0.15)';
+                    bgCtx.shadowBlur = 6;
+                    bgCtx.shadowOffsetY = 3;
+                    bgCtx.beginPath();
+                    bgCtx.arc(obj.x, obj.y, obj.radius, 0, 2*Math.PI);
+                    bgCtx.stroke();
+                } else if (obj.type === 'arrow') {
+                    drawArrow(bgCtx, obj.x, obj.y, obj.toX, obj.toY, obj.color, obj.width || 5);
+                }
+                bgCtx.restore();
+            });
+        }
+
+        // Вспомогательные функции
+        function roundRect(ctx, x, y, w, h, r) {
+            if (w < 2*r) r = w/2;
+            if (h < 2*r) r = h/2;
+            ctx.beginPath();
+            ctx.moveTo(x+r, y);
+            ctx.lineTo(x+w-r, y);
+            ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+            ctx.lineTo(x+w, y+h-r);
+            ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+            ctx.lineTo(x+r, y+h);
+            ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+            ctx.lineTo(x, y+r);
+            ctx.quadraticCurveTo(x, y, x+r, y);
+            ctx.closePath();
+        }
+
+        function drawArrow(ctx, fromX, fromY, toX, toY, color, width) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = width;
+            ctx.shadowColor = 'rgba(0,0,0,0.15)';
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetY = 2;
+            // линия
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            // наконечник
+            let angle = Math.atan2(toY - fromY, toX - fromX);
+            let arrowSize = 18 + width;
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - arrowSize * 0.8 * Math.cos(angle) - arrowSize * 0.3 * Math.sin(angle), toY - arrowSize * 0.8 * Math.sin(angle) + arrowSize * 0.3 * Math.cos(angle));
+            ctx.lineTo(toX - arrowSize * 0.8 * Math.cos(angle) + arrowSize * 0.3 * Math.sin(angle), toY - arrowSize * 0.8 * Math.sin(angle) - arrowSize * 0.3 * Math.cos(angle));
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // ----- Интерактивный слой (рамка выделения + предпросмотр) -----
+        function redrawInteraction() {
+            iCtx.clearRect(0, 0, iCanvas.width, iCanvas.height);
+
+            // Предпросмотр фигуры
+            if (previewShape) {
+                iCtx.save();
+                iCtx.strokeStyle = previewShape.color;
+                iCtx.lineWidth = 3;
+                iCtx.setLineDash([6, 6]);
+                if (previewShape.type === 'rect') {
+                    iCtx.strokeRect(previewShape.startX, previewShape.startY, previewShape.currentX - previewShape.startX, previewShape.currentY - previewShape.startY);
+                } else if (previewShape.type === 'circle') {
+                    const rad = Math.hypot(previewShape.currentX - previewShape.startX, previewShape.currentY - previewShape.startY);
+                    iCtx.beginPath();
+                    iCtx.arc(previewShape.startX, previewShape.startY, rad, 0, 2*Math.PI);
+                    iCtx.stroke();
+                } else if (previewShape.type === 'arrow') {
+                    drawArrow(iCtx, previewShape.startX, previewShape.startY, previewShape.currentX, previewShape.currentY, previewShape.color, currentSize);
+                }
+                iCtx.restore();
+            }
+
+            // Рамка выделенного объекта
+            if (selectedObjectIndex !== -1 && objects[selectedObjectIndex]) {
+                const obj = objects[selectedObjectIndex];
+                iCtx.save();
+                iCtx.strokeStyle = '#3b82f6';
+                iCtx.lineWidth = 2.5;
+                iCtx.setLineDash([5, 5]);
+                if (obj.type === 'sticker') {
+                    iCtx.strokeRect(obj.x-5, obj.y-5, obj.w+10, obj.h+10);
+                } else if (obj.type === 'text') {
+                    iCtx.font = `bold ${obj.fontSize || 32}px 'Segoe UI', Inter, sans-serif`;
+                    const metrics = iCtx.measureText(obj.text);
+                    const textWidth = metrics.width;
+                    const textHeight = (obj.fontSize || 32) * 1.2;
+                    iCtx.strokeRect(obj.x-8, obj.y - textHeight + 8, textWidth + 16, textHeight + 8);
+                } else if (obj.type === 'rect') {
+                    iCtx.strokeRect(obj.x-6, obj.y-6, obj.w+12, obj.h+12);
+                } else if (obj.type === 'circle') {
+                    iCtx.beginPath();
+                    iCtx.arc(obj.x, obj.y, obj.radius+8, 0, 2*Math.PI);
+                    iCtx.stroke();
+                } else if (obj.type === 'arrow') {
+                    const minX = Math.min(obj.x, obj.toX)-12;
+                    const minY = Math.min(obj.y, obj.toY)-12;
+                    const ww = Math.abs(obj.toX-obj.x)+24;
+                    const hh = Math.abs(obj.toY-obj.y)+24;
+                    iCtx.strokeRect(minX, minY, ww, hh);
+                }
+                iCtx.restore();
+            }
+        }
+
+        // ----- Поиск объекта под точкой (улучшен) -----
+        function findObject(x, y) {
+            for (let i = objects.length-1; i>=0; i--) {
+                const o = objects[i];
+                if (o.type === 'sticker' && x>=o.x && x<=o.x+o.w && y>=o.y && y<=o.y+o.h) return i;
+                if (o.type === 'text') {
+                    iCtx.font = `bold ${o.fontSize || 32}px 'Segoe UI', Inter, sans-serif`;
+                    const metrics = iCtx.measureText(o.text);
+                    const textWidth = metrics.width;
+                    const textHeight = (o.fontSize || 32) * 1.2;
+                    if (x >= o.x - 8 && x <= o.x + textWidth + 8 && y >= o.y - textHeight + 8 && y <= o.y + 8) return i;
+                }
+                if (o.type === 'rect' && x>=o.x && x<=o.x+o.w && y>=o.y && y<=o.y+o.h) return i;
+                if (o.type === 'circle') {
+                    const dx = x-o.x, dy = y-o.y;
+                    if (dx*dx+dy*dy <= o.radius*o.radius) return i;
+                }
+                if (o.type === 'arrow') {
+                    // Упрощённо: bounding box
+                    const minX = Math.min(o.x, o.toX)-15;
+                    const maxX = Math.max(o.x, o.toX)+15;
+                    const minY = Math.min(o.y, o.toY)-15;
+                    const maxY = Math.max(o.y, o.toY)+15;
+                    if (x>=minX && x<=maxX && y>=minY && y<=maxY) return i;
+                }
+            }
+            return -1;
+        }
+
+        // ----- Координаты мыши -----
+        function getCoords(e) {
+            const rect = iCanvas.getBoundingClientRect();
+            const scaleX = iCanvas.width / rect.width;
+            const scaleY = iCanvas.height / rect.height;
+            let clientX, clientY;
+            if (e.touches) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            const x = (clientX - rect.left) * scaleX;
+            const y = (clientY - rect.top) * scaleY;
+            return { x: Math.min(iCanvas.width-1, Math.max(0, x)), y: Math.min(iCanvas.height-1, Math.max(0, y)) };
+        }
+
+        // ----- Обработчики -----
+        function handleMouseDown(e) {
+            e.preventDefault();
+            const { x, y } = getCoords(e);
+
+            if (currentTool === 'select') {
+                const idx = findObject(x, y);
+                if (idx !== -1) {
+                    selectedObjectIndex = idx;
+                    const obj = objects[idx];
+                    dragOffsetX = x - (obj.type === 'circle' ? obj.x : (obj.type === 'arrow' ? obj.x : obj.x));
+                    dragOffsetY = y - (obj.type === 'circle' ? obj.y : (obj.type === 'arrow' ? obj.y : obj.y));
+                    isDragging = true;
+                } else {
+                    selectedObjectIndex = -1;
+                }
+                redrawInteraction();
+            }
+            else if (currentTool === 'pen') {
+                isPenDrawing = true;
+                lastPenX = x; lastPenY = y;
+                penStrokes.push({ color: currentColor, size: currentSize, points: [{x, y}] });
+                redrawBackground();
+            }
+            else if (currentTool === 'text') {
+                // Проще: сразу создаём текст с коротким именем
+                const newText = { type: 'text', x, y, text: 'текст', color: currentColor, fontSize: 32 };
+                objects.push(newText);
+                redrawBackground();
+                redrawInteraction();
+            }
+            else if (currentTool === 'sticker') {
+                objects.push({ type: 'sticker', x: x-50, y: y-40, w: 140, h: 90, text: 'новый', color: currentColor });
+                redrawBackground();
+                redrawInteraction();
+            }
+            else if (currentTool === 'rect' || currentTool === 'circle' || currentTool === 'arrow') {
+                shapeStartX = x; shapeStartY = y;
+                isDrawingShape = true;
+                previewShape = { type: currentTool, startX: x, startY: y, currentX: x, currentY: y, color: currentColor, size: currentSize };
+                redrawInteraction();
+            }
+        }
+
+        function handleMouseMove(e) {
+            e.preventDefault();
+            const { x, y } = getCoords(e);
+
+            if (currentTool === 'select' && isDragging && selectedObjectIndex !== -1) {
+                const obj = objects[selectedObjectIndex];
+                if (obj.type === 'sticker') { obj.x = x - dragOffsetX; obj.y = y - dragOffsetY; }
+                else if (obj.type === 'text') { obj.x = x - dragOffsetX; obj.y = y - dragOffsetY; }
+                else if (obj.type === 'rect') { obj.x = x - dragOffsetX; obj.y = y - dragOffsetY; }
+                else if (obj.type === 'circle') { obj.x = x - dragOffsetX; obj.y = y - dragOffsetY; }
+                else if (obj.type === 'arrow') { 
+                    let dx = x - obj.x - dragOffsetX;
+                    let dy = y - obj.y - dragOffsetY;
+                    obj.x += dx; obj.y += dy;
+                    obj.toX += dx; obj.toY += dy;
+                }
+                redrawBackground();
+                redrawInteraction();
+            }
+            else if (currentTool === 'pen' && isPenDrawing) {
+                const lastStroke = penStrokes[penStrokes.length-1];
+                lastStroke.points.push({x, y});
+                redrawBackground();
+                lastPenX = x; lastPenY = y;
+            }
+            else if (isDrawingShape && previewShape) {
+                previewShape.currentX = x;
+                previewShape.currentY = y;
+                redrawInteraction();
+            }
+        }
+
+        function handleMouseUp(e) {
+            e.preventDefault();
+            const { x, y } = getCoords(e);
+
+            if (currentTool === 'select') {
+                isDragging = false;
+                selectedObjectIndex = -1;
+                redrawInteraction();
+            }
+            else if (currentTool === 'pen') {
+                isPenDrawing = false;
+            }
+            else if (isDrawingShape && previewShape) {
+                if (currentTool === 'rect') {
+                    objects.push({ type: 'rect', x: Math.min(shapeStartX, x), y: Math.min(shapeStartY, y), w: Math.abs(x - shapeStartX), h: Math.abs(y - shapeStartY), color: currentColor });
+                } else if (currentTool === 'circle') {
+                    const rad = Math.hypot(x - shapeStartX, y - shapeStartY);
+                    objects.push({ type: 'circle', x: shapeStartX, y: shapeStartY, radius: rad, color: currentColor });
+                } else if (currentTool === 'arrow') {
+                    objects.push({ type: 'arrow', x: shapeStartX, y: shapeStartY, toX: x, toY: y, color: currentColor, width: currentSize });
+                }
+                previewShape = null;
+                isDrawingShape = false;
+                redrawBackground();
+                redrawInteraction();
+            }
+        }
+
+        // Двойной клик — редактирование текста/стикера
+        function handleDoubleClick(e) {
+            e.preventDefault();
+            const { x, y } = getCoords(e);
+            const idx = findObject(x, y);
+            if (idx !== -1) {
+                const obj = objects[idx];
+                if (obj.type === 'text') {
+                    const newText = prompt('Редактировать текст:', obj.text);
+                    if (newText !== null) obj.text = newText || ' ';
+                    redrawBackground();
+                    redrawInteraction();
+                } else if (obj.type === 'sticker') {
+                    const newText = prompt('Текст на стикере:', obj.text);
+                    if (newText !== null) obj.text = newText;
+                    redrawBackground();
+                    redrawInteraction();
+                }
+            }
+        }
+
+        // ----- События -----
+        iCanvas.addEventListener('mousedown', handleMouseDown);
+        iCanvas.addEventListener('mousemove', handleMouseMove);
+        iCanvas.addEventListener('mouseup', handleMouseUp);
+        iCanvas.addEventListener('mouseleave', () => { isPenDrawing = false; isDrawingShape = false; previewShape = null; redrawInteraction(); });
+        iCanvas.addEventListener('dblclick', handleDoubleClick);
+
+        iCanvas.addEventListener('touchstart', handleMouseDown);
+        iCanvas.addEventListener('touchmove', handleMouseMove);
+        iCanvas.addEventListener('touchend', handleMouseUp);
+        iCanvas.addEventListener('touchcancel', handleMouseUp);
+
+        // ----- Переключение инструментов -----
+        function setTool(tool) {
+            currentTool = tool;
+            [selectBtn, penBtn, textBtn, stickerBtn, rectBtn, circleBtn, arrowBtn].forEach(btn => btn.classList.remove('active'));
+            if (tool === 'select') selectBtn.classList.add('active');
+            else if (tool === 'pen') penBtn.classList.add('active');
+            else if (tool === 'text') textBtn.classList.add('active');
+            else if (tool === 'sticker') stickerBtn.classList.add('active');
+            else if (tool === 'rect') rectBtn.classList.add('active');
+            else if (tool === 'circle') circleBtn.classList.add('active');
+            else if (tool === 'arrow') arrowBtn.classList.add('active');
+        }
+
+        selectBtn.addEventListener('click', () => setTool('select'));
+        penBtn.addEventListener('click', () => setTool('pen'));
+        textBtn.addEventListener('click', () => setTool('text'));
+        stickerBtn.addEventListener('click', () => setTool('sticker'));
+        rectBtn.addEventListener('click', () => setTool('rect'));
+        circleBtn.addEventListener('click', () => setTool('circle'));
+        arrowBtn.addEventListener('click', () => setTool('arrow'));
+
+        // Горячие клавиши
+        window.addEventListener('keydown', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'v') setTool('select');
+            else if (k === 'p') setTool('pen');
+            else if (k === 't') setTool('text');
+            else if (k === 's') setTool('sticker');
+            else if (k === 'r') setTool('rect');
+            else if (k === 'c') setTool('circle');
+            else if (k === 'a') setTool('arrow');
+        });
+
+        // Цвет и размер
+        colorPicker.addEventListener('input', (e) => { currentColor = e.target.value; });
+        sizeRange.addEventListener('input', (e) => { currentSize = parseInt(e.target.value); sizeSpan.innerText = currentSize; });
+
+        // Очистка
+        clearBtn.addEventListener('click', () => {
+            if (confirm('Очистить всё?')) {
+                objects = [];
+                penStrokes = [];
+                redrawBackground();
+                redrawInteraction();
+            }
+        });
+
+        // Старт
+        redrawBackground();
+        redrawInteraction();
+    })();
+</script>
+</body>
+</html>
