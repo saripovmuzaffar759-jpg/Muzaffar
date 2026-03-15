@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuzaffarGram</title>
+    
+    <!-- Шрифты и иконки -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            color: #1a1a1a;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Экран авторизации */
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #667eea;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-logo h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .auth-logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #667eea;
+            color: #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            width: auto;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            cursor: pointer;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .username {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Посты */
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .post {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            gap: 12px;
+        }
+        
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .post-user {
+            font-weight: 600;
+        }
+        
+        .post-date {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .post-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            padding: 12px 16px;
+        }
+        
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .post-action.liked {
+            color: #e53e3e;
+        }
+        
+        .post-caption {
+            padding: 0 16px 16px;
+            font-size: 14px;
+        }
+        
+        .post-caption strong {
+            margin-right: 8px;
+            color: #333;
+        }
+        
+        /* Комментарии */
+        .comments-section {
+            padding: 16px;
+            border-top: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+        
+        .comment {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .comment-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .comment-user {
+            font-weight: 600;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .comment-text {
+            font-size: 13px;
+        }
+        
+        .comment-date {
+            font-size: 10px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .profile-header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin: 15px 0;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .profile-bio {
+            color: #666;
+            font-size: 14px;
+            margin: 15px 0;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        /* Модалка комментариев */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .new-post-form {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            color: #666;
+        }
+        
+        .image-preview {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-stats {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ЭКРАН АВТОРИЗАЦИИ -->
+    <div id="auth-screen" class="auth-screen">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <h1>MuzaffarGram</h1>
+                <p>Вход в аккаунт</p>
+            </div>
+            
+            <div id="auth-message" class="alert hidden"></div>
+            
+            <!-- Форма входа -->
+            <div id="login-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="Введите email">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Введите пароль">
+                </div>
+                <button id="login-btn" class="btn btn-primary">
+                    Войти
+                </button>
+                <p style="margin-top: 20px; text-align: center;">
+                    Нет аккаунта? 
+                    <span class="link" id="show-register" style="color: #667eea; cursor: pointer;">Зарегистрироваться</span>
+                </p>
+            </div>
+            
+            <!-- Форма регистрации -->
+            <div id="register-form" style="display: none;">
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" id="register-fullname" class="form-control" placeholder="Как вас зовут?">
+                </div>
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="register-username" class="form-control" placeholder="@username">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="register-email" class="form-control" placeholder="Введите email">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="register-password" class="form-control" placeholder="Минимум 6 символов">
+                </div>
+                <button id="register-btn" class="btn btn-primary">
+                    Зарегистрироваться
+                </button>
+                <p style="margin-top: 20px; text-align: center;">
+                    Уже есть аккаунт? 
+                    <span class="link" id="show-login" style="color: #667eea; cursor: pointer;">Войти</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ГЛАВНЫЙ ЭКРАН -->
+    <div id="main-screen" class="hidden">
+        <!-- Хедер -->
+        <header class="header">
+            <div class="container header-content">
+                <div class="logo" onclick="goToFeed()">MuzaffarGram</div>
+                <div class="user-info">
+                    <span class="username" id="username-display"></span>
+                    <img id="user-avatar-header" class="avatar" src="" alt="Avatar">
+                    <button id="logout-btn" class="btn btn-small btn-outline">Выйти</button>
+                </div>
+            </div>
+        </header>
+        
+        <main class="container">
+            <!-- Табы -->
+            <div class="tabs">
+                <div class="tab active" data-tab="feed">Лента</div>
+                <div class="tab" data-tab="profile">Профиль</div>
+                <div class="tab" data-tab="new-post">+ Пост</div>
+            </div>
+            
+            <!-- ЛЕНТА -->
+            <div id="feed-tab" class="tab-content">
+                <div id="posts-container" class="posts-container">
+                    <!-- Посты загружаются сюда -->
+                </div>
+            </div>
+            
+            <!-- ПРОФИЛЬ -->
+            <div id="profile-tab" class="tab-content hidden">
+                <div class="profile-header">
+                    <img id="profile-avatar" class="profile-avatar" src="" alt="Avatar">
+                    <div style="flex: 1;">
+                        <h2 id="profile-fullname" style="margin-bottom: 5px;"></h2>
+                        <p id="profile-username" style="color: #666; margin-bottom: 15px;"></p>
+                        
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <div class="stat-value" id="profile-posts">0</div>
+                                <div class="stat-label">постов</div>
+                            </div>
+                        </div>
+                        
+                        <p class="profile-bio" id="profile-bio"></p>
+                        
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="text" id="edit-bio" class="form-control" placeholder="Новый статус" style="flex: 1;">
+                            <button id="update-bio-btn" class="btn btn-primary" style="width: auto;">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 20px 0 15px;">Мои посты</h3>
+                <div id="profile-posts-container" class="posts-container"></div>
+            </div>
+            
+            <!-- НОВЫЙ ПОСТ -->
+            <div id="new-post-tab" class="tab-content hidden">
+                <div class="new-post-form">
+                    <h3 style="margin-bottom: 20px;">Создать пост</h3>
+                    
+                    <input type="file" id="post-image-input" class="file-input" accept="image/*">
+                    <label for="post-image-input" class="file-label" id="post-label">
+                        <span class="material-icons">add_photo_alternate</span>
+                        <p>Нажмите, чтобы выбрать фото</p>
+                    </label>
+                    
+                    <img id="post-image-preview" class="image-preview hidden">
+                    
+                    <div class="form-group">
+                        <label>Подпись</label>
+                        <textarea id="post-caption" class="form-control" rows="3" placeholder="Напишите что-нибудь..."></textarea>
+                    </div>
+                    
+                    <button id="upload-post-btn" class="btn btn-primary">Опубликовать</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- МОДАЛКА КОММЕНТАРИЕВ -->
+    <div id="comments-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Комментарии</h3>
+                <span class="modal-close" onclick="closeComments()">&times;</span>
+            </div>
+            <div id="comments-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;"></div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="new-comment-text" class="form-control" placeholder="Комментарий...">
+                <button id="add-comment-btn" class="btn btn-primary" style="width: auto;">Отправить</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ==============================================
+        // FIREBASE - ТВОИ ДАННЫЕ
+        // ==============================================
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDebw9ztkpGDZ8zugfWB1bG3mdHMzztUS0",
+            authDomain: "book-63c93.firebaseapp.com",
+            projectId: "book-63c93",
+            storageBucket: "book-63c93.firebasestorage.app",
+            messagingSenderId: "1051750888512",
+            appId: "1:1051750888512:web:09f24b98c240514b66dba5"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        const auth = firebase.auth();
+
+        // ==============================================
+        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        // ==============================================
+        
+        let currentUser = null;
+        let currentUserData = null;
+        let currentPostId = null;
+
+        // ==============================================
+        // ФУНКЦИИ
+        // ==============================================
+        
+        window.goToFeed = function() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelector('[data-tab="feed"]').classList.add('active');
+            document.getElementById('feed-tab').classList.remove('hidden');
+        };
+
+        // ==============================================
+        // АВТОРИЗАЦИЯ
+        // ==============================================
+        
+        document.getElementById('show-register').addEventListener('click', () => {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+        });
+        
+        document.getElementById('show-login').addEventListener('click', () => {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+        });
+        
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const msg = document.getElementById('auth-message');
+            
+            if (!email || !password) {
+                showMessage(msg, "Введите email и пароль", false);
+                return;
+            }
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                showMessage(msg, "Неверный email или пароль", false);
+            }
+        });
+        
+        document.getElementById('register-btn').addEventListener('click', async () => {
+            const fullName = document.getElementById('register-fullname').value.trim();
+            const username = document.getElementById('register-username').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const msg = document.getElementById('auth-message');
+            
+            if (!fullName || !username || !email || !password) {
+                showMessage(msg, "Заполните все поля", false);
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage(msg, "Пароль должен быть минимум 6 символов", false);
+                return;
+            }
+            
+            try {
+                const result = await auth.createUserWithEmailAndPassword(email, password);
+                const userData = {
+                    uid: result.user.uid,
+                    fullName: fullName,
+                    username: username,
+                    email: email,
+                    bio: "Привет! Я в MuzaffarGram",
+                    avatar: "https://i.ibb.co/kVZdSwzy/24ba19a8-aafe-4165-b731-5abb06575e7b.png",
+                    posts: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('users').doc(result.user.uid).set(userData);
+            } catch (error) {
+                showMessage(msg, "Ошибка регистрации", false);
+            }
+        });
+        
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await auth.signOut();
+            showAuthScreen();
+        });
+
+        // ==============================================
+        // ЗАГРУЗКА ДАННЫХ
+        // ==============================================
+        
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user.uid;
+                const doc = await db.collection('users').doc(currentUser).get();
+                currentUserData = doc.data();
+                
+                if (currentUserData) {
+                    document.getElementById('username-display').textContent = '@' + currentUserData.username;
+                    document.getElementById('user-avatar-header').src = currentUserData.avatar;
+                    
+                    await loadPosts();
+                    await loadProfile();
+                    showMainScreen();
+                }
+            } else {
+                showAuthScreen();
+            }
+        });
+        
+        async function loadPosts() {
+            const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
+            const container = document.getElementById('posts-container');
+            container.innerHTML = '';
+            
+            if (snapshot.empty) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Пока нет постов</div>';
+                return;
+            }
+            
+            for (const doc of snapshot.docs) {
+                const post = { id: doc.id, ...doc.data() };
+                const likeDoc = await db.collection('posts').doc(post.id).collection('likes').doc(currentUser).get();
+                const isLiked = likeDoc.exists;
+                
+                const commentsSnapshot = await db.collection('posts').doc(post.id).collection('comments').orderBy('createdAt', 'desc').limit(3).get();
+                const comments = [];
+                commentsSnapshot.forEach(c => comments.push({ id: c.id, ...c.data() }));
+                
+                container.appendChild(createPostElement(post, isLiked, comments));
+            }
+        }
+        
+        function createPostElement(post, isLiked, comments) {
+            const div = document.createElement('div');
+            div.className = 'post';
+            
+            let commentsHtml = '';
+            if (comments.length > 0) {
+                commentsHtml = '<div class="comments-section">';
+                comments.forEach(c => {
+                    commentsHtml += `
+                        <div class="comment">
+                            <img src="${c.userAvatar}" class="comment-avatar">
+                            <div>
+                                <span class="comment-user">${c.userName}</span>
+                                <span class="comment-text">${c.text}</span>
+                                <div class="comment-date">${formatDate(c.createdAt)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                if (post.comments > 3) {
+                    commentsHtml += `<div style="color: #667eea; cursor: pointer; margin-top: 10px;" onclick="showComments('${post.id}')">Посмотреть все комментарии</div>`;
+                }
+                commentsHtml += '</div>';
+            }
+            
+            div.innerHTML = `
+                <div class="post-header">
+                    <img src="${post.userAvatar}" class="post-avatar">
+                    <div>
+                        <div class="post-user">${post.userName}</div>
+                        <div class="post-date">${formatDate(post.createdAt)}</div>
+                    </div>
+                </div>
+                <img src="${post.imageUrl}" class="post-image">
+                <div class="post-actions">
+                    <div class="post-action ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                        <span class="material-icons">${isLiked ? 'favorite' : 'favorite_border'}</span>
+                        <span>${post.likes || 0}</span>
+                    </div>
+                    <div class="post-action" onclick="showComments('${post.id}')">
+                        <span class="material-icons">comment</span>
+                        <span>${post.comments || 0}</span>
+                    </div>
+                </div>
+                <div class="post-caption">
+                    <strong>${post.userName}</strong> ${post.caption}
+                </div>
+                ${commentsHtml}
+            `;
+            return div;
+        }
+        
+        async function loadProfile() {
+            document.getElementById('profile-fullname').textContent = currentUserData.fullName;
+            document.getElementById('profile-username').textContent = '@' + currentUserData.username;
+            document.getElementById('profile-avatar').src = currentUserData.avatar;
+            document.getElementById('profile-bio').textContent = currentUserData.bio;
+            document.getElementById('profile-posts').textContent = currentUserData.posts || 0;
+            
+            const snapshot = await db.collection('posts').where('userId', '==', currentUser).get();
+            const container = document.getElementById('profile-posts-container');
+            container.innerHTML = '';
+            
+            if (snapshot.empty) {
+                container.innerHTML = '<div style="text-align: center; color: #999;">Нет постов</div>';
+            } else {
+                snapshot.forEach(doc => {
+                    const post = doc.data();
+                    container.innerHTML += `
+                        <div class="post">
+                            <img src="${post.imageUrl}" style="width: 100%; max-height: 300px; object-fit: cover;">
+                            <div style="padding: 10px;">❤️ ${post.likes || 0}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // ==============================================
+        // КОММЕНТАРИИ (ИСПРАВЛЕНО!)
+        // ==============================================
+        
+        window.showComments = async function(postId) {
+            currentPostId = postId;
+            
+            const snapshot = await db.collection('posts').doc(postId).collection('comments').orderBy('createdAt', 'desc').get();
+            const container = document.getElementById('comments-container');
+            container.innerHTML = '';
+            
+            if (snapshot.empty) {
+                container.innerHTML = '<div style="text-align: center; color: #999;">Нет комментариев</div>';
+            } else {
+                snapshot.forEach(doc => {
+                    const comment = doc.data();
+                    container.innerHTML += `
+                        <div class="comment">
+                            <img src="${comment.userAvatar}" class="comment-avatar">
+                            <div>
+                                <span class="comment-user">${comment.userName}</span>
+                                <span class="comment-text">${comment.text}</span>
+                                <div class="comment-date">${formatDate(comment.createdAt)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('comments-modal').classList.remove('hidden');
+        };
+        
+        document.getElementById('add-comment-btn').addEventListener('click', async () => {
+            const text = document.getElementById('new-comment-text').value;
+            if (!text || !currentPostId) return;
+            
+            await db.collection('posts').doc(currentPostId).collection('comments').add({
+                userId: currentUser,
+                userName: currentUserData.username,
+                userAvatar: currentUserData.avatar,
+                text: text,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            await db.collection('posts').doc(currentPostId).update({
+                comments: firebase.firestore.FieldValue.increment(1)
+            });
+            
+            document.getElementById('new-comment-text').value = '';
+            document.getElementById('comments-modal').classList.add('hidden');
+            loadPosts();
+        });
+        
+        window.closeComments = function() {
+            document.getElementById('comments-modal').classList.add('hidden');
+            currentPostId = null;
+        };
+
+        // ==============================================
+        // ЛАЙКИ
+        // ==============================================
+        
+        window.toggleLike = async (postId) => {
+            const likeRef = db.collection('posts').doc(postId).collection('likes').doc(currentUser);
+            const postRef = db.collection('posts').doc(postId);
+            
+            if ((await likeRef.get()).exists) {
+                await likeRef.delete();
+                await postRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
+            } else {
+                await likeRef.set({ userId: currentUser, createdAt: new Date() });
+                await postRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+            }
+            loadPosts();
+        };
+
+        // ==============================================
+        // ЗАГРУЗКА ФОТО
+        // ==============================================
+        
+        document.getElementById('post-image-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('post-image-preview').src = e.target.result;
+                    document.getElementById('post-image-preview').classList.remove('hidden');
+                    document.getElementById('post-label').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        document.getElementById('upload-post-btn').addEventListener('click', async () => {
+            const file = document.getElementById('post-image-input').files[0];
+            const caption = document.getElementById('post-caption').value;
+            
+            if (!file) {
+                alert('Выберите фото');
+                return;
+            }
+            
+            const storageRef = storage.ref(`posts/${currentUser}_${Date.now()}`);
+            await storageRef.put(file);
+            const imageUrl = await storageRef.getDownloadURL();
+            
+            await db.collection('posts').add({
+                userId: currentUser,
+                userName: currentUserData.username,
+                userAvatar: currentUserData.avatar,
+                imageUrl: imageUrl,
+                caption: caption,
+                likes: 0,
+                comments: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            await db.collection('users').doc(currentUser).update({
+                posts: (currentUserData.posts || 0) + 1
+            });
+            
+            alert('Пост опубликован');
+            document.getElementById('post-image-input').value = '';
+            document.getElementById('post-caption').value = '';
+            document.getElementById('post-image-preview').classList.add('hidden');
+            document.getElementById('post-label').style.display = 'flex';
+            
+            loadPosts();
+            loadProfile();
+        });
+
+        // ==============================================
+        // ОБНОВЛЕНИЕ ПРОФИЛЯ
+        // ==============================================
+        
+        document.getElementById('update-bio-btn').addEventListener('click', async () => {
+            const bio = document.getElementById('edit-bio').value;
+            if (bio) {
+                await db.collection('users').doc(currentUser).update({ bio });
+                currentUserData.bio = bio;
+                document.getElementById('profile-bio').textContent = bio;
+                document.getElementById('edit-bio').value = '';
+            }
+        });
+
+        // ==============================================
+        // ТАБЫ
+        // ==============================================
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab + '-tab').classList.remove('hidden');
+            });
+        });
+
+        // ==============================================
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ==============================================
+        
+        function formatDate(timestamp) {
+            if (!timestamp) return 'только что';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 60000);
+            
+            if (diff < 1) return 'только что';
+            if (diff < 60) return diff + ' мин назад';
+            if (diff < 1440) return Math.floor(diff / 60) + ' ч назад';
+            return date.toLocaleDateString();
+        }
+        
+        function showMessage(element, msg, success) {
+            element.textContent = msg;
+            element.className = `alert ${success ? 'alert-success' : 'alert-error'}`;
+            element.classList.remove('hidden');
+            setTimeout(() => element.classList.add('hidden'), 3000);
+        }
+        
+        function showAuthScreen() {
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('main-screen').classList.add('hidden');
+        }
+        
+        function showMainScreen() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

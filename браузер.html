@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>muzaffar - Браузер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .browser-container {
+            width: 1400px;
+            max-width: 100%;
+            height: 850px;
+            max-height: 95vh;
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Заголовок браузера */
+        .browser-title-bar {
+            background: #f8fafc;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+
+        .dot:hover { opacity: 0.7; }
+        .dot.red { background: #ff5f57; }
+        .dot.yellow { background: #febc2e; }
+        .dot.green { background: #28c840; }
+
+        .nav-controls {
+            display: flex;
+            gap: 8px;
+            margin-left: 8px;
+        }
+
+        .nav-control {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            color: #475569;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .nav-control:hover:not(:disabled) {
+            background: #e2e8f0;
+        }
+
+        .nav-control:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Адресная строка */
+        .search-wrapper {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 30px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s;
+        }
+
+        .search-wrapper:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+        }
+
+        .search-icon {
+            color: #64748b;
+            font-size: 18px;
+        }
+
+        .search-wrapper input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #0f172a;
+            background: transparent;
+        }
+
+        .search-wrapper input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-actions {
+            display: flex;
+            gap: 12px;
+            color: #64748b;
+        }
+
+        .search-actions span {
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .profile-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #3b82f6, #8b5cf6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(59,130,246,0.3);
+        }
+
+        /* Вкладки */
+        .tabs-section {
+            background: #f8fafc;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab-item {
+            min-width: 180px;
+            max-width: 220px;
+            height: 42px;
+            background: #e2e8f0;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 10px;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            border-bottom: none;
+            transition: all 0.2s;
+        }
+
+        .tab-item.active {
+            background: #ffffff;
+            height: 43px;
+            margin-bottom: -1px;
+            border-color: #cbd5e1;
+            border-bottom: 1px solid white;
+        }
+
+        .tab-fav {
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tab-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13px;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .tab-close {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-close:hover {
+            background: #cbd5e1;
+            color: #ef4444;
+        }
+
+        .add-tab {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            font-size: 24px;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-tab:hover {
+            background: #e2e8f0;
+        }
+
+        /* Основной контент */
+        .main-layout {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        /* История */
+        .history-sidebar {
+            width: 280px;
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-header {
+            padding: 18px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .clear-history-btn {
+            background: transparent;
+            border: none;
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: background 0.2s;
+        }
+
+        .clear-history-btn:hover {
+            background: rgba(59,130,246,0.1);
+        }
+
+        .history-entries {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            list-style: none;
+        }
+
+        .history-entry {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .history-entry:hover {
+            border-color: #3b82f6;
+            transform: translateX(4px);
+            box-shadow: 0 6px 12px rgba(59,130,246,0.1);
+        }
+
+        .history-query-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #0f172a;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .history-time-text {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .empty-history-text {
+            text-align: center;
+            color: #94a3b8;
+            padding: 24px;
+            font-size: 13px;
+            background: white;
+            border-radius: 12px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        /* Область результатов */
+        .content-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .results-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Стили для iframe поиска */
+        .search-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            width: 420px;
+            max-width: 90%;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-box h3 {
+            color: #0f172a;
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .modal-box p {
+            color: #475569;
+            margin-bottom: 28px;
+            font-size: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.primary {
+            background: #ef4444;
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            background: #dc2626;
+        }
+
+        .modal-btn.secondary {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Анимации */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .browser-container {
+            animation: slideUp 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="browser-container">
+        <!-- Верхняя панель -->
+        <div class="browser-title-bar">
+            <div class="window-dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            
+            <div class="nav-controls">
+                <button class="nav-control" id="navBack" disabled>←</button>
+                <button class="nav-control" id="navForward" disabled>→</button>
+                <button class="nav-control" id="navRefresh">↻</button>
+            </div>
+
+            <!-- Поисковая строка -->
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Поиск в MUzaffar или введите URL" autofocus>
+                <div class="search-actions">
+                    <span>⭐</span>
+                    <span>🎙️</span>
+                </div>
+            </div>
+
+            <div class="profile-badge">D</div>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="tabs-section">
+            <div class="tab-item active" data-tab="1">
+                <div class="tab-fav">G</div>
+                <span class="tab-text">Новая вкладка</span>
+                <button class="tab-close">✕</button>
+            </div>
+            <button class="add-tab" id="addTabBtn">+</button>
+        </div>
+
+        <!-- Основная часть -->
+        <div class="main-layout">
+            <!-- Боковая панель истории -->
+            <div class="history-sidebar">
+                <div class="history-header">
+                    <h3>📋 ИСТОРИЯ ПОИСКА</h3>
+                    <button class="clear-history-btn" id="clearHistoryBtn">Очистить</button>
+                </div>
+                <ul class="history-entries" id="historyEntries">
+                    <li class="empty-history-text">Загрузка истории...</li>
+                </ul>
+            </div>
+
+            <!-- Область контента -->
+            <div class="content-panel">
+                <div class="results-area" id="resultsArea">
+                    <!-- Здесь будут отображаться результаты поиска -->
+                    <iframe id="searchFrame" class="search-iframe" src="about:blank"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box">
+            <h3>Очистить историю?</h3>
+            <p>Все сохраненные запросы будут удалены без возможности восстановления.</p>
+            <div class="modal-actions">
+                <button class="modal-btn primary" id="confirmClear">Очистить</button>
+                <button class="modal-btn secondary" id="cancelClear">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Инициализация IndexedDB
+            let db;
+            const DB_NAME = 'MuzaffarSearchDB';
+            const DB_VERSION = 1;
+            const STORE_NAME = 'history';
+            
+            // DOM элементы
+            const searchInput = document.getElementById('searchInput');
+            const searchFrame = document.getElementById('searchFrame');
+            const historyEntries = document.getElementById('historyEntries');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            const refreshBtn = document.getElementById('navRefresh');
+            const addTabBtn = document.getElementById('addTabBtn');
+            const modal = document.getElementById('confirmModal');
+            const confirmClear = document.getElementById('confirmClear');
+            const cancelClear = document.getElementById('cancelClear');
+            
+            // Открытие/создание базы данных
+            function initDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => resolve(request.result);
+                    
+                    request.onupgradeneeded = (event) => {
+                        const database = event.target.result;
+                        if (!database.objectStoreNames.contains(STORE_NAME)) {
+                            const store = database.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                            store.createIndex('timestamp', 'timestamp', { unique: false });
+                        }
+                    };
+                });
+            }
+            
+            // Сохранение запроса в историю
+            async function saveToHistory(query) {
+                if (!query.trim() || !db) return;
+                
+                try {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    
+                    store.add({
+                        query: query,
+                        timestamp: Date.now()
+                    });
+                    
+                    transaction.oncomplete = () => loadHistory();
+                } catch (error) {
+                    console.error('Ошибка сохранения:', error);
+                }
+            }
+            
+            // Загрузка истории
+            async function loadHistory() {
+                if (!db) {
+                    db = await initDB();
+                }
+                
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const index = store.index('timestamp');
+                const request = index.openCursor(null, 'prev');
+                
+                historyEntries.innerHTML = '';
+                let count = 0;
+                
+                request.onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor && count < 30) {
+                        const item = cursor.value;
+                        const li = document.createElement('li');
+                        li.className = 'history-entry';
+                        li.innerHTML = `
+                            <div class="history-query-text">🔍 ${escapeHtml(item.query)}</div>
+                            <div class="history-time-text">${formatTime(item.timestamp)}</div>
+                        `;
+                        
+                        li.addEventListener('click', () => {
+                            searchInput.value = item.query;
+                            searchGoogle(item.query);
+                        });
+                        
+                        historyEntries.appendChild(li);
+                        count++;
+                        cursor.continue();
+                    } else if (historyEntries.children.length === 0) {
+                        historyEntries.innerHTML = '<li class="empty-history-text">📭 История поиска пуста</li>';
+                    }
+                };
+            }
+            
+            // Экранирование HTML
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            // Форматирование времени
+            function formatTime(timestamp) {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diff = now - date;
+                
+                if (diff < 60000) return 'только что';
+                if (diff < 3600000) {
+                    const mins = Math.floor(diff / 60000);
+                    return `${mins} ${mins === 1 ? 'минуту' : 'минуты'} назад`;
+                }
+                if (diff < 86400000) {
+                    const hours = Math.floor(diff / 3600000);
+                    return `${hours} ${hours === 1 ? 'час' : 'часа'} назад`;
+                }
+                if (diff < 604800000) {
+                    const days = Math.floor(diff / 86400000);
+                    return `${days} ${days === 1 ? 'день' : 'дня'} назад`;
+                }
+                
+                return date.toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            
+            // Поиск в Google (РАБОЧАЯ ВЕРСИЯ)
+            function searchGoogle(query) {
+                if (!query.trim()) return;
+                
+                // Сохраняем в историю
+                saveToHistory(query);
+                
+                // Обновляем заголовок вкладки
+                const tabText = document.querySelector('.tab-text');
+                if (tabText) {
+                    tabText.textContent = query.length > 35 ? query.substring(0, 35) + '...' : query;
+                }
+                
+                // Формируем URL для поиска Google
+                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&igu=1`;
+                
+                // Загружаем результаты в iframe
+                searchFrame.src = searchUrl;
+                
+                // Обновляем заголовок страницы
+                document.title = `${query} - muzaffars Browser`;
+            }
+            
+            // Очистка истории
+            async function clearHistory() {
+                if (!db) return;
+                
+                try {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    await store.clear();
+                    loadHistory();
+                    modal.classList.remove('active');
+                } catch (error) {
+                    console.error('Ошибка очистки:', error);
+                }
+            }
+            
+            // Инициализация
+            (async function() {
+                try {
+                    db = await initDB();
+                    await loadHistory();
+                } catch (error) {
+                    console.error('Ошибка инициализации:', error);
+                    historyEntries.innerHTML = '<li class="empty-history-text">❌ Ошибка загрузки истории</li>';
+                }
+            })();
+            
+            // Обработчики событий
+            
+            // Поиск по Enter
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchGoogle(searchInput.value);
+                }
+            });
+            
+            // Кнопка обновления
+            refreshBtn.addEventListener('click', () => {
+                if (searchInput.value) {
+                    searchGoogle(searchInput.value);
+                } else {
+                    searchFrame.src = 'about:blank';
+                }
+            });
+            
+            // Очистка истории
+            clearHistoryBtn.addEventListener('click', () => {
+                modal.classList.add('active');
+            });
+            
+            confirmClear.addEventListener('click', clearHistory);
+            
+            cancelClear.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+            
+            // Новая вкладка
+            addTabBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchFrame.src = 'about:blank';
+                document.querySelector('.tab-text').textContent = 'Новая вкладка';
+                searchInput.focus();
+            });
+            
+            // Закрытие модального окна по клику вне его
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+            
+            // Кнопки навигации (демо)
+            document.getElementById('navBack').addEventListener('click', () => {
+                alert('Навигация назад (демо-режим)');
+            });
+            
+            document.getElementById('navForward').addEventListener('click', () => {
+                alert('Навигация вперед (демо-режим)');
+            });
+            
+            // Обработка закрытия вкладки
+            document.querySelector('.tab-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                alert('Нельзя закрыть последнюю вкладку');
+            });
+        })();
+    </script>
+</body>
+</html>
