@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUZAFFAR | Словарь Википедии</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+        }
+
+        .content {
+            padding: 30px;
+            background: #f5f5f5;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-btn:active {
+            transform: scale(0.95);
+        }
+
+        .quick-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .quick-word {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .quick-word:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .word-title {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .word-title h2 {
+            color: #333;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .wiki-icon {
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .result-image {
+            margin: 20px 0;
+            text-align: center;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .result-image img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-text {
+            color: #444;
+            line-height: 1.7;
+            font-size: 16px;
+            margin: 20px 0;
+            text-align: justify;
+        }
+
+        .wiki-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .wiki-link:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #764ba2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fff2f0;
+            border: 1px solid #ffccc7;
+            color: #f5222d;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #764ba2;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MUZAFFAR</h1>
+            <p>Словарь на основе Википедии</p>
+            <div class="badge">📚 Без API ключа • Бесплатно • Wikipedia</div>
+        </div>
+        
+        <div class="content">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Введите слово для поиска..." autofocus>
+                <button class="search-btn" onclick="searchWord()">
+                    <span>🔍</span> Поиск
+                </button>
+            </div>
+
+            <div class="quick-words">
+                <span class="quick-word" onclick="searchWord('Философия')">Философия</span>
+                <span class="quick-word" onclick="searchWord('Космос')">Космос</span>
+                <span class="quick-word" onclick="searchWord('Искусство')">Искусство</span>
+                <span class="quick-word" onclick="searchWord('Наука')">Наука</span>
+                <span class="quick-word" onclick="searchWord('Технология')">Технология</span>
+                <span class="quick-word" onclick="searchWord('История')">История</span>
+                <span class="quick-word" onclick="searchWord('Природа')">Природа</span>
+                <span class="quick-word" onclick="searchWord('Музыка')">Музыка</span>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Поиск в Википедии...</p>
+            </div>
+
+            <div id="error" class="error"></div>
+
+            <div id="result" class="result"></div>
+
+            <div class="footer">
+                <p>⚡ Данные из <a href="#" onclick="window.open('https://ru.wikipedia.org')">Википедии</a> • Свободная энциклопедия</p>
+                <p style="margin-top: 5px; color: #999;">© 2024 MUZAFFAR Словарь</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция поиска
+        async function searchWord(word = null) {
+            const query = word || document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                showError('Пожалуйста, введите слово для поиска');
+                return;
+            }
+
+            // Показываем загрузку
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('result').classList.remove('show');
+            
+            try {
+                // Используем Wikipedia API (без ключа!)
+                const url = `https://ru.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // Убираем загрузку
+                document.getElementById('loading').classList.remove('show');
+
+                if (data.type === 'https://mediawiki.org/wiki/HyperSwitch/errors/not_found') {
+                    showError(`Слово "${query}" не найдено в Википедии`);
+                    return;
+                }
+
+                // Показываем результат
+                showResult(data);
+                
+            } catch (error) {
+                document.getElementById('loading').classList.remove('show');
+                showError('Ошибка подключения. Проверьте интернет.');
+            }
+        }
+
+        // Показать результат
+        function showResult(data) {
+            const resultDiv = document.getElementById('result');
+            
+            // Проверяем наличие изображения
+            const image = data.originalimage || data.thumbnail;
+            const imageHtml = image ? `
+                <div class="result-image">
+                    <img src="${image.source}" alt="${data.title}">
+                </div>
+            ` : '';
+
+            // Формируем HTML
+            resultDiv.innerHTML = `
+                <div class="word-title">
+                    <h2>${data.title}</h2>
+                    <span class="wiki-icon">Wikipedia</span>
+                </div>
+                ${imageHtml}
+                <div class="result-text">
+                    ${data.extract || 'Описание отсутствует'}
+                </div>
+                <button class="wiki-link" onclick="window.open('https://ru.wikipedia.org/wiki/${encodeURIComponent(data.title)}', '_blank')">
+                    <span>📖 Читать в Википедии</span>
+                    <span>→</span>
+                </button>
+            `;
+            
+            resultDiv.classList.add('show');
+        }
+
+        // Показать ошибку
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.innerHTML = `
+                <strong>⚠️ ${message}</strong><br>
+                <span style="font-size: 14px; margin-top: 10px; display: block;">Попробуйте другое слово</span>
+            `;
+            errorDiv.classList.add('show');
+        }
+
+        // Поиск по Enter
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchWord();
+            }
+        });
+
+        // Поиск примера при загрузке
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                searchWord('Википедия');
+            }, 300);
+        });
+    </script>
+</body>
+</html>
