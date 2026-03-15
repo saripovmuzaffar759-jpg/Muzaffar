@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра "Я угадаю твоё число"</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --text-secondary: #b0bec5;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .game-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .computer-guess {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 20px 0;
+            min-height: 40px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .action-buttons button {
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #btn-correct { background-color: #4caf50; }
+        #btn-correct:hover { background-color: #388e3c; }
+        #btn-too-high { background-color: #d32f2f; }
+        #btn-too-high:hover { background-color: #b71c1c; }
+        #btn-too-low { background-color: #1e88e5; }
+        #btn-too-low:hover { background-color: #1565c0; }
+        #btn-reset { 
+            background: none;
+            border: 2px solid var(--text-secondary);
+            color: var(--text-secondary);
+            margin-top: 15px;
+        }
+        #btn-reset:hover { background: rgba(255, 255, 255, 0.1); }
+        .result-message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Я угадаю твоё число!</h1>
+        <p>Загадай число от 1 до 100. Я попробую его угадать за 7 попыток.</p>
+        <div class="computer-guess" id="computerGuess"></div>
+        <p>Моё число... Оно больше, меньше или правильное?</p>
+        <div class="action-buttons">
+            <button id="btn-too-high">Моё число меньше</button>
+            <button id="btn-correct">Я угадал!</button>
+            <button id="btn-too-low"> Моё число больше</button>
+        </div>
+        <div class="result-message" id="resultMessage"></div>
+        <button id="btn-reset">Начать заново</button>
+    </div>
+
+    <script>
+        const computerGuessEl = document.getElementById('computerGuess');
+        const resultMessageEl = document.getElementById('resultMessage');
+        const btnTooHigh = document.getElementById('btn-too-high');
+        const btnCorrect = document.getElementById('btn-correct');
+        const btnTooLow = document.getElementById('btn-too-low');
+        const btnReset = document.getElementById('btn-reset');
+
+        let minRange, maxRange, computerGuess;
+        let attempts = 0;
+
+        function startGame() {
+            minRange = 1;
+            maxRange = 100;
+            attempts = 0;
+            resultMessageEl.textContent = '';
+            btnTooHigh.disabled = false;
+            btnCorrect.disabled = false;
+            btnTooLow.disabled = false;
+            makeGuess();
+        }
+
+        function makeGuess() {
+            if (minRange > maxRange) {
+                // Это случается, если пользователь обманывает
+                resultMessageEl.textContent = 'Ты обманываешь меня! Я не могу найти такое число.';
+                resultMessageEl.style.color = 'var(--text-secondary)';
+                disableButtons();
+                return;
+            }
+
+            computerGuess = Math.floor((minRange + maxRange) / 2);
+            computerGuessEl.textContent = `Моя догадка: ${computerGuess}`;
+            attempts++;
+            if (attempts > 7) {
+                resultMessageEl.textContent = `Я не угадал за 7 попыток. Загаданное число было ${computerGuess}.`;
+                resultMessageEl.style.color = '#f44336';
+                disableButtons();
+            }
+        }
+
+        function disableButtons() {
+            btnTooHigh.disabled = true;
+            btnCorrect.disabled = true;
+            btnTooLow.disabled = true;
+        }
+
+        btnTooHigh.addEventListener('click', () => {
+            maxRange = computerGuess - 1;
+            makeGuess();
+        });
+
+        btnTooLow.addEventListener('click', () => {
+            minRange = computerGuess + 1;
+            makeGuess();
+        });
+
+        btnCorrect.addEventListener('click', () => {
+            resultMessageEl.textContent = `🎉 Ура! Я угадал твоё число ${computerGuess} за ${attempts} попыток.`;
+            resultMessageEl.style.color = '#4caf50';
+            disableButtons();
+        });
+
+        btnReset.addEventListener('click', startGame);
+
+        // Начало игры
+        startGame();
+    </script>
+</body>
+</html>
