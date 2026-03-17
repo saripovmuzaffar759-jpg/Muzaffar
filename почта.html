@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MuzaffarMail - отправка на любой email</title>
+    <meta charset="utf-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Экран входа */
+        .login-screen {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .login-screen h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 36px;
+        }
+        
+        .login-screen input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .login-screen input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-screen button {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+        
+        .login-screen button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+        
+        .link {
+            color: #667eea;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin: 15px 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Главная почта */
+        .main-screen {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-email {
+            background: #f0f2f5;
+            padding: 8px 16px;
+            border-radius: 50px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .logout-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+        
+        /* Коды подтверждения */
+        .codes-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .codes-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .code-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .code-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #4caf50;
+            letter-spacing: 2px;
+        }
+        
+        .code-site {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .code-time {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        /* Форма отправки */
+        .compose-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .compose-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        .send-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .send-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+        
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .alert {
+            padding: 12px;
+            background: #fff3cd;
+            color: #856404;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ЭКРАН ВХОДА / РЕГИСТРАЦИИ -->
+        <div id="authScreen" class="login-screen">
+            <h1>📧 MuzaffarMail</h1>
+            
+            <div id="loginForm">
+                <h3 style="text-align: center; margin-bottom: 20px;">Вход в почту</h3>
+                <input type="email" id="loginEmail" placeholder="Твой email" value="muzaffar@mail.com">
+                <input type="password" id="loginPassword" placeholder="Пароль" value="123456">
+                <button onclick="handleLogin()">Войти</button>
+                <span class="link" onclick="showRegister()">Нет аккаунта? Создать</span>
+            </div>
+            
+            <div id="registerForm" class="hidden">
+                <h3 style="text-align: center; margin-bottom: 20px;">Создать аккаунт</h3>
+                <input type="text" id="regName" placeholder="Твоё имя" value="Музаффар">
+                <input type="email" id="regEmail" placeholder="Твой email" value="muzaffar@mail.com">
+                <input type="password" id="regPassword" placeholder="Пароль" value="123456">
+                <button onclick="handleRegister()">Создать</button>
+                <span class="link" onclick="showLogin()">Уже есть аккаунт? Войти</span>
+            </div>
+            
+            <div id="authMessage" class="alert hidden"></div>
+        </div>
+        
+        <!-- ГЛАВНЫЙ ЭКРАН ПОЧТЫ -->
+        <div id="mainScreen" class="main-screen hidden">
+            <div class="header">
+                <div class="logo">📧 MuzaffarMail</div>
+                <div class="user-info">
+                    <span class="user-email" id="currentUserEmail"></span>
+                    <button class="logout-btn" onclick="logout()">Выйти</button>
+                </div>
+            </div>
+            
+            <!-- Коды подтверждения (приходят на твой email) -->
+            <div class="codes-section">
+                <h3>🔐 Коды подтверждения (для тебя)</h3>
+                <div id="codesList">
+                    <div class="code-item">
+                        <div>
+                            <span class="code-site">Google</span>
+                            <div class="code-time">5 мин назад</div>
+                        </div>
+                        <span class="code-value">584392</span>
+                    </div>
+                    <div class="code-item">
+                        <div>
+                            <span class="code-site">Instagram</span>
+                            <div class="code-time">15 мин назад</div>
+                        </div>
+                        <span class="code-value">762145</span>
+                    </div>
+                    <div class="code-item">
+                        <div>
+                            <span class="code-site">Facebook</span>
+                            <div class="code-time">1 час назад</div>
+                        </div>
+                        <span class="code-value">391784</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Отправка писем на ЛЮБОЙ email -->
+            <div class="compose-section">
+                <h3>✉️ Отправить письмо (на любой email)</h3>
+                
+                <div class="form-group">
+                    <label>Кому отправить?</label>
+                    <input type="email" id="toEmail" placeholder="Введи email получателя" value="friend@gmail.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Тема письма</label>
+                    <input type="text" id="subject" value="Привет от Muzaffar">
+                </div>
+                
+                <div class="form-group">
+                    <label>Сообщение</label>
+                    <textarea id="message">Привет! Как дела?</textarea>
+                </div>
+                
+                <button class="send-btn" onclick="sendEmail()">
+                    📨 Отправить письмо
+                </button>
+                
+                <div id="sendMessage" class="message"></div>
+                
+                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 14px;">
+                    ⚡ Письмо уходит прямо на указанный email
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ==============================================
+        // ДАННЫЕ ПОЛЬЗОВАТЕЛЕЙ
+        // ==============================================
+        
+        // База пользователей (в памяти браузера)
+        let users = [
+            { email: 'muzaffar@mail.com', password: '123456', name: 'Музаффар' }
+        ];
+        
+        let currentUser = null;
+        
+        // ==============================================
+        // АВТОРИЗАЦИЯ
+        // ==============================================
+        
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+        }
+        
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+        
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const msg = document.getElementById('authMessage');
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('mainScreen').classList.remove('hidden');
+                document.getElementById('currentUserEmail').textContent = user.email;
+                msg.classList.add('hidden');
+            } else {
+                msg.textContent = '❌ Неверный email или пароль';
+                msg.classList.remove('hidden');
+            }
+        }
+        
+        function handleRegister() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const msg = document.getElementById('authMessage');
+            
+            if (!name || !email || !password) {
+                msg.textContent = '❌ Заполни все поля';
+                msg.classList.remove('hidden');
+                return;
+            }
+            
+            if (users.find(u => u.email === email)) {
+                msg.textContent = '❌ Такой email уже есть';
+                msg.classList.remove('hidden');
+                return;
+            }
+            
+            const newUser = { name, email, password };
+            users.push(newUser);
+            currentUser = newUser;
+            
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            document.getElementById('currentUserEmail').textContent = email;
+            msg.classList.add('hidden');
+        }
+        
+        function logout() {
+            currentUser = null;
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('mainScreen').classList.add('hidden');
+        }
+        
+        // ==============================================
+        // ОТПРАВКА ПИСЕМ (FormSubmit - работает 100%)
+        // ==============================================
+        
+        function sendEmail() {
+            const to = document.getElementById('toEmail').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            const msgDiv = document.getElementById('sendMessage');
+            
+            if (!to || !subject || !message) {
+                showMessage('❌ Заполни все поля', 'error');
+                return;
+            }
+            
+            // Создаем невидимую форму
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://formsubmit.co/ms8096181@gmail.com';
+            form.target = 'hidden_iframe';
+            
+            // Поля формы
+            const fields = {
+                '_subject': `📨 Для ${to}: ${subject}`,
+                'message': message,
+                '_captcha': 'false',
+                '_template': 'table',
+                '_cc': to // ВАЖНО! Письмо уходит на указанный email
+            };
+            
+            for (const [name, value] of Object.entries(fields)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            
+            // Невидимый iframe для ответа
+            const iframe = document.createElement('iframe');
+            iframe.name = 'hidden_iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            form.submit();
+            
+            showMessage(`✅ Письмо отправлено на ${to}!`, 'success');
+            
+            // Очищаем форму (оставляем только поле "Кому")
+            document.getElementById('subject').value = '';
+            document.getElementById('message').value = '';
+            
+            // Удаляем форму и iframe
+            setTimeout(() => {
+                document.body.removeChild(form);
+                document.body.removeChild(iframe);
+            }, 1000);
+        }
+        
+        function showMessage(text, type) {
+            const msgDiv = document.getElementById('sendMessage');
+            msgDiv.textContent = text;
+            msgDiv.className = `message ${type}`;
+            
+            setTimeout(() => {
+                msgDiv.className = 'message';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
