@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Javoni Lyceum · Электронный журнал</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Стили без изменений */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Inter", sans-serif;
+            background: #0b141f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle at 30% 40%, rgba(0, 180, 255, 0.15) 0%, transparent 30%),
+                        radial-gradient(circle at 70% 60%, rgba(150, 50, 255, 0.12) 0%, transparent 35%),
+                        radial-gradient(circle at 10% 80%, rgba(255, 100, 100, 0.08) 0%, transparent 40%),
+                        #0b141f;
+            animation: bgMove 28s infinite alternate;
+            z-index: -2;
+        }
+        @keyframes bgMove {
+            0% { transform: translate(0,0) rotate(0deg); }
+            100% { transform: translate(5%,3%) rotate(1deg); }
+        }
+        .card {
+            width: 100%;
+            max-width: 1400px;
+            background: rgba(18, 28, 40, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+            animation: float 6s infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-6px); }
+        }
+        h2 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #fff, #b0ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .subtitle {
+            color: #98a9c7;
+            border-left: 4px solid #2f80ff;
+            padding-left: 20px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        .subjects-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 60px;
+            padding: 10px 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .subject-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #b0d0ff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+            flex: 0 1 auto;
+        }
+        .subject-btn:hover {
+            background: #2f80ff20;
+            border-color: #2f80ff;
+            color: white;
+        }
+        .subject-btn.active {
+            background: #2f80ff;
+            border-color: #2f80ff;
+            color: white;
+            box-shadow: 0 8px 20px -8px #2f80ff;
+        }
+        .control-panel {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+        .input-field {
+            flex: 2;
+            min-width: 250px;
+            background: #1e2b3a;
+            border: 1px solid #314a66;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            padding: 5px 5px 5px 25px;
+            transition: 0.2s;
+        }
+        .input-field:focus-within {
+            border-color: #2f80ff;
+            box-shadow: 0 0 0 3px rgba(47,128,255,0.2);
+        }
+        .input-field i {
+            color: #5f7ea0;
+            font-size: 1.3rem;
+        }
+        .input-field input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 18px 15px;
+            font-size: 1.2rem;
+            color: white;
+            outline: none;
+        }
+        .input-field input::placeholder {
+            color: #5a7795;
+            font-weight: 300;
+        }
+        .action-btn {
+            background: linear-gradient(115deg, #1f2f4a, #121f32);
+            border: 1px solid #2f80ff66;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            padding: 0 25px;
+            border-radius: 60px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .action-btn:hover {
+            background: #1f3a5a;
+            border-color: #2f80ff;
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px #2f80ff;
+        }
+        .action-btn i {
+            font-size: 1.2rem;
+            color: #b0d0ff;
+        }
+        .result {
+            background: #102030;
+            border-radius: 40px;
+            padding: 25px;
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #2a4a70;
+            animation: fadeSlide 0.4s ease;
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .student-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px dashed #2f5580;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 70px;
+            height: 70px;
+            background: #1f3a5a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #b5d6ff;
+            border: 2px solid #3f6a9f;
+        }
+        .student-name {
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #fff, #c0d9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 25px;
+            background: #0a1a28;
+            border: 1px solid #2a4a70;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #c9dfff;
+        }
+        th {
+            background: #142c40;
+            padding: 15px 12px;
+            font-weight: 600;
+            border-bottom: 2px solid #2f5580;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #1c3a55;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .error-message {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #301010;
+            border: 1px solid #b55a5a;
+            border-radius: 60px;
+            padding: 20px 30px;
+            color: #ffbcbc;
+            font-size: 1.1rem;
+        }
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #3f5f8f;
+            border-top-color: #2f80ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: #98b9e6;
+            padding: 20px;
+            font-size: 1.1rem;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 30px;
+            color: #4f6990;
+            font-size: 0.9rem;
+            border-top: 1px solid #1e3349;
+            padding-top: 20px;
+        }
+        .footer-note i {
+            margin-right: 6px;
+        }
+        @media (max-width: 700px) {
+            .card { padding: 25px; border-radius: 35px; }
+            h2 { font-size: 2rem; }
+            .student-name { font-size: 1.6rem; }
+            .avatar { width: 55px; height: 55px; font-size: 1.6rem; }
+            th, td { padding: 10px 8px; font-size: 0.9rem; }
+            .subjects-bar { border-radius: 30px; padding: 8px; }
+            .subject-btn { font-size: 0.9rem; padding: 8px 16px; }
+            .control-panel { flex-direction: column; }
+            .action-btn { padding: 15px 25px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2><i class="fas fa-gem"></i> Javoni Lyceum</h2>
+        <div class="subtitle"><i class="fas fa-book-open"></i> Выберите предмет</div>
+
+        <!-- Панель выбора предметов -->
+        <div class="subjects-bar" id="subjectsBar"></div>
+
+        <!-- Панель управления -->
+        <div class="control-panel">
+            <div class="input-field">
+                <i class="fas fa-key"></i>
+                <input type="text" id="codeInput" placeholder="Введите код для поиска" autocomplete="off">
+            </div>
+            <button class="action-btn" id="searchBtn"><i class="fas fa-magnifying-glass"></i> Найти</button>
+            <button class="action-btn" id="showAllBtn"><i class="fas fa-table"></i> Показать всех</button>
+        </div>
+
+        <!-- Индикатор загрузки -->
+        <div id="loading" class="loading-indicator" style="display: none;">
+            <div class="loader"></div>
+            <span>Загружаем данные...</span>
+        </div>
+
+        <!-- Блок результата -->
+        <div id="result" class="result"></div>
+
+        <div class="footer-note">
+            <i class="fas fa-cloud-arrow-up"></i> Данные из Google Таблицы
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================================================================
+            // ⚙️ ID вашей таблицы (можно взять из ссылки)
+            // ==================================================================
+            const SPREADSHEET_ID = '1EwVlRXOyJAV8C46vsfILuQBRlLimIMEe7JkhCqyjfY0';
+            
+            // Соответствие названий предметов и имён листов (как они называются в таблице)
+            const subjects = [
+                { name: '⚛️ Физика', sheetName: 'физика' },
+                { name: '📐 Алгебра', sheetName: 'алгебра' },
+                { name: '🔨 Крафт', sheetName: 'крафт' }
+            ];
+
+            // Индексы столбцов (A - код, B - имя, C и далее - данные)
+            const CODE_COLUMN = 0;
+            const NAME_COLUMN = 1;
+            const FIRST_DATA_COLUMN = 2;
+
+            // ==================================================================
+            let currentSubjectIndex = 0;
+            let students = [];
+            let dataHeaders = [];
+            let isLoading = false;
+
+            const subjectsBar = document.getElementById('subjectsBar');
+            const codeInput = document.getElementById('codeInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const showAllBtn = document.getElementById('showAllBtn');
+            const loadingDiv = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+
+            function buildSubjectsBar() {
+                subjectsBar.innerHTML = '';
+                subjects.forEach((subj, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'subject-btn' + (idx === currentSubjectIndex ? ' active' : '');
+                    btn.textContent = subj.name;
+                    btn.addEventListener('click', () => switchSubject(idx));
+                    subjectsBar.appendChild(btn);
+                });
+            }
+
+            function switchSubject(index) {
+                if (index === currentSubjectIndex) return;
+                currentSubjectIndex = index;
+                document.querySelectorAll('.subject-btn').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === index);
+                });
+                resultDiv.style.display = 'none';
+                resultDiv.innerHTML = '';
+                codeInput.value = '';
+                loadData();
+            }
+
+            async function loadData() {
+                const sheetName = subjects[currentSubjectIndex].sheetName;
+                isLoading = true;
+                loadingDiv.style.display = 'flex';
+                resultDiv.style.display = 'none';
+
+                // Используем альтернативный URL, который гарантированно работает
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+                
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const csv = await response.text();
+                    parseCSV(csv);
+                } catch (e) {
+                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-circle-exclamation"></i> Ошибка загрузки: ${e.message}. Проверьте названия листов.</div>`;
+                    resultDiv.style.display = 'block';
+                } finally {
+                    isLoading = false;
+                    loadingDiv.style.display = 'none';
+                }
+            }
+
+            function parseCSV(csv) {
+                const lines = csv.trim().split('\n').map(line => 
+                    line.split(',').map(cell => cell.trim().replace(/^"(.*)"$/, '$1'))
+                );
+
+                // Ищем первую строку, где первый столбец похож на число (код)
+                let startRow = -1;
+                for (let i = 0; i < lines.length; i++) {
+                    const cell = lines[i][CODE_COLUMN];
+                    if (cell && cell.trim() !== '' && !isNaN(parseFloat(cell))) {
+                        startRow = i;
+                        break;
+                    }
+                }
+                if (startRow === -1) {
+                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-triangle-exclamation"></i> Не удалось найти данные учеников на этом листе.</div>`;
+                    resultDiv.style.display = 'block';
+                    students = [];
+                    dataHeaders = [];
+                    return;
+                }
+
+                // Заголовки данных — из предыдущей строки, если есть
+                let headerRow = (startRow > 0) ? lines[startRow - 1] : lines[startRow];
+                dataHeaders = [];
+                for (let i = FIRST_DATA_COLUMN; i < headerRow.length; i++) {
+                    dataHeaders.push(headerRow[i] || `Колонка ${i+1}`);
+                }
+
+                // Парсим учеников
+                students = [];
+                for (let i = startRow; i < lines.length; i++) {
+                    const row = lines[i];
+                    const code = row[CODE_COLUMN]?.trim();
+                    const name = row[NAME_COLUMN]?.trim();
+                    if (!code || !name) continue;
+
+                    const data = [];
+                    for (let j = FIRST_DATA_COLUMN; j < row.length; j++) {
+                        data.push(row[j] || '');
+                    }
+                    students.push({ code, name, data });
+                }
+            }
+
+            function showAllStudents() {
+                if (isLoading) {
+                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-spinner fa-pulse"></i> Данные загружаются...</div>`;
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+                if (students.length === 0) {
+                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-info-circle"></i> Нет данных для отображения</div>`;
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+
+                let html = `
+                    <div class="student-header">
+                        <div class="avatar"><i class="fas fa-users"></i></div>
+                        <span class="student-name">Все ученики (${students.length})</span>
+                    </div>
+                `;
+                html += '<div class="table-wrapper"><table><tr>';
+                html += '<th>Код</th><th>Имя</th>';
+                dataHeaders.forEach(h => html += `<th>${h}</th>`);
+                html += '</tr>';
+                students.forEach(s => {
+                    html += '<tr>';
+                    html += `<td>${s.code}</td>`;
+                    html += `<td>${s.name}</td>`;
+                    s.data.forEach(v => html += `<td>${v}</td>`);
+                    html += '</tr>';
+                });
+                html += '</table></div>';
+                resultDiv.innerHTML = html;
+                resultDiv.style.display = 'block';
+            }
+
+            function findStudent() {
+                const query = codeInput.value.trim();
+                if (isLoading) {
+                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-spinner fa-pulse"></i> Данные загружаются...</div>`;
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+                if (!query) {
+                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Введите код</div>`;
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+
+                const student = students.find(s => s.code === query);
+                if (!student) {
+                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Ученик с кодом «${query}» не найден</div>`;
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+
+                let html = `
+                    <div class="student-header">
+                        <div class="avatar"><i class="fas fa-user-astronaut"></i></div>
+                        <span class="student-name">${student.name}</span>
+                    </div>
+                `;
+                if (dataHeaders.length > 0 && student.data.length > 0) {
+                    html += '<div class="table-wrapper"><table><tr>';
+                    dataHeaders.forEach(h => html += `<th>${h}</th>`);
+                    html += '</tr><tr>';
+                    student.data.forEach(v => html += `<td>${v}</td>`);
+                    html += '</tr></table></div>';
+                } else {
+                    html += '<p style="color:#7f9bc0; text-align:center;">Нет дополнительных данных</p>';
+                }
+                resultDiv.innerHTML = html;
+                resultDiv.style.display = 'block';
+            }
+
+            buildSubjectsBar();
+            loadData();
+
+            searchBtn.addEventListener('click', findStudent);
+            showAllBtn.addEventListener('click', showAllStudents);
+            codeInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') findStudent();
+            });
+        })();
+    </script>
+</body>
+</html>
