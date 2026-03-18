@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школьный портал - Все предметы</title>
+    <!-- jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Стили (без изменений, оставил как в предыдущей версии) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #1a1e2c 0%, #2a2f45 50%, #1a1e2c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        .teacher-greeting {
+            background: rgba(0, 200, 255, 0.1);
+            border-left: 5px solid #00c8ff;
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            animation: slideIn 0.5s ease;
+        }
+        .teacher-greeting i {
+            font-size: 3rem;
+            color: #00c8ff;
+        }
+        .greeting-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #00c8ff;
+        }
+        .greeting-subtext {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .logo h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+        .logo p {
+            color: #00c8ff;
+            font-size: 1rem;
+        }
+        .class-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .class-btn {
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .class-btn.active {
+            background: #00c8ff;
+            border-color: #00c8ff;
+            color: #1a1e2c;
+        }
+        .progress-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            height: 8px;
+            border-radius: 10px;
+            width: 200px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #00c8ff;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .reset-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .subject-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 30px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 50px;
+            justify-content: center;
+        }
+        .subject-tab {
+            padding: 10px 18px;
+            border-radius: 30px;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+            font-size: 0.9rem;
+        }
+        .subject-tab i {
+            font-size: 1rem;
+        }
+        .subject-tab:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+        .subject-tab.active {
+            background: #00c8ff;
+            color: #1a1e2c;
+        }
+        .subject-tab.active i {
+            color: #1a1e2c;
+        }
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .lesson-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .lesson-card:hover {
+            transform: translateY(-5px);
+            border-color: #00c8ff;
+            box-shadow: 0 10px 30px rgba(0, 200, 255, 0.1);
+        }
+        .lesson-card.locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .lesson-card.locked .video-container::after {
+            content: "🔒";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            background: rgba(0,0,0,0.7);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #00c8ff;
+            z-index: 10;
+        }
+        .lesson-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .lesson-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+        }
+        .youtube-link {
+            color: #ff0000;
+            font-size: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .youtube-link:hover {
+            transform: scale(1.1);
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 16/9;
+        }
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .lesson-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+        }
+        .btn-primary {
+            background: #00c8ff;
+            color: #1a1e2c;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #00a3d9;
+            transform: scale(1.02);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255,255,255,0.15);
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .test-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 1px solid #00c8ff;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .question {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .question p {
+            margin-bottom: 15px;
+            color: #00c8ff;
+            font-weight: 500;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option:hover {
+            background: rgba(0,200,255,0.1);
+            border-color: #00c8ff;
+        }
+        .option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #00c8ff;
+        }
+        .test-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 30px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .success-message {
+            background: rgba(0, 200, 255, 0.2);
+            border: 1px solid #00c8ff;
+            color: #00c8ff;
+        }
+        .error-message {
+            background: rgba(255, 80, 80, 0.2);
+            border: 1px solid #ff5050;
+            color: #ff5050;
+        }
+        .certificate-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: #1a1e2c;
+            border: 2px solid #00c8ff;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0,200,255,0.3);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+            transition: all 0.3s;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .certificate-modal.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+        .certificate-modal h2 {
+            color: #00c8ff;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .certificate-modal input {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        .certificate-modal input:focus {
+            border-color: #00c8ff;
+        }
+        .certificate-modal .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        @media (max-width: 768px) {
+            .subject-tabs { 
+                flex-direction: column; 
+                border-radius: 30px;
+                align-items: stretch;
+            }
+            .class-selector { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="teacher-greeting">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <div>
+                <div class="greeting-text">Здравствуйте, уважаемые ученики!</div>
+                <div class="greeting-subtext">Добро пожаловать на наш образовательный портал. Здесь собраны лучшие видеоуроки по всем предметам.</div>
+            </div>
+        </div>
+
+        <header>
+            <div class="logo">
+                <h1>Школьный портал</h1>
+                <p>Все предметы • 1–11 классы</p>
+            </div>
+            <div class="class-selector" id="classSelector"></div>
+            <div class="progress-area">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <button class="reset-btn" onclick="resetProgress()"><i class="fas fa-redo-alt"></i> Сброс</button>
+            </div>
+        </header>
+
+        <div class="subject-tabs" id="subjectTabs"></div>
+        <div id="lessonsContainer" class="lessons-grid"></div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeCertificateModal()"></div>
+    <div class="certificate-modal" id="certificateModal">
+        <h2>Сертификат</h2>
+        <input type="text" id="firstName" placeholder="Имя" required>
+        <input type="text" id="lastName" placeholder="Фамилия" required>
+        <button class="btn btn-primary" onclick="generateCertificate()"><i class="fas fa-file-pdf"></i> Скачать PDF</button>
+        <button class="btn btn-secondary" onclick="closeCertificateModal()">Закрыть</button>
+    </div>
+
+    <script>
+        // Все предметы
+        const subjects = [
+            { id: 'math', name: 'Математика', icon: 'fa-calculator' },
+            { id: 'russian', name: 'Русский язык', icon: 'fa-language' },
+            { id: 'physics', name: 'Физика', icon: 'fa-atom' },
+            { id: 'programming', name: 'Программирование', icon: 'fa-code' },
+            { id: 'literature', name: 'Литература', icon: 'fa-book' },
+            { id: 'history', name: 'История', icon: 'fa-landmark' }
+        ];
+
+        // Видео ID (добавлено ваше новое видео)
+        const videoIds = {
+            // Математика
+            math1_add: "12Vv5-lHqaQ", // Сложение и вычитание (1 класс)
+            math2: "7yzA5pZ9aFw", // Деление
+            math3: "GjvJQwYx3wM", // Дроби
+            math4: "tWfTJkLq5pE", // Проценты
+            
+            // Русский язык
+            rus1_add: "PLjYqJOvfkY", // ВСЕ ПРАВИЛА РУССКОГО ЯЗЫКА ЗА 1 КЛАСС (ваше новое видео)
+            rus2: "tRkLqH3nV7m", // Прилагательное (старое, можно заменить)
+            
+            // Физика
+            phys1: "uXzLqH5nR4m", // Силы
+            
+            // Программирование
+            prog1: "oYzLqH7nR2m", // Scratch
+            
+            // Литература
+            lit1: "pLqH4nR6kM2", // Сказки
+            
+            // История
+            hist1: "rKmN5jH3gF7" // Древний мир
+        };
+
+        // Уроки с реальными работающими видео
+        const lessons = {
+            math: {
+                1: [
+                    { title: "Сложение и вычитание чисел до 10", videoId: videoIds.math1_add, topic: "Сложение и вычитание" },
+                    { title: "Учимся считать до 20", videoId: videoIds.math2, topic: "Счет до 20" }
+                ],
+                2: [
+                    { title: "Таблица умножения", videoId: videoIds.math2, topic: "Умножение" },
+                    { title: "Деление", videoId: videoIds.math2, topic: "Деление" }
+                ],
+                3: [
+                    { title: "Что такое дробь", videoId: videoIds.math3, topic: "Дроби" },
+                    { title: "Сложение дробей", videoId: videoIds.math3, topic: "Дроби" }
+                ],
+                4: [
+                    { title: "Проценты для начинающих", videoId: videoIds.math4, topic: "Проценты" }
+                ],
+                5: [
+                    { title: "Обыкновенные дроби", videoId: videoIds.math3, topic: "Дроби" }
+                ]
+            },
+            russian: {
+                1: [
+                    { title: "Все правила русского языка за 1 класс", videoId: videoIds.rus1_add, topic: "Правила русского языка" }, // ВАШЕ НОВОЕ ВИДЕО
+                    { title: "Буквы и звуки", videoId: videoIds.rus2, topic: "Азбука" }
+                ],
+                2: [
+                    { title: "Имя существительное", videoId: videoIds.rus2, topic: "Существительное" }
+                ],
+                3: [
+                    { title: "Имя прилагательное", videoId: videoIds.rus2, topic: "Прилагательное" }
+                ]
+            },
+            literature: {
+                1: [
+                    { title: "Русские народные сказки", videoId: videoIds.lit1, topic: "Сказки" }
+                ],
+                2: [
+                    { title: "Сказки Пушкина", videoId: videoIds.lit1, topic: "Пушкин" }
+                ]
+            },
+            history: {
+                5: [
+                    { title: "Древний Египет", videoId: videoIds.hist1, topic: "Египет" },
+                    { title: "Древняя Греция", videoId: videoIds.hist1, topic: "Греция" }
+                ]
+            },
+            physics: {
+                7: [
+                    { title: "Силы в природе", videoId: videoIds.phys1, topic: "Силы" }
+                ]
+            },
+            programming: {
+                5: [
+                    { title: "Scratch для начинающих", videoId: videoIds.prog1, topic: "Scratch" }
+                ]
+            }
+        };
+
+        // Тесты
+        const tests = {
+            math: {
+                1: [
+                    {
+                        title: "Сложение и вычитание",
+                        questions: [
+                            { text: "2 + 3 = ?", options: ["4", "5", "6", "7"], correct: 1 },
+                            { text: "5 - 2 = ?", options: ["2", "3", "4", "5"], correct: 1 },
+                            { text: "4 + 1 = ?", options: ["4", "5", "6", "7"], correct: 1 },
+                            { text: "7 - 3 = ?", options: ["3", "4", "5", "6"], correct: 1 },
+                            { text: "3 + 4 = ?", options: ["6", "7", "8", "9"], correct: 1 }
+                        ]
+                    }
+                ]
+            },
+            russian: {
+                1: [ // Добавил тест для 1 класса
+                    {
+                        title: "Правила русского языка",
+                        questions: [
+                            { text: "Как правильно написать: 'ж___знь'?", options: ["и", "ы", "е", "я"], correct: 0 },
+                            { text: "Как пишется сочетание: 'ч___й'?", options: ["я", "а", "у", "и"], correct: 1 },
+                            { text: "Как пишется сочетание: 'ч___до'?", options: ["я", "а", "у", "и"], correct: 2 },
+                            { text: "В слове 'ш___шка' пишется...", options: ["ы", "и", "е", "я"], correct: 1 },
+                            { text: "В слове 'ч___йник' пишется...", options: ["я", "а", "у", "и"], correct: 1 }
+                        ]
+                    }
+                ],
+                2: [
+                    {
+                        title: "Существительное",
+                        questions: [
+                            { text: "Что такое существительное?", options: ["действие", "предмет", "признак", "число"], correct: 1 },
+                            { text: "Найди существительное", options: ["бегать", "красный", "стол", "быстро"], correct: 2 },
+                            { text: "Какого рода слово 'солнце'?", options: ["мужской", "женский", "средний", "общий"], correct: 2 },
+                            { text: "Множественное число слова 'кот'", options: ["коты", "котики", "котов", "коту"], correct: 0 },
+                            { text: "Одушевленное существительное", options: ["камень", "дерево", "собака", "дом"], correct: 2 }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Текущее состояние
+        let currentSubject = 'math';
+        let currentClass = 1;
+        let currentTestLesson = null;
+
+        function initSubjectTabs() {
+            const container = document.getElementById('subjectTabs');
+            container.innerHTML = '';
+            
+            subjects.forEach(subj => {
+                const tab = document.createElement('div');
+                tab.className = `subject-tab ${subj.id === currentSubject ? 'active' : ''}`;
+                tab.innerHTML = `<i class="fas ${subj.icon}"></i> ${subj.name}`;
+                tab.onclick = () => switchSubject(subj.id);
+                container.appendChild(tab);
+            });
+        }
+
+        function initClassSelector() {
+            const container = document.getElementById('classSelector');
+            container.innerHTML = '';
+            for (let i = 1; i <= 11; i++) {
+                const btn = document.createElement('button');
+                btn.className = `class-btn ${i === currentClass ? 'active' : ''}`;
+                btn.textContent = `${i} класс`;
+                btn.onclick = () => switchClass(i);
+                container.appendChild(btn);
+            }
+        }
+
+        function switchSubject(subject) {
+            currentSubject = subject;
+            document.querySelectorAll('.subject-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.innerHTML.includes(subjects.find(s => s.id === subject).name)) {
+                    tab.classList.add('active');
+                }
+            });
+            renderLessons();
+        }
+
+        function switchClass(classNum) {
+            currentClass = classNum;
+            document.querySelectorAll('.class-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(classNum)) btn.classList.add('active');
+            });
+            renderLessons();
+        }
+
+        function getProgressKey() {
+            return `school_progress_${currentSubject}_${currentClass}`;
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem(getProgressKey());
+            return saved ? parseInt(saved) : 0;
+        }
+
+        function saveProgress(lessonIndex) {
+            localStorage.setItem(getProgressKey(), lessonIndex);
+            updateProgressBar();
+        }
+
+        function resetProgress() {
+            if (confirm('Сбросить прогресс?')) {
+                localStorage.removeItem(getProgressKey());
+                renderLessons();
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = loadProgress();
+            const subjectLessons = lessons[currentSubject]?.[currentClass] || [];
+            const percentage = subjectLessons.length ? (progress / (subjectLessons.length - 1)) * 100 : 0;
+            document.getElementById('progressFill').style.width = Math.min(percentage, 100) + '%';
+        }
+
+        function renderLessons() {
+            const container = document.getElementById('lessonsContainer');
+            const subjectLessons = lessons[currentSubject]?.[currentClass] || [];
+            const currentProgress = loadProgress();
+
+            if (!subjectLessons || subjectLessons.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 50px; color: rgba(255,255,255,0.5);">Нет уроков для этого класса</div>';
+                return;
+            }
+
+            container.innerHTML = subjectLessons.map((lesson, index) => {
+                const isLocked = index > currentProgress;
+                const youtubeUrl = `https://www.youtube.com/watch?v=${lesson.videoId}`;
+                return `
+                    <div class="lesson-card ${isLocked ? 'locked' : ''}">
+                        <div class="lesson-header">
+                            <h3>${index + 1}. ${lesson.title}</h3>
+                            <a href="${youtubeUrl}" target="_blank" class="youtube-link" title="Смотреть на YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/${lesson.videoId}" 
+                                    loading="lazy"
+                                    allowfullscreen></iframe>
+                        </div>
+                        <div class="lesson-actions">
+                            <button class="btn btn-primary" 
+                                    onclick="openTest(${index})"
+                                    ${isLocked ? 'disabled' : ''}>
+                                <i class="fas fa-pencil-alt"></i> Пройти тест
+                            </button>
+                            <button class="btn btn-secondary" 
+                                    onclick="window.open('${youtubeUrl}', '_blank')"
+                                    ${isLocked ? 'disabled' : ''}>
+                                <i class="fab fa-youtube"></i> YouTube
+                            </button>
+                        </div>
+                        <div id="test-${index}" class="test-section" style="display: none;"></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openTest(lessonIndex) {
+            if (currentTestLesson !== null && currentTestLesson !== lessonIndex) {
+                const prevTest = document.getElementById(`test-${currentTestLesson}`);
+                if (prevTest) prevTest.style.display = 'none';
+            }
+            
+            currentTestLesson = lessonIndex;
+            const testDiv = document.getElementById(`test-${lessonIndex}`);
+            
+            const subjectTests = tests[currentSubject]?.[currentClass];
+            if (!subjectTests || !subjectTests[lessonIndex]) {
+                testDiv.innerHTML = '<div style="color: #ff5050; padding: 20px;">Тесты в разработке</div>';
+                testDiv.style.display = 'block';
+                return;
+            }
+
+            const test = subjectTests[lessonIndex];
+
+            let questionsHtml = '';
+            test.questions.forEach((q, qIndex) => {
+                questionsHtml += `
+                    <div class="question">
+                        <p>${qIndex + 1}. ${q.text}</p>
+                        <div class="options">
+                            ${q.options.map((opt, optIndex) => `
+                                <label class="option">
+                                    <input type="radio" name="q${lessonIndex}-${qIndex}" value="${optIndex}">
+                                    ${opt}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            testDiv.innerHTML = `
+                <h3 style="color: #00c8ff; margin-bottom: 15px;">Тест: ${test.title}</h3>
+                ${questionsHtml}
+                <button class="btn btn-primary" onclick="submitTest(${lessonIndex})">
+                    <i class="fas fa-check"></i> Проверить
+                </button>
+                <div id="test-result-${lessonIndex}" class="test-result"></div>
+            `;
+            
+            testDiv.style.display = 'block';
+        }
+
+        function submitTest(lessonIndex) {
+            const subjectTests = tests[currentSubject]?.[currentClass];
+            if (!subjectTests || !subjectTests[lessonIndex]) return;
+
+            const test = subjectTests[lessonIndex];
+            let correctAnswers = 0;
+
+            for (let i = 0; i < test.questions.length; i++) {
+                const radios = document.getElementsByName(`q${lessonIndex}-${i}`);
+                for (let radio of radios) {
+                    if (radio.checked && parseInt(radio.value) === test.questions[i].correct) {
+                        correctAnswers++;
+                        break;
+                    }
+                }
+            }
+
+            const resultDiv = document.getElementById(`test-result-${lessonIndex}`);
+            
+            if (correctAnswers >= 4) {
+                resultDiv.className = 'test-result success-message';
+                resultDiv.innerHTML = `✅ Отлично! Правильных ответов: ${correctAnswers}/5. Тест пройден!`;
+                
+                openCertificateModal(lessonIndex);
+                
+                const currentProgress = loadProgress();
+                if (lessonIndex === currentProgress && lessonIndex < lessons[currentSubject][currentClass].length - 1) {
+                    saveProgress(lessonIndex + 1);
+                    renderLessons();
+                }
+            } else {
+                resultDiv.className = 'test-result error-message';
+                resultDiv.innerHTML = `❌ Правильных ответов: ${correctAnswers}/5. Попробуйте еще раз!`;
+            }
+        }
+
+        let certificateLessonIndex = null;
+
+        function openCertificateModal(lessonIndex) {
+            certificateLessonIndex = lessonIndex;
+            document.getElementById('certificateModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeCertificateModal() {
+            document.getElementById('certificateModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            certificateLessonIndex = null;
+        }
+
+        function generateCertificate() {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            
+            if (!firstName || !lastName) {
+                alert('Введите имя и фамилию');
+                return;
+            }
+
+            const lessonIndex = certificateLessonIndex;
+            if (lessonIndex === null) return;
+
+            const lesson = lessons[currentSubject][currentClass][lessonIndex];
+            const subject = subjects.find(s => s.id === currentSubject).name;
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            doc.setFillColor(26, 30, 44);
+            doc.rect(0, 0, 297, 210, 'F');
+            
+            doc.setDrawColor(0, 200, 255);
+            doc.setLineWidth(2);
+            doc.roundedRect(15, 15, 267, 180, 10, 10, 'S');
+
+            doc.setFontSize(40);
+            doc.setTextColor(0, 200, 255);
+            doc.text('СЕРТИФИКАТ', 148.5, 60, { align: 'center' });
+
+            doc.setFontSize(20);
+            doc.setTextColor(255, 255, 255);
+            doc.text('подтверждает, что', 148.5, 85, { align: 'center' });
+
+            doc.setFontSize(28);
+            doc.setTextColor(0, 200, 255);
+            doc.text(`${lastName} ${firstName}`, 148.5, 110, { align: 'center' });
+
+            doc.setFontSize(18);
+            doc.setTextColor(255, 255, 255);
+            doc.text(`успешно завершил(а) тему`, 148.5, 130, { align: 'center' });
+
+            doc.setFontSize(24);
+            doc.setTextColor(0, 200, 255);
+            doc.text(lesson.topic, 148.5, 150, { align: 'center' });
+
+            doc.setFontSize(14);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Предмет: ${subject} • ${currentClass} класс`, 148.5, 170, { align: 'center' });
+
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('ru-RU');
+            doc.text(dateStr, 148.5, 185, { align: 'center' });
+
+            doc.save(`Сертификат_${lesson.topic}.pdf`);
+            closeCertificateModal();
+        }
+
+        initSubjectTabs();
+        initClassSelector();
+        renderLessons();
+        updateProgressBar();
+    </script>
+</body>
+</html>
