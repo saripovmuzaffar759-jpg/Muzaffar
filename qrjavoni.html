@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Javoni - QR код работает!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        :root {
+            --primary-color: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary-color: #00b894;
+            --danger-color: #d63031;
+            --warning-color: #f39c12;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2d3436;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background-color: rgba(108, 92, 231, 0.1);
+        }
+
+        .panel {
+            display: none;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .qr-result {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            background: #f8f9fa;
+            border: 2px dashed var(--primary-color);
+        }
+
+        .qr-result.active {
+            display: block;
+        }
+
+        #qrCode {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .student-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .student-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .student-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .student-class {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--secondary-color), #00a884);
+            color: white;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-qrcode"></i> Online Javoni</h1>
+            <p>Система с QR-кодами</p>
+            <div id="currentDate"></div>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="add-student">➕ Добавить ученика</div>
+            <div class="tab" data-tab="students-list">👥 Список учеников</div>
+        </div>
+        
+        <!-- Панель 1: Добавление ученика -->
+        <div class="panel active" id="add-student-panel">
+            <h2 class="panel-title">➕ Добавление нового ученика</h2>
+            
+            <div class="form-container">
+                <div class="form-group">
+                    <label>Имя ученика</label>
+                    <input type="text" id="studentName" class="form-control" placeholder="Введите полное имя">
+                </div>
+                
+                <div class="form-group">
+                    <label>Класс</label>
+                    <input type="text" id="studentClass" class="form-control" placeholder="Например: 9Б">
+                </div>
+                
+                <button id="createQrBtn" class="btn">
+                    <i class="fas fa-qrcode"></i> Создать QR-код
+                </button>
+                
+                <div class="qr-result" id="qrResult">
+                    <h3>✅ QR-код создан!</h3>
+                    <div id="qrStudentInfo"></div>
+                    <div id="qrCode"></div>
+                    <p>Сохраните этот QR-код для ученика</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Панель 2: Список учеников -->
+        <div class="panel" id="students-list-panel">
+            <h2 class="panel-title">👥 Список учеников</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <select id="filterClass" style="padding: 10px; border-radius: 8px; border: 2px solid #e0e0e0;">
+                    <option value="">Все классы</option>
+                </select>
+                <button id="refreshBtn" class="btn" style="margin-left: 10px;">🔄 Обновить</button>
+            </div>
+            
+            <div id="studentsContainer">
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <p>Пока нет учеников. Добавьте первого ученика!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Уведомления -->
+        <div class="notification" id="notification">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationMessage"></span>
+        </div>
+        
+        <footer>
+            <p>© 2024 Online Javoni</p>
+        </footer>
+    </div>
+
+    <!-- Подключаем библиотеку для QR-кодов ПРАВИЛЬНО -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        // Глобальные переменные
+        let db;
+        const DB_NAME = "JavoniDB";
+        const DB_VERSION = 1;
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Страница загружена");
+            
+            // Текущая дата
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ru-RU', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+
+            // Проверяем, загрузилась ли библиотека QRCode
+            if (typeof QRCode !== 'undefined') {
+                console.log("✅ Библиотека QRCode загружена");
+            } else {
+                console.error("❌ Библиотека QRCode НЕ загружена");
+            }
+
+            // Инициализация базы данных
+            initDatabase();
+
+            // Настройка вкладок
+            setupTabs();
+
+            // Кнопка создания QR
+            const createBtn = document.getElementById('createQrBtn');
+            if (createBtn) {
+                console.log("✅ Кнопка найдена");
+                createBtn.addEventListener('click', function() {
+                    console.log("Кнопка нажата!");
+                    createStudent();
+                });
+            } else {
+                console.error("❌ Кнопка не найдена");
+            }
+
+            // Кнопка обновления
+            document.getElementById('refreshBtn').addEventListener('click', loadStudents);
+            
+            // Фильтр классов
+            document.getElementById('filterClass').addEventListener('change', loadStudents);
+        });
+
+        // Инициализация базы данных
+        function initDatabase() {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+            request.onerror = function(event) {
+                console.error("Ошибка базы данных:", event.target.error);
+            };
+
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                console.log("✅ База данных открыта");
+                loadStudents();
+                loadClassFilter();
+            };
+
+            request.onupgradeneeded = function(event) {
+                const db = event.target.result;
+                
+                if (!db.objectStoreNames.contains('students')) {
+                    db.createObjectStore('students', { keyPath: 'id' });
+                    console.log("✅ Хранилище students создано");
+                }
+            };
+        }
+
+        // Настройка вкладок
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                    document.getElementById(`${tabId}-panel`).classList.add('active');
+                    
+                    if (tabId === 'students-list') {
+                        loadStudents();
+                    }
+                });
+            });
+        }
+
+        // Функция создания ученика
+        function createStudent() {
+            console.log("Функция createStudent вызвана");
+            
+            const name = document.getElementById('studentName').value.trim();
+            const className = document.getElementById('studentClass').value.trim();
+
+            if (!name || !className) {
+                showNotification("Заполните все поля!");
+                return;
+            }
+
+            // Генерация уникального ID
+            const id = 'STU-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+            
+            const student = {
+                id: id,
+                name: name,
+                class: className
+            };
+
+            console.log("Создан ученик:", student);
+
+            // Сохраняем в базу данных
+            if (!db) {
+                showNotification("Ошибка базы данных!");
+                return;
+            }
+
+            const transaction = db.transaction(['students'], 'readwrite');
+            const store = transaction.objectStore('students');
+            const request = store.add(student);
+
+            request.onsuccess = function() {
+                console.log("✅ Ученик сохранен в базу");
+                
+                // Показываем QR-код
+                showQrCode(student);
+                
+                // Очищаем форму
+                document.getElementById('studentName').value = '';
+                document.getElementById('studentClass').value = '';
+                
+                // Обновляем фильтр
+                loadClassFilter();
+                
+                showNotification("Ученик добавлен!");
+            };
+
+            request.onerror = function(error) {
+                console.error("❌ Ошибка сохранения:", error);
+                showNotification("Ошибка при сохранении");
+            };
+        }
+
+        // Функция показа QR-кода
+        function showQrCode(student) {
+            console.log("Показываем QR-код для:", student);
+            
+            const qrResult = document.getElementById('qrResult');
+            const qrInfo = document.getElementById('qrStudentInfo');
+            const qrCodeDiv = document.getElementById('qrCode');
+
+            // Показываем информацию
+            qrInfo.innerHTML = `<strong>${student.name}</strong> (${student.class})`;
+            
+            // Очищаем предыдущий QR-код
+            qrCodeDiv.innerHTML = '';
+
+            // Проверяем наличие библиотеки QRCode
+            if (typeof QRCode === 'undefined') {
+                console.error("❌ Библиотека QRCode не загружена!");
+                qrCodeDiv.innerHTML = '<p style="color:red">Ошибка загрузки QR-библиотеки</p>';
+                return;
+            }
+
+            // Создаем новый QR-код
+            try {
+                new QRCode(qrCodeDiv, {
+                    text: student.id,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#6c5ce7",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                console.log("✅ QR-код создан");
+            } catch (error) {
+                console.error("❌ Ошибка создания QR-кода:", error);
+                qrCodeDiv.innerHTML = '<p style="color:red">Ошибка создания QR-кода</p>';
+            }
+
+            // Показываем результат
+            qrResult.classList.add('active');
+        }
+
+        // Загрузка списка учеников
+        function loadStudents() {
+            if (!db) return;
+
+            const filterClass = document.getElementById('filterClass').value;
+
+            const transaction = db.transaction(['students'], 'readonly');
+            const store = transaction.objectStore('students');
+            const request = store.getAll();
+
+            request.onsuccess = function() {
+                let students = request.result;
+                console.log("Загружено учеников:", students.length);
+
+                const container = document.getElementById('studentsContainer');
+
+                if (students.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            <i class="fas fa-users-slash" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                            <p>Нет учеников</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Фильтр по классу
+                if (filterClass) {
+                    students = students.filter(s => s.class === filterClass);
+                }
+
+                let html = '<div class="students-grid">';
+                
+                students.forEach(student => {
+                    html += `
+                        <div class="student-card">
+                            <h3 class="student-name">${student.name}</h3>
+                            <div class="student-class">${student.class}</div>
+                            <div style="font-size: 0.8rem; color: #999; margin-top: 10px;">
+                                ID: ${student.id.substring(0, 10)}...
+                            </div>
+                            <button class="btn" style="margin-top: 15px; width: 100%;" 
+                                    onclick="showStudentQr('${student.id}')">
+                                <i class="fas fa-qrcode"></i> Показать QR
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                container.innerHTML = html;
+            };
+        }
+
+        // Загрузка фильтра классов
+        function loadClassFilter() {
+            if (!db) return;
+
+            const transaction = db.transaction(['students'], 'readonly');
+            const store = transaction.objectStore('students');
+            const request = store.getAll();
+
+            request.onsuccess = function() {
+                const students = request.result;
+                const classes = [...new Set(students.map(s => s.class))].sort();
+
+                const filterSelect = document.getElementById('filterClass');
+                const currentValue = filterSelect.value;
+
+                // Очищаем кроме первого
+                while (filterSelect.options.length > 1) {
+                    filterSelect.remove(1);
+                }
+
+                // Добавляем классы
+                classes.forEach(className => {
+                    const option = document.createElement('option');
+                    option.value = className;
+                    option.textContent = className;
+                    filterSelect.appendChild(option);
+                });
+
+                // Восстанавливаем выбор
+                if (currentValue && classes.includes(currentValue)) {
+                    filterSelect.value = currentValue;
+                }
+            };
+        }
+
+        // Показать QR ученика
+        function showStudentQr(studentId) {
+            if (!db) return;
+
+            const transaction = db.transaction(['students'], 'readonly');
+            const store = transaction.objectStore('students');
+            const request = store.get(studentId);
+
+            request.onsuccess = function() {
+                const student = request.result;
+                if (student) {
+                    alert(`QR-код ученика ${student.name} (${student.class})\nID: ${student.id}`);
+                }
+            };
+        }
+
+        // Показать уведомление
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const messageSpan = document.getElementById('notificationMessage');
+            
+            messageSpan.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
