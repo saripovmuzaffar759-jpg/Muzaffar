@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIZMASTER • школа Джавони</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Ubuntu+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff6b35;
+            --primary-dark: #e55a2b;
+            --secondary: #ff8e53;
+            --accent: #ffa726;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --light: #f0f0f0;
+            --gray: #4a4a6a;
+            --success: #4caf50;
+            --error: #f44336;
+            --glow: 0 0 20px rgba(255, 107, 53, 0.5);
+            --radius: 8px;
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--darker);
+            border-radius: var(--radius);
+            box-shadow: var(--glow);
+            border: 2px solid var(--primary);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 3px;
+        }
+
+        header p {
+            font-family: 'Ubuntu Mono', monospace;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .sound-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.3);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .sound-btn:hover { background: rgba(0,0,0,0.5); }
+
+        .tabs {
+            display: flex;
+            background: #0f0f1f;
+            border-bottom: 2px solid var(--primary);
+            flex-wrap: wrap;
+        }
+        .tab {
+            flex: 1 1 auto;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            background: transparent;
+            color: var(--light);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        .tab.active {
+            background: rgba(255,107,53,0.2);
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab:hover { background: rgba(255,255,255,0.05); }
+        .tab.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--gray);
+            color: var(--light);
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-danger {
+            background: rgba(220, 20, 60, 0.8);
+            color: white;
+            border: 2px solid #8b0000;
+        }
+        .btn-danger:hover { background: #8b0000; }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--gray);
+            border-radius: var(--radius);
+            color: var(--light);
+            font-family: 'Ubuntu Mono', monospace;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 10px rgba(255,107,53,0.3);
+        }
+
+        .question-card {
+            background: rgba(255,107,53,0.1);
+            border: 1px solid rgba(255,107,53,0.3);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .question-card h4 { margin-bottom: 15px; color: var(--secondary); }
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--error);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .code-display {
+            background: #0f0f1f;
+            border: 2px dashed var(--primary);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            font-size: 2rem;
+            letter-spacing: 8px;
+            margin: 20px 0;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        .quiz-option:hover { background: rgba(255,107,53,0.2); }
+        .quiz-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            accent-color: var(--primary);
+        }
+
+        .hidden { display: none; }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            border-top: 1px solid #2a2a3a;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--gray);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+        }
+        .result-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        .result-item p { margin: 5px 0; }
+        .stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--radius);
+            padding: 15px;
+            flex: 1 1 200px;
+            border: 1px solid var(--primary);
+        }
+        .stat-card h4 { color: var(--accent); margin-bottom: 10px; }
+        .stat-card .number { font-size: 2rem; font-weight: bold; color: var(--primary); }
+        .export-btn { margin-right: 10px; }
+        .danger-zone {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px dashed #8b0000;
+            border-radius: var(--radius);
+            background: rgba(139,0,0,0.1);
+        }
+        .role-selector {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+        .role-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+        }
+        .teacher-login {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+        .teacher-login input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <header>
+            <h1>Javonitest</h1>
+            <p>_школа «Джавони» · тесты_</p>
+            <button class="sound-btn" id="soundToggle"><i class="fas fa-volume-up"></i></button>
+        </header>
+
+        <!-- Выбор роли -->
+        <div id="roleSelection" class="content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2>Выберите роль</h2>
+            </div>
+            <div class="role-selector">
+                <button class="btn btn-primary role-btn" id="studentRoleBtn"><i class="fas fa-user-graduate"></i> Я ученик</button>
+                <button class="btn btn-secondary role-btn" id="teacherRoleBtn"><i class="fas fa-chalkboard-teacher"></i> Я учитель</button>
+            </div>
+        </div>
+
+        <!-- Вход для учителя (пароль) -->
+        <div id="teacherLogin" class="content hidden">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2>Вход для учителя</h2>
+            </div>
+            <div class="teacher-login">
+                <input type="password" id="teacherPassword" placeholder="Введите пароль">
+                <button class="btn btn-primary" id="loginTeacherBtn"><i class="fas fa-sign-in-alt"></i> Войти</button>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn btn-secondary" id="backToRoleBtn"><i class="fas fa-arrow-left"></i> Назад</button>
+            </div>
+            <p style="text-align: center; margin-top: 20px; color: var(--gray);">Подсказка: пароль javoni2025</p>
+        </div>
+
+        <!-- Основной интерфейс после выбора роли -->
+        <div id="mainApp" class="hidden">
+            <div class="tabs" id="tabs">
+                <div class="tab" data-tab="take">Пройти тест</div>
+                <div class="tab teacher-only hidden" data-tab="create">Создать / Редактировать</div>
+                <div class="tab teacher-only hidden" data-tab="results">Результаты и статистика</div>
+            </div>
+
+            <div class="content">
+                <!-- Вкладка создания/редактирования теста (только учитель) -->
+                <div id="createTab" class="hidden">
+                    <div class="form-group" style="display: flex; gap:10px; align-items: flex-end;">
+                        <div style="flex:1;">
+                            <label>Код теста (для редактирования)</label>
+                            <input type="text" id="editCode" placeholder="оставьте пустым для нового теста">
+                        </div>
+                        <button class="btn btn-secondary" id="loadTestForEdit"><i class="fas fa-edit"></i> Загрузить</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Название теста</label>
+                        <input type="text" id="testTitle" placeholder="например: Итоговая контрольная">
+                    </div>
+                    <div id="questionsContainer"></div>
+                    <button class="btn btn-secondary" id="addQuestion">
+                        <i class="fas fa-plus-circle"></i> Добавить вопрос
+                    </button>
+                    <button class="btn btn-primary" id="generateTest" style="margin-top:20px;">
+                        <i class="fas fa-rocket"></i> Сохранить / Сгенерировать код
+                    </button>
+                    <div id="generatedCode" class="hidden">
+                        <div class="code-display" id="testCode"></div>
+                        <button class="btn btn-secondary" id="copyCode"><i class="fas fa-copy"></i> Скопировать</button>
+                        <button class="btn btn-secondary" id="resetCreate"><i class="fas fa-redo"></i> Создать новый</button>
+                    </div>
+                </div>
+
+                <!-- Вкладка прохождения теста (доступна всем) -->
+                <div id="takeTab">
+                    <!-- Шаг 1: ввод кода -->
+                    <div id="stepCode">
+                        <div class="form-group">
+                            <label>Код теста</label>
+                            <input type="text" id="inputCode" placeholder="введите код">
+                        </div>
+                        <button class="btn btn-primary" id="loadTest"><i class="fas fa-search"></i> Найти тест</button>
+                    </div>
+                    <!-- Шаг 2: данные ученика -->
+                    <div id="stepStudent" class="hidden">
+                        <h3 style="margin-bottom:20px;">📋 Ваши данные</h3>
+                        <div class="info-grid">
+                            <div class="form-group"><label>Имя и фамилия</label><input id="studentName" placeholder="Иванов Иван"></div>
+                            <div class="form-group"><label>Класс</label><input id="studentClass" placeholder="9А"></div>
+                            <div class="form-group"><label>Телефон</label><input id="studentPhone" placeholder="+992 92 888 1915"></div>
+                        </div>
+                        <button class="btn btn-primary" id="startTest"><i class="fas fa-play"></i> Начать тест</button>
+                    </div>
+                    <!-- Шаг 3: вопросы -->
+                    <div id="stepQuestions" class="hidden">
+                        <h2 id="quizTitle"></h2>
+                        <div id="progressContainer" class="progress-bar">
+                            <div id="progressFill" class="progress-fill" style="width:0%"></div>
+                        </div>
+                        <div id="questionsListTake"></div>
+                        <button class="btn btn-primary" id="submitTest"><i class="fas fa-paper-plane"></i> Отправить</button>
+                    </div>
+                    <!-- Шаг 4: результат -->
+                    <div id="stepResult" class="hidden">
+                        <div style="text-align:center; padding:30px; background:rgba(255,107,53,0.1); border-radius:var(--radius);">
+                            <h3>✅ Готово!</h3>
+                            <p>Ответы отправлены учителю.</p>
+                            <button class="btn btn-primary" id="resetTake"><i class="fas fa-redo"></i> Пройти ещё</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка результатов (только учитель) -->
+                <div id="resultsTab" class="hidden">
+                    <div class="form-group" style="display: flex; gap:10px; align-items: flex-end; flex-wrap: wrap;">
+                        <div style="flex:1;">
+                            <label>Код теста</label>
+                            <input type="text" id="resultsCode" placeholder="введите код теста">
+                        </div>
+                        <button class="btn btn-primary" id="loadResults"><i class="fas fa-search"></i> Показать</button>
+                        <button class="btn btn-secondary" id="exportResults"><i class="fas fa-download"></i> CSV</button>
+                        <button class="btn btn-danger" id="deleteResults"><i class="fas fa-trash"></i> Удалить все</button>
+                    </div>
+                    <div id="statsContainer" class="hidden stats"></div>
+                    <div id="resultsContainer" style="margin-top:30px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Школа «Джавони» · учись и твори</div>
+    </div>
+
+    <audio id="click" src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3"></audio>
+    <audio id="success" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
+    <audio id="error" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3"></audio>
+
+    <script>
+        (function() {
+            // ========== НАСТРОЙКИ ==========
+            const TELEGRAM_TOKEN = '7249906234:AAHhVmAepD-T86jcjLGo8_mVcgsq6eAOXro';
+            const CHAT_ID = '5450527103';
+            const TEACHER_PASSWORD = 'javoni2025'; // пароль для входа учителя
+
+            // ========== СОСТОЯНИЕ ==========
+            let soundOn = true;
+            let currentTest = null;
+            let student = { name:'', class:'', phone:'' };
+            let editingCode = null;
+            let isTeacher = false; // флаг, что вошёл учитель
+
+            // ========== DOM ЭЛЕМЕНТЫ ==========
+            const soundBtn = document.getElementById('soundToggle');
+            const clickSound = document.getElementById('click');
+            const successSound = document.getElementById('success');
+            const errorSound = document.getElementById('error');
+
+            // экраны выбора роли
+            const roleSelection = document.getElementById('roleSelection');
+            const teacherLogin = document.getElementById('teacherLogin');
+            const mainApp = document.getElementById('mainApp');
+            const studentRoleBtn = document.getElementById('studentRoleBtn');
+            const teacherRoleBtn = document.getElementById('teacherRoleBtn');
+            const backToRoleBtn = document.getElementById('backToRoleBtn');
+            const loginTeacherBtn = document.getElementById('loginTeacherBtn');
+            const teacherPassword = document.getElementById('teacherPassword');
+
+            // вкладки
+            const tabs = document.querySelectorAll('.tab');
+            const createTab = document.getElementById('createTab');
+            const takeTab = document.getElementById('takeTab');
+            const resultsTab = document.getElementById('resultsTab');
+
+            // создание/редактирование
+            const questionsContainer = document.getElementById('questionsContainer');
+            const addQuestionBtn = document.getElementById('addQuestion');
+            const generateTestBtn = document.getElementById('generateTest');
+            const generatedCodeDiv = document.getElementById('generatedCode');
+            const testCodeSpan = document.getElementById('testCode');
+            const copyCodeBtn = document.getElementById('copyCode');
+            const resetCreateBtn = document.getElementById('resetCreate');
+            const testTitleInput = document.getElementById('testTitle');
+            const editCodeInput = document.getElementById('editCode');
+            const loadTestForEditBtn = document.getElementById('loadTestForEdit');
+
+            // прохождение теста
+            const stepCode = document.getElementById('stepCode');
+            const stepStudent = document.getElementById('stepStudent');
+            const stepQuestions = document.getElementById('stepQuestions');
+            const stepResult = document.getElementById('stepResult');
+            const inputCode = document.getElementById('inputCode');
+            const loadTestBtn = document.getElementById('loadTest');
+            const startTestBtn = document.getElementById('startTest');
+            const submitTestBtn = document.getElementById('submitTest');
+            const resetTakeBtn = document.getElementById('resetTake');
+            const studentName = document.getElementById('studentName');
+            const studentClass = document.getElementById('studentClass');
+            const studentPhone = document.getElementById('studentPhone');
+            const quizTitle = document.getElementById('quizTitle');
+            const questionsListTake = document.getElementById('questionsListTake');
+            const progressFill = document.getElementById('progressFill');
+
+            // результаты
+            const resultsCode = document.getElementById('resultsCode');
+            const loadResultsBtn = document.getElementById('loadResults');
+            const exportResultsBtn = document.getElementById('exportResults');
+            const deleteResultsBtn = document.getElementById('deleteResults');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const statsContainer = document.getElementById('statsContainer');
+
+            // ========== ЗВУКИ ==========
+            function play(snd) { if(soundOn) { snd.currentTime = 0; snd.play().catch(()=>{}); } }
+            function toggleSound() { soundOn = !soundOn; soundBtn.innerHTML = soundOn ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>'; }
+            soundBtn.addEventListener('click', toggleSound);
+
+            function generateCode() { return Math.random().toString(36).substr(2,8); }
+
+            // ========== ВЫБОР РОЛИ ==========
+            studentRoleBtn.addEventListener('click', () => {
+                play(clickSound);
+                isTeacher = false;
+                roleSelection.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                // Показываем только вкладку "Пройти тест", остальные скрываем и убираем из табов
+                document.querySelectorAll('.teacher-only').forEach(el => el.classList.add('hidden'));
+                // Активируем вкладку "Пройти тест"
+                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelector('.tab[data-tab="take"]').classList.add('active');
+                takeTab.classList.remove('hidden');
+                createTab.classList.add('hidden');
+                resultsTab.classList.add('hidden');
+            });
+
+            teacherRoleBtn.addEventListener('click', () => {
+                play(clickSound);
+                roleSelection.classList.add('hidden');
+                teacherLogin.classList.remove('hidden');
+            });
+
+            backToRoleBtn.addEventListener('click', () => {
+                play(clickSound);
+                teacherLogin.classList.add('hidden');
+                roleSelection.classList.remove('hidden');
+                teacherPassword.value = '';
+            });
+
+            loginTeacherBtn.addEventListener('click', () => {
+                const pwd = teacherPassword.value.trim();
+                if(pwd === TEACHER_PASSWORD) {
+                    play(successSound);
+                    isTeacher = true;
+                    teacherLogin.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    // Показываем все вкладки
+                    document.querySelectorAll('.teacher-only').forEach(el => el.classList.remove('hidden'));
+                    // Активируем вкладку "Создать" по умолчанию
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelector('.tab[data-tab="create"]').classList.add('active');
+                    createTab.classList.remove('hidden');
+                    takeTab.classList.add('hidden');
+                    resultsTab.classList.add('hidden');
+                } else {
+                    play(errorSound);
+                    alert('Неверный пароль');
+                }
+            });
+
+            // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК (только для учителя, но переключение доступно всем, но неактивные вкладки скрыты) ==========
+            tabs.forEach(t => {
+                t.addEventListener('click', () => {
+                    // Если ученик, то доступна только вкладка take
+                    if(!isTeacher && t.dataset.tab !== 'take') {
+                        play(errorSound);
+                        return;
+                    }
+                    play(clickSound);
+                    tabs.forEach(tab => tab.classList.remove('active'));
+                    t.classList.add('active');
+
+                    // Скрыть все
+                    createTab.classList.add('hidden');
+                    takeTab.classList.add('hidden');
+                    resultsTab.classList.add('hidden');
+
+                    // Показать выбранную
+                    if(t.dataset.tab === 'create') createTab.classList.remove('hidden');
+                    else if(t.dataset.tab === 'take') takeTab.classList.remove('hidden');
+                    else if(t.dataset.tab === 'results') resultsTab.classList.remove('hidden');
+                });
+            });
+
+            // ========== СОЗДАНИЕ / РЕДАКТИРОВАНИЕ ТЕСТА ==========
+            function createQuestionCard(text = '', options = '', correct = '') {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.innerHTML = `
+                    <button class="remove-btn" onclick="this.closest('.question-card').remove(); updateGenerateBtn();"><i class="fas fa-trash"></i></button>
+                    <h4>Вопрос ${questionsContainer.children.length + 1}</h4>
+                    <div class="form-group"><label>Текст вопроса</label><input type="text" class="qText" value="${text.replace(/"/g, '&quot;')}" placeholder="например: 2+2 = ?"></div>
+                    <div class="form-group"><label>Варианты (каждый с новой строки)</label><textarea class="qOptions" rows="3">${options.replace(/</g, '&lt;')}</textarea></div>
+                    <div class="form-group"><label>Правильный ответ (точно как в варианте)</label><input type="text" class="qCorrect" value="${correct.replace(/"/g, '&quot;')}" placeholder="4"></div>
+                `;
+                questionsContainer.appendChild(card);
+                generateTestBtn.style.display = 'inline-flex';
+            }
+            addQuestionBtn.addEventListener('click', () => { play(clickSound); createQuestionCard(); });
+
+            window.updateGenerateBtn = function() {
+                if(questionsContainer.children.length === 0) generateTestBtn.style.display = 'inline-flex';
+            };
+
+            loadTestForEditBtn.addEventListener('click', () => {
+                play(clickSound);
+                const code = editCodeInput.value.trim();
+                if(!code) { alert('Введите код теста'); return; }
+                const data = localStorage.getItem(`test_${code}`);
+                if(!data) { alert('Тест не найден'); play(errorSound); return; }
+                const test = JSON.parse(data);
+                questionsContainer.innerHTML = '';
+                testTitleInput.value = test.title;
+                test.questions.forEach(q => {
+                    createQuestionCard(q.text, q.options.join('\n'), q.correct);
+                });
+                editingCode = code;
+                alert(`Тест "${test.title}" загружен для редактирования.`);
+            });
+
+            generateTestBtn.addEventListener('click', () => {
+                play(clickSound);
+                const title = testTitleInput.value.trim();
+                if(!title) { alert('Введите название теста'); return; }
+                const cards = document.querySelectorAll('.question-card');
+                if(cards.length === 0) { alert('Добавьте хотя бы один вопрос'); return; }
+
+                const test = { title, questions: [] };
+                for(let card of cards) {
+                    const text = card.querySelector('.qText').value.trim();
+                    const optionsText = card.querySelector('.qOptions').value.trim();
+                    const correct = card.querySelector('.qCorrect').value.trim();
+                    if(!text || !optionsText || !correct) { alert('Заполните все поля вопросов'); return; }
+                    const options = optionsText.split('\n').map(s => s.trim()).filter(s => s);
+                    if(options.length < 2) { alert('У каждого вопроса должно быть минимум 2 варианта'); return; }
+                    if(!options.includes(correct)) { alert('Правильный ответ должен совпадать с одним из вариантов'); return; }
+                    test.questions.push({ text, options, correct });
+                }
+
+                let code;
+                if(editingCode && confirm('Сохранить с текущим кодом ('+editingCode+')? Нажмите ОК, иначе будет создан новый код.')) {
+                    code = editingCode;
+                } else {
+                    code = generateCode();
+                }
+
+                localStorage.setItem(`test_${code}`, JSON.stringify(test));
+                if(!localStorage.getItem(`results_${code}`)) {
+                    localStorage.setItem(`results_${code}`, JSON.stringify([]));
+                }
+                testCodeSpan.innerText = code;
+                generatedCodeDiv.classList.remove('hidden');
+                play(successSound);
+                editingCode = null;
+            });
+
+            copyCodeBtn.addEventListener('click', () => {
+                play(clickSound);
+                const code = testCodeSpan.innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    const orig = copyCodeBtn.innerHTML;
+                    copyCodeBtn.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
+                    setTimeout(() => copyCodeBtn.innerHTML = orig, 2000);
+                });
+            });
+
+            resetCreateBtn.addEventListener('click', () => {
+                play(clickSound);
+                questionsContainer.innerHTML = '';
+                testTitleInput.value = '';
+                generatedCodeDiv.classList.add('hidden');
+                editCodeInput.value = '';
+                editingCode = null;
+            });
+
+            // ========== ПРОХОЖДЕНИЕ ТЕСТА ==========
+            loadTestBtn.addEventListener('click', () => {
+                play(clickSound);
+                const code = inputCode.value.trim();
+                if(!code) { alert('Введите код'); return; }
+                const data = localStorage.getItem(`test_${code}`);
+                if(!data) { alert('Тест не найден'); play(errorSound); return; }
+                currentTest = JSON.parse(data);
+                stepCode.classList.add('hidden');
+                stepStudent.classList.remove('hidden');
+            });
+
+            startTestBtn.addEventListener('click', () => {
+                const name = studentName.value.trim();
+                const cls = studentClass.value.trim();
+                const phone = studentPhone.value.trim();
+                if(!name || !cls || !phone) { alert('Заполните все поля'); return; }
+                student = { name, class: cls, phone };
+
+                quizTitle.innerText = currentTest.title;
+                let html = '';
+                currentTest.questions.forEach((q, idx) => {
+                    html += `<div class="question-card"><h4>${idx+1}. ${q.text}</h4>`;
+                    q.options.forEach(opt => {
+                        html += `<label class="quiz-option"><input type="radio" name="q${idx}" value="${opt}"> ${opt}</label>`;
+                    });
+                    html += '</div>';
+                });
+                questionsListTake.innerHTML = html;
+
+                updateProgress();
+
+                document.querySelectorAll('input[type="radio"]').forEach(r => {
+                    r.addEventListener('change', updateProgress);
+                });
+
+                stepStudent.classList.add('hidden');
+                stepQuestions.classList.remove('hidden');
+            });
+
+            function updateProgress() {
+                if(!currentTest) return;
+                let answered = 0;
+                for(let i = 0; i < currentTest.questions.length; i++) {
+                    const radios = document.getElementsByName(`q${i}`);
+                    for(let r of radios) {
+                        if(r.checked) { answered++; break; }
+                    }
+                }
+                const percent = (answered / currentTest.questions.length) * 100;
+                progressFill.style.width = percent + '%';
+            }
+
+            submitTestBtn.addEventListener('click', async () => {
+                for(let i = 0; i < currentTest.questions.length; i++) {
+                    const radios = document.getElementsByName(`q${i}`);
+                    let answered = false;
+                    for(let r of radios) if(r.checked) { answered = true; break; }
+                    if(!answered) {
+                        alert(`Ответьте на вопрос ${i+1}`);
+                        play(errorSound);
+                        return;
+                    }
+                }
+
+                if(!confirm('Отправить ответы?')) return;
+
+                const answers = [];
+                currentTest.questions.forEach((q, idx) => {
+                    const radios = document.getElementsByName(`q${idx}`);
+                    for(let r of radios) {
+                        if(r.checked) {
+                            answers.push({
+                                question: q.text,
+                                answer: r.value,
+                                correct: r.value === q.correct
+                            });
+                            break;
+                        }
+                    }
+                });
+
+                let msg = `<b>📝 Результат теста</b>\n`;
+                msg += `<b>Тест:</b> ${currentTest.title}\n`;
+                msg += `<b>👤 ${student.name}</b>, класс ${student.class}, тел. ${student.phone}\n\n`;
+                answers.forEach((a,i) => {
+                    msg += `<b>${i+1}. ${a.question}</b>\n${a.answer} ${a.correct ? '✅' : '❌'}\n\n`;
+                });
+
+                try {
+                    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' })
+                    });
+                    const data = await res.json();
+                    if(data.ok) {
+                        play(successSound);
+                        const code = inputCode.value.trim();
+                        const results = JSON.parse(localStorage.getItem(`results_${code}`)) || [];
+                        results.push({
+                            student: { ...student },
+                            answers: answers,
+                            date: new Date().toLocaleString()
+                        });
+                        localStorage.setItem(`results_${code}`, JSON.stringify(results));
+
+                        stepQuestions.classList.add('hidden');
+                        stepResult.classList.remove('hidden');
+                    } else {
+                        alert('Ошибка отправки. Проверьте, правильно ли настроен бот.');
+                        play(errorSound);
+                    }
+                } catch(e) {
+                    alert('Ошибка соединения с Telegram. Возможно, проблемы с интернетом.');
+                    play(errorSound);
+                }
+            });
+
+            resetTakeBtn.addEventListener('click', () => {
+                play(clickSound);
+                inputCode.value = '';
+                studentName.value = ''; studentClass.value = ''; studentPhone.value = '';
+                stepResult.classList.add('hidden');
+                stepCode.classList.remove('hidden');
+            });
+
+            // ========== ПРОСМОТР РЕЗУЛЬТАТОВ ==========
+            function displayResults(code) {
+                const results = JSON.parse(localStorage.getItem(`results_${code}`)) || [];
+                const testData = localStorage.getItem(`test_${code}`);
+                if(!testData) {
+                    resultsContainer.innerHTML = '<p style="color:var(--gray);">Тест с таким кодом не найден.</p>';
+                    statsContainer.classList.add('hidden');
+                    return;
+                }
+                const test = JSON.parse(testData);
+                if(results.length === 0) {
+                    resultsContainer.innerHTML = '<p style="color:var(--gray);">Пока нет результатов.</p>';
+                    statsContainer.classList.add('hidden');
+                    return;
+                }
+
+                let total = results.length;
+                let correctCount = 0;
+                results.forEach(r => {
+                    r.answers.forEach(a => { if(a.correct) correctCount++; });
+                });
+                let totalQuestions = test.questions.length * total;
+                let avgPercent = totalQuestions ? Math.round((correctCount / totalQuestions)*100) : 0;
+
+                statsContainer.classList.remove('hidden');
+                statsContainer.innerHTML = `
+                    <div class="stat-card"><h4>Всего прохождений</h4><div class="number">${total}</div></div>
+                    <div class="stat-card"><h4>Средний % правильных</h4><div class="number">${avgPercent}%</div></div>
+                    <div class="stat-card"><h4>Всего ответов</h4><div class="number">${totalQuestions}</div></div>
+                `;
+
+                let html = `<h3>Результаты теста «${test.title}» (код ${code})</h3>`;
+                results.forEach((r, idx) => {
+                    let correctAnswers = r.answers.filter(a => a.correct).length;
+                    let percent = Math.round((correctAnswers / test.questions.length)*100);
+                    html += `<div class="result-item">`;
+                    html += `<p><strong>${r.student.name}</strong>, класс ${r.student.class}, тел. ${r.student.phone}</p>`;
+                    html += `<p>Правильно: ${correctAnswers}/${test.questions.length} (${percent}%) · <small>${r.date}</small></p>`;
+                    html += `<ul style="margin-top:10px;">`;
+                    r.answers.forEach((a,i) => {
+                        html += `<li>${i+1}. ${a.answer} ${a.correct ? '✅' : '❌'}</li>`;
+                    });
+                    html += `</ul></div>`;
+                });
+                resultsContainer.innerHTML = html;
+            }
+
+            loadResultsBtn.addEventListener('click', () => {
+                play(clickSound);
+                const code = resultsCode.value.trim();
+                if(!code) { alert('Введите код теста'); return; }
+                displayResults(code);
+            });
+
+            exportResultsBtn.addEventListener('click', () => {
+                const code = resultsCode.value.trim();
+                if(!code) { alert('Введите код теста'); return; }
+                const results = JSON.parse(localStorage.getItem(`results_${code}`)) || [];
+                if(results.length === 0) { alert('Нет данных для экспорта'); return; }
+                const test = JSON.parse(localStorage.getItem(`test_${code}`));
+                let csv = "Имя,Класс,Телефон,Дата,Вопрос,Ответ,Правильно\n";
+                results.forEach(r => {
+                    r.answers.forEach((a, idx) => {
+                        csv += `"${r.student.name}","${r.student.class}","${r.student.phone}","${r.date}","${a.question}","${a.answer}","${a.correct ? 'Да' : 'Нет'}"\n`;
+                    });
+                });
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `results_${code}.csv`;
+                link.click();
+                play(successSound);
+            });
+
+            deleteResultsBtn.addEventListener('click', () => {
+                const code = resultsCode.value.trim();
+                if(!code) { alert('Введите код теста'); return; }
+                if(confirm('Удалить все результаты для этого теста? Это действие нельзя отменить.')) {
+                    localStorage.setItem(`results_${code}`, JSON.stringify([]));
+                    displayResults(code);
+                    play(clickSound);
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
