@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Музаффар · Голосовой помощник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0f1f;
+            color: #00ffff;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 4em;
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 0 0 20px cyan;
+            background: linear-gradient(45deg, #0ff, #f0f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-bar {
+            background: #1a1f2e;
+            border: 3px solid cyan;
+            border-radius: 50px;
+            padding: 20px 30px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        #status {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .mic-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.3em;
+        }
+
+        .mic-led {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: red;
+            box-shadow: 0 0 15px red;
+        }
+
+        .mic-led.active {
+            background: #0f0;
+            box-shadow: 0 0 20px #0f0;
+        }
+
+        .debug-panel {
+            background: #000;
+            border: 3px solid magenta;
+            border-radius: 30px;
+            padding: 25px;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        .debug-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,0,255,0.3);
+        }
+
+        .debug-label {
+            color: cyan;
+        }
+
+        .debug-value {
+            color: magenta;
+            word-break: break-word;
+            max-width: 60%;
+        }
+
+        .button {
+            background: linear-gradient(45deg, cyan, magenta);
+            color: black;
+            border: none;
+            border-radius: 60px;
+            padding: 20px 50px;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 0;
+            border: 3px solid white;
+            box-shadow: 0 0 30px cyan;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px magenta;
+        }
+
+        .commands {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .command-card {
+            background: rgba(0,30,60,0.8);
+            border: 2px solid cyan;
+            border-radius: 30px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .command-card h3 {
+            color: magenta;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .command-card p {
+            color: cyan;
+            font-size: 1.2em;
+        }
+
+        #log {
+            background: #000;
+            border: 3px solid cyan;
+            border-radius: 30px;
+            padding: 25px;
+            margin: 30px 0;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid rgba(0,255,255,0.3);
+        }
+
+        .instruction {
+            background: rgba(255,0,255,0.1);
+            border: 2px solid magenta;
+            border-radius: 30px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.3em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ МУЗАФФАР ⚡</h1>
+
+        <div class="status-bar">
+            <div id="status">💤 ОЖИДАНИЕ</div>
+            <div class="mic-status">
+                <span>МИКРОФОН</span>
+                <div class="mic-led" id="micLed"></div>
+                <span id="micLevel">0%</span>
+            </div>
+        </div>
+
+        <div class="debug-panel">
+            <div class="debug-row">
+                <span class="debug-label">🎤 ЧТО СЛЫШНО:</span>
+                <span class="debug-value" id="heardText">—</span>
+            </div>
+            <div class="debug-row">
+                <span class="debug-label">🔍 РАСПОЗНАНО:</span>
+                <span class="debug-value" id="recognizedText">—</span>
+            </div>
+            <div class="debug-row">
+                <span class="debug-label">📊 УВЕРЕННОСТЬ:</span>
+                <span class="debug-value" id="confidence">0%</span>
+            </div>
+        </div>
+
+        <button class="button" id="startBtn">🔰 ЗАПУСТИТЬ</button>
+
+        <div class="instruction">
+            🎯 Скажите: <strong style="color: magenta;">"Музаффар"</strong> + команда<br>
+            <small style="color: cyan;">Например: "Музаффар, открой браузер"</small>
+        </div>
+
+        <div class="commands">
+            <div class="command-card">
+                <h3>🌐 Браузер</h3>
+                <p>"Музаффар, открой браузер"</p>
+            </div>
+            <div class="command-card">
+                <h3>📝 Блокнот</h3>
+                <p>"Музаффар, открой блокнот"</p>
+            </div>
+            <div class="command-card">
+                <h3>🧮 Калькулятор</h3>
+                <p>"Музаффар, открой калькулятор"</p>
+            </div>
+            <div class="command-card">
+                <h3>⏰ Время</h3>
+                <p>"Музаффар, сколько времени"</p>
+            </div>
+        </div>
+
+        <div id="log">
+            <div class="log-entry">⚡ Голосовой помощник готов</div>
+            <div class="log-entry">🎤 Скажите "Музаффар"</div>
+        </div>
+    </div>
+
+    <script>
+        let recognition = null;
+        let isListening = false;
+        let synth = window.speechSynthesis;
+
+        // Функция для озвучивания
+        function speak(text) {
+            let msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ru-RU';
+            msg.rate = 1.0;
+            msg.volume = 1.0;
+            
+            // Выбираем русский голос
+            let voices = synth.getVoices();
+            let ruVoice = voices.find(v => v.lang.includes('ru'));
+            if (ruVoice) msg.voice = ruVoice;
+            
+            synth.speak(msg);
+            
+            // Добавляем в лог
+            addToLog('🤖 ' + text);
+        }
+
+        // Добавление в лог
+        function addToLog(text) {
+            let log = document.getElementById('log');
+            let entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = new Date().toLocaleTimeString() + ' — ' + text;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Запуск распознавания
+        function startRecognition() {
+            let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                alert('Ваш браузер не поддерживает голосовое управление. Используйте Chrome или Edge.');
+                return false;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ru-RU';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 5;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById('status').textContent = '🎤 СЛУШАЮ...';
+                addToLog('🎤 Начало прослушивания');
+            };
+
+            recognition.onresult = function(event) {
+                let lastResult = event.results[event.results.length - 1];
+                let text = lastResult[0].transcript;
+                let confidence = Math.round(lastResult[0].confidence * 100);
+                
+                document.getElementById('heardText').textContent = text;
+                document.getElementById('confidence').textContent = confidence + '%';
+                
+                // Если результат финальный
+                if (lastResult.isFinal) {
+                    document.getElementById('recognizedText').textContent = text;
+                    addToLog('🎤 ' + text);
+                    
+                    // Проверяем наличие имени
+                    let lowerText = text.toLowerCase();
+                    if (lowerText.includes('музаффар') || lowerText.includes('музафар') || lowerText.includes('муза')) {
+                        document.getElementById('status').textContent = '🎯 АКТИВИРОВАН';
+                        document.getElementById('status').style.color = 'magenta';
+                        
+                        // Извлекаем команду (всё после имени)
+                        let command = text;
+                        if (lowerText.includes('музаффар')) {
+                            command = text.substring(text.toLowerCase().indexOf('музаффар') + 9).trim();
+                        } else if (lowerText.includes('музафар')) {
+                            command = text.substring(text.toLowerCase().indexOf('музафар') + 8).trim();
+                        } else if (lowerText.includes('муза')) {
+                            command = text.substring(text.toLowerCase().indexOf('муза') + 5).trim();
+                        }
+                        
+                        if (command) {
+                            processCommand(command);
+                        } else {
+                            speak("Слушаю");
+                        }
+                    }
+                }
+                
+                // Визуализация звука (имитация)
+                let level = Math.floor(Math.random() * 30) + 10;
+                document.getElementById('micLevel').textContent = level + '%';
+                if (level > 15) {
+                    document.getElementById('micLed').className = 'mic-led active';
+                } else {
+                    document.getElementById('micLed').className = 'mic-led';
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.log('Ошибка:', event.error);
+                if (event.error !== 'no-speech') {
+                    addToLog('❌ Ошибка: ' + event.error);
+                }
+            };
+
+            recognition.onend = function() {
+                if (isListening) {
+                    recognition.start();
+                }
+            };
+
+            recognition.start();
+            return true;
+        }
+
+        // Обработка команд
+        function processCommand(command) {
+            addToLog('⚙️ Команда: ' + command);
+            
+            let cmd = command.toLowerCase();
+            
+            if (cmd.includes('браузер') || cmd.includes('хром') || cmd.includes('chrome') || cmd.includes('гугл')) {
+                speak('Открываю браузер');
+                window.open('https://google.com', '_blank');
+            }
+            else if (cmd.includes('блокнот') || cmd.includes('notepad') || cmd.includes('текст')) {
+                speak('Открываю блокнот');
+                window.open('notepad://');
+                setTimeout(() => {
+                    window.open('https://www.onlinenotepad.io', '_blank');
+                }, 1000);
+            }
+            else if (cmd.includes('калькулятор') || cmd.includes('посчитай') || cmd.includes('calc')) {
+                speak('Открываю калькулятор');
+                window.open('calculator://');
+                setTimeout(() => {
+                    window.open('https://www.online-calculator.com', '_blank');
+                }, 1000);
+            }
+            else if (cmd.includes('время') || cmd.includes('сколько времени')) {
+                let now = new Date();
+                let timeStr = `Сейчас ${now.getHours()} часов ${now.getMinutes()} минут`;
+                speak(timeStr);
+            }
+            else if (cmd.includes('телеграм') || cmd.includes('telegram')) {
+                speak('Открываю Telegram');
+                window.open('https://web.telegram.org', '_blank');
+            }
+            else if (cmd.includes('спасибо')) {
+                speak('Всегда пожалуйста!');
+            }
+            else if (cmd.includes('что ты умеешь') || cmd.includes('помощь')) {
+                speak('Я умею открывать браузер, блокнот, калькулятор, показывать время. Скажите команду.');
+            }
+            else {
+                speak('Команда не найдена');
+            }
+        }
+
+        // Запуск/остановка
+        document.getElementById('startBtn').addEventListener('click', function() {
+            if (!isListening) {
+                startRecognition();
+                this.textContent = '⛔ ДЕАКТИВИРОВАТЬ';
+                addToLog('⚡ Система запущена');
+            } else {
+                if (recognition) {
+                    recognition.stop();
+                    isListening = false;
+                }
+                this.textContent = '🔰 ЗАПУСТИТЬ';
+                document.getElementById('status').textContent = '💤 ОСТАНОВЛЕНО';
+                addToLog('⏹️ Система остановлена');
+            }
+        });
+
+        // Загрузка голосов
+        window.speechSynthesis.onvoiceschanged = function() {
+            console.log('Голоса загружены');
+        };
+    </script>
+</body>
+</html>
