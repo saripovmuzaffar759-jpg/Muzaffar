@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STELLAR - Социальная сеть</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #00ba7c;
+            --bg: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-hover: #252542;
+            --border: #2f334d;
+            --text: #e7e9ea;
+            --text-secondary: #8b8db2;
+            --error: #f4212e;
+            --success: #00ba7c;
+            --admin: #10b981;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .auth-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px 30px;
+            border: 1px solid var(--border);
+        }
+
+        .auth-logo {
+            font-size: 48px;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .main-container {
+            display: none;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 275px 1fr 350px;
+            gap: 0;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 88px 1fr;
+            }
+            .right-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 688px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            .left-sidebar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--bg);
+                border-top: 1px solid var(--border);
+                z-index: 100;
+                flex-direction: row !important;
+                padding: 0 !important;
+                height: auto !important;
+            }
+            .nav-menu {
+                flex-direction: row !important;
+                justify-content: space-around;
+                padding: 8px 0;
+            }
+            .nav-item span {
+                display: none;
+            }
+            .logo, .post-btn, .user-profile {
+                display: none !important;
+            }
+        }
+
+        .left-sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 12px;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 32px;
+            color: var(--primary);
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 12px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 20px;
+            font-weight: 400;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .nav-item.active {
+            font-weight: 700;
+        }
+
+        .nav-item i {
+            width: 26px;
+        }
+
+        .nav-item.admin {
+            color: var(--admin);
+        }
+
+        .post-btn {
+            margin: 16px 0;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .post-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: auto;
+        }
+
+        .user-profile:hover {
+            background: var(--bg-hover);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-handle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .main-content {
+            border-right: 1px solid var(--border);
+            min-height: 100vh;
+        }
+
+        .content-header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 35, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            z-index: 10;
+        }
+
+        .content-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .compose-post {
+            border-bottom: 8px solid var(--bg-secondary);
+            padding: 16px 20px;
+        }
+
+        .compose-form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .compose-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .compose-input-area {
+            flex: 1;
+        }
+
+        .compose-textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 20px;
+            resize: none;
+            min-height: 60px;
+            outline: none;
+        }
+
+        .compose-textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .compose-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .compose-icons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .btn-post {
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-post:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-post:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .image-preview {
+            margin-top: 12px;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: rgba(15, 20, 25, 0.75);
+            backdrop-filter: blur(4px);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feed {
+            padding-bottom: 80px;
+        }
+
+        .post {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .post:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .post-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .post-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .post-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .post-author-name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .post-author-handle {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .post-time {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .post-content {
+            font-size: 15px;
+            line-height: 20px;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            max-height: 510px;
+            object-fit: cover;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            max-width: 425px;
+            margin-top: 12px;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .post-action:hover {
+            color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .post-action.liked {
+            color: #f91880;
+        }
+
+        .post-action.liked:hover {
+            background: rgba(249, 24, 128, 0.1);
+        }
+
+        .right-sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 12px 16px;
+            overflow-y: auto;
+        }
+
+        .search-box {
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            padding: 4px 0 12px;
+            z-index: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid transparent;
+            border-radius: 30px;
+            color: var(--text);
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: var(--bg);
+            border-color: var(--primary);
+        }
+
+        .widget {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .widget-header {
+            padding: 12px 16px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .user-suggestion {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .user-suggestion:hover {
+            background: var(--bg-hover);
+        }
+
+        .suggestion-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .suggestion-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .suggestion-name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .suggestion-handle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .btn-follow {
+            padding: 6px 16px;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-follow:hover {
+            background: var(--text-secondary);
+        }
+
+        .btn-following {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-following:hover {
+            background: rgba(244, 33, 46, 0.1);
+            border-color: rgba(244, 33, 46, 0.4);
+            color: var(--error);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.error {
+            background: var(--error);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .profile-header {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-banner {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary), #9333ea);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .profile-info-section {
+            padding: 16px 20px;
+        }
+
+        .profile-avatar-container {
+            margin-top: -80px;
+            margin-bottom: 12px;
+        }
+
+        .profile-avatar-large {
+            width: 134px;
+            height: 134px;
+            border-radius: 50%;
+            border: 4px solid var(--bg);
+            object-fit: cover;
+        }
+
+        .profile-actions {
+            text-align: right;
+            margin-bottom: 12px;
+        }
+
+        .btn-edit-profile {
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-edit-profile:hover {
+            background: var(--bg-hover);
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-handle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .profile-bio {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 12px;
+        }
+
+        .profile-stat {
+            font-size: 15px;
+        }
+
+        .profile-stat strong {
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        .profile-stat span {
+            color: var(--text-secondary);
+        }
+
+        /* Админ панель */
+        .admin-panel {
+            padding: 20px;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 16px;
+            border-left: 4px solid var(--admin);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--admin);
+        }
+
+        .stat-card .stat-change {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .admin-users {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .admin-users h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .users-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--error);
+        }
+
+        .status-dot.online {
+            background: var(--success);
+        }
+
+        .btn-admin {
+            background: var(--admin);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-admin:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <i class="fas fa-star"></i>
+            </div>
+            <h1 class="auth-title">STELLAR</h1>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Вход</div>
+                <div class="auth-tab" data-tab="register">Регистрация</div>
+            </div>
+
+            <form id="loginForm" class="auth-form active">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <label>Пароль</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password">
+                </div>
+                <div class="error-message" id="loginError"></div>
+                <button type="submit" class="btn-primary">Войти</button>
+            </form>
+
+            <form id="registerForm" class="auth-form">
+                <div class="input-group">
+                    <label>Имя</label>
+                    <input type="text" id="registerName" required autocomplete="name">
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" required autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <label>Пароль (минимум 6 символов)</label>
+                    <input type="password" id="registerPassword" required autocomplete="new-password" minlength="6">
+                </div>
+                <div class="error-message" id="registerError"></div>
+                <button type="submit" class="btn-primary">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="mainContainer" class="main-container">
+        <div class="main-layout">
+            <aside class="left-sidebar">
+                <div class="logo">
+                    <i class="fas fa-star"></i>
+                </div>
+                
+                <nav class="nav-menu">
+                    <div class="nav-item active" data-view="home">
+                        <i class="fas fa-home"></i>
+                        <span>Главная</span>
+                    </div>
+                    <div class="nav-item" data-view="profile">
+                        <i class="fas fa-user"></i>
+                        <span>Профиль</span>
+                    </div>
+                    <div class="nav-item" data-view="admin" style="display: none;">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Админ-панель</span>
+                    </div>
+                    <div class="nav-item" data-view="messages">
+                        <i class="fas fa-envelope"></i>
+                        <span>Сообщения</span>
+                    </div>
+                </nav>
+
+                <button class="post-btn" id="composeBtn">
+                    <i class="fas fa-feather"></i>
+                    <span>Написать</span>
+                </button>
+
+                <div class="user-profile" id="userProfileBtn">
+                    <img class="user-avatar" id="sidebarAvatar" src="">
+                    <div class="user-info">
+                        <div class="user-name" id="sidebarName"></div>
+                        <div class="user-handle" id="sidebarHandle"></div>
+                    </div>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div id="homeView">
+                    <div class="content-header">
+                        <h2 class="content-title">Главная</h2>
+                    </div>
+
+                    <div class="compose-post">
+                        <div class="compose-form">
+                            <img class="compose-avatar" id="composeAvatar" src="">
+                            <div class="compose-input-area">
+                                <textarea class="compose-textarea" id="postText" placeholder="Что нового?"></textarea>
+                                <div id="postImagePreview" class="image-preview" style="display: none;">
+                                    <img id="postImagePreviewImg" src="">
+                                    <button class="remove-image" id="removePostImage">×</button>
+                                </div>
+                                <div class="compose-actions">
+                                    <div class="compose-icons">
+                                        <button type="button" class="icon-btn" id="addImageBtn">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                    </div>
+                                    <button class="btn-post" id="publishPostBtn">Опубликовать</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feed" id="feed">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i> Загрузка...
+                        </div>
+                    </div>
+                </div>
+
+                <div id="profileView" style="display: none;">
+                    <div class="content-header">
+                        <h2 class="content-title">Профиль</h2>
+                    </div>
+                    <div id="profileContent"></div>
+                </div>
+
+                <div id="adminView" style="display: none;">
+                    <div class="content-header">
+                        <h2 class="content-title">Админ-панель</h2>
+                    </div>
+                    <div class="admin-panel" id="adminPanel">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i> Загрузка статистики...
+                        </div>
+                    </div>
+                </div>
+
+                <div id="messagesView" style="display: none;">
+                    <div class="content-header">
+                        <h2 class="content-title">Сообщения</h2>
+                    </div>
+                    <div class="empty-state">
+                        <i class="fas fa-envelope"></i>
+                        <h3>Сообщения скоро появятся</h3>
+                        <p>Эта функция в разработке</p>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="right-sidebar">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Поиск">
+                </div>
+
+                <div class="widget">
+                    <div class="widget-header">Кого читать</div>
+                    <div id="suggestions"></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt04qUBk6fXq58NE9zoA5Q3yWWpk_KK8s",
+            authDomain: "famdshop-2196c.firebaseapp.com",
+            databaseURL: "https://famdshop-2196c-default-rtdb.firebaseio.com",
+            projectId: "famdshop-2196c",
+            storageBucket: "famdshop-2196c.firebasestorage.app",
+            messagingSenderId: "75598057700",
+            appId: "1:75598057700:web:7274d018a585e599381cf1",
+            measurementId: "G-F977PSHJTC"
+        };
+
+        const ADMIN_EMAILS = ["admin@stellar.com", "admin@gmail.com"];
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const rtdb = firebase.database();
+
+        let currentUser = null;
+        let currentView = 'home';
+        let postImageUrl = null;
+        let unsubscribeFeed = null;
+        let isAdmin = false;
+
+        const authScreen = document.getElementById('authScreen');
+        const mainContainer = document.getElementById('mainContainer');
+        const notification = document.getElementById('notification');
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                isAdmin = ADMIN_EMAILS.includes(user.email);
+                loadUserProfile();
+                showMainApp();
+            } else {
+                showAuthScreen();
+            }
+        });
+
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tabName + 'Form').classList.add('active');
+            });
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                errorEl.textContent = getErrorMessage(error);
+                errorEl.style.display = 'block';
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const errorEl = document.getElementById('registerError');
+
+            if (password.length < 6) {
+                errorEl.textContent = 'Пароль должен быть не менее 6 символов';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({
+                    displayName: name,
+                    photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=7c3aed&color=fff&size=200`
+                });
+
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    uid: userCredential.user.uid,
+                    displayName: name,
+                    email: email,
+                    photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=7c3aed&color=fff&size=200`,
+                    bio: '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    followers: 0,
+                    following: 0,
+                    isAdmin: ADMIN_EMAILS.includes(email)
+                });
+
+                await rtdb.ref(`users/${userCredential.user.uid}/status`).set('online');
+            } catch (error) {
+                errorEl.textContent = getErrorMessage(error);
+                errorEl.style.display = 'block';
+            }
+        });
+
+        function showAuthScreen() {
+            authScreen.style.display = 'flex';
+            mainContainer.style.display = 'none';
+        }
+
+        function showMainApp() {
+            authScreen.style.display = 'none';
+            mainContainer.style.display = 'block';
+            
+            const adminNav = document.querySelector('[data-view="admin"]');
+            if (isAdmin) {
+                adminNav.style.display = 'flex';
+            } else {
+                adminNav.style.display = 'none';
+            }
+            
+            loadFeed();
+            loadSuggestions();
+        }
+
+        async function loadUserProfile() {
+            try {
+                const doc = await db.collection('users').doc(currentUser.uid).get();
+                const userData = doc.exists ? doc.data() : {};
+                
+                const name = userData.displayName || currentUser.displayName || 'Пользователь';
+                const photoURL = userData.photoURL || currentUser.photoURL || `https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=200`;
+                const handle = '@' + (currentUser.email.split('@')[0]);
+
+                document.getElementById('sidebarName').textContent = name;
+                document.getElementById('sidebarHandle').textContent = handle;
+                document.getElementById('sidebarAvatar').src = photoURL;
+                document.getElementById('composeAvatar').src = photoURL;
+
+                rtdb.ref(`users/${currentUser.uid}/status`).set('online');
+                rtdb.ref(`users/${currentUser.uid}/lastSeen`).set(firebase.database.ServerValue.TIMESTAMP);
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const view = item.dataset.view;
+                switchView(view);
+            });
+        });
+
+        function switchView(view) {
+            currentView = view;
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+
+            document.getElementById('homeView').style.display = view === 'home' ? 'block' : 'none';
+            document.getElementById('profileView').style.display = view === 'profile' ? 'block' : 'none';
+            document.getElementById('adminView').style.display = view === 'admin' ? 'block' : 'none';
+            document.getElementById('messagesView').style.display = view === 'messages' ? 'block' : 'none';
+
+            if (view === 'profile') {
+                loadProfile(currentUser.uid);
+            } else if (view === 'admin' && isAdmin) {
+                loadAdminPanel();
+            }
+        }
+
+        document.getElementById('addImageBtn').addEventListener('click', () => {
+            uploadImage();
+        });
+
+        document.getElementById('removePostImage').addEventListener('click', () => {
+            postImageUrl = null;
+            document.getElementById('postImagePreview').style.display = 'none';
+        });
+
+        async function uploadImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (file.size > 10 * 1024 * 1024) {
+                    showNotification('Файл слишком большой (максимум 10 МБ)', 'error');
+                    return;
+                }
+
+                try {
+                    const url = await uploadToImgBB(file);
+                    postImageUrl = url;
+                    document.getElementById('postImagePreviewImg').src = url;
+                    document.getElementById('postImagePreview').style.display = 'block';
+                    showNotification('Изображение загружено', 'success');
+                } catch (error) {
+                    showNotification('Ошибка загрузки изображения', 'error');
+                    console.error(error);
+                }
+            };
+            input.click();
+        }
+
+        async function uploadToImgBB(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const response = await fetch('https://api.imgbb.com/1/upload?key=46bdae5781ff2eae374ed74398e79578', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            if (!data.success) throw new Error('Upload failed');
+            return data.data.url;
+        }
+
+        document.getElementById('publishPostBtn').addEventListener('click', async () => {
+            const text = document.getElementById('postText').value.trim();
+            
+            if (!text && !postImageUrl) {
+                showNotification('Напишите что-нибудь или прикрепите фото', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('publishPostBtn');
+            btn.disabled = true;
+            btn.textContent = 'Публикация...';
+
+            try {
+                const postData = {
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || 'Пользователь',
+                    userAvatar: currentUser.photoURL || `https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=200`,
+                    userHandle: '@' + currentUser.email.split('@')[0],
+                    text: text,
+                    imageUrl: postImageUrl || null,
+                    likes: 0,
+                    comments: 0,
+                    reposts: 0,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: Date.now()
+                };
+
+                await db.collection('posts').add(postData);
+
+                document.getElementById('postText').value = '';
+                postImageUrl = null;
+                document.getElementById('postImagePreview').style.display = 'none';
+                
+                showNotification('Пост опубликован', 'success');
+            } catch (error) {
+                showNotification('Ошибка публикации', 'error');
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Опубликовать';
+            }
+        });
+
+        function loadFeed() {
+            const feed = document.getElementById('feed');
+            
+            if (unsubscribeFeed) {
+                unsubscribeFeed();
+            }
+
+            unsubscribeFeed = db.collection('posts')
+                .orderBy('createdAt', 'desc')
+                .limit(50)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        feed.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-star"></i>
+                                <h3>Пока здесь пусто</h3>
+                                <p>Будьте первым, кто что-то напишет!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    feed.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const post = doc.data();
+                        post.id = doc.id;
+                        feed.appendChild(createPostElement(post));
+                    });
+                }, error => {
+                    console.error('Error loading feed:', error);
+                    feed.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Ошибка загрузки</h3>
+                        </div>
+                    `;
+                });
+        }
+
+        function createPostElement(post) {
+            const article = document.createElement('article');
+            article.className = 'post';
+            article.dataset.id = post.id;
+
+            const time = post.timestamp ? getTimeAgo(post.timestamp.toDate()) : 'только что';
+            
+            let mediaHtml = '';
+            if (post.imageUrl) {
+                mediaHtml = `<img class="post-image" src="${post.imageUrl}" alt="">`;
+            }
+
+            article.innerHTML = `
+                <div class="post-header">
+                    <img class="post-avatar" src="${post.userAvatar}" alt="">
+                    <div class="post-info">
+                        <div class="post-author">
+                            <span class="post-author-name">${post.userName}</span>
+                            <span class="post-author-handle">${post.userHandle}</span>
+                            <span class="post-time">· ${time}</span>
+                        </div>
+                    </div>
+                </div>
+                ${post.text ? `<div class="post-content">${escapeHtml(post.text)}</div>` : ''}
+                ${mediaHtml}
+                <div class="post-actions">
+                    <div class="post-action" data-action="comment">
+                        <i class="far fa-comment"></i>
+                        <span>${post.comments || 0}</span>
+                    </div>
+                    <div class="post-action" data-action="repost">
+                        <i class="fas fa-retweet"></i>
+                        <span>${post.reposts || 0}</span>
+                    </div>
+                    <div class="post-action" data-action="like">
+                        <i class="far fa-heart"></i>
+                        <span>${post.likes || 0}</span>
+                    </div>
+                </div>
+            `;
+
+            article.querySelector('[data-action="like"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleLike(post.id, article);
+            });
+
+            article.querySelector('[data-action="comment"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                showCommentModal(post);
+            });
+
+            return article;
+        }
+
+        async function handleLike(postId, element) {
+            const likeBtn = element.querySelector('[data-action="like"]');
+            const icon = likeBtn.querySelector('i');
+            const count = likeBtn.querySelector('span');
+            
+            try {
+                const likesRef = db.collection('likes').doc(`${currentUser.uid}_${postId}`);
+                const likeDoc = await likesRef.get();
+
+                if (likeDoc.exists) {
+                    await likesRef.delete();
+                    await db.collection('posts').doc(postId).update({
+                        likes: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    icon.className = 'far fa-heart';
+                    likeBtn.classList.remove('liked');
+                    count.textContent = parseInt(count.textContent) - 1;
+                } else {
+                    await likesRef.set({
+                        userId: currentUser.uid,
+                        postId: postId,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    await db.collection('posts').doc(postId).update({
+                        likes: firebase.firestore.FieldValue.increment(1)
+                    });
+                    icon.className = 'fas fa-heart';
+                    likeBtn.classList.add('liked');
+                    count.textContent = parseInt(count.textContent) + 1;
+                }
+            } catch (error) {
+                console.error('Error handling like:', error);
+            }
+        }
+
+        function showCommentModal(post) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="modal-close">×</button>
+                        <div class="modal-title">Комментарии</div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="compose-form">
+                            <img class="compose-avatar" src="${currentUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=200'}" alt="">
+                            <div class="compose-input-area">
+                                <textarea class="compose-textarea" id="commentText" placeholder="Напишите комментарий..."></textarea>
+                                <div class="compose-actions">
+                                    <button class="btn-post" id="postCommentBtn">Комментировать</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="commentsList" style="margin-top: 20px;"></div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            modal.querySelector('.modal-close').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+
+            modal.querySelector('#postCommentBtn').addEventListener('click', async () => {
+                const text = modal.querySelector('#commentText').value.trim();
+                if (!text) return;
+
+                try {
+                    await db.collection('comments').add({
+                        postId: post.id,
+                        userId: currentUser.uid,
+                        userName: currentUser.displayName || 'Пользователь',
+                        userAvatar: currentUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=200',
+                        userHandle: '@' + currentUser.email.split('@')[0],
+                        text: text,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    await db.collection('posts').doc(post.id).update({
+                        comments: firebase.firestore.FieldValue.increment(1)
+                    });
+
+                    modal.querySelector('#commentText').value = '';
+                    showNotification('Комментарий добавлен', 'success');
+                    loadComments(post.id, modal.querySelector('#commentsList'));
+                } catch (error) {
+                    showNotification('Ошибка добавления комментария', 'error');
+                }
+            });
+
+            loadComments(post.id, modal.querySelector('#commentsList'));
+        }
+
+        async function loadComments(postId, container) {
+            try {
+                const snapshot = await db.collection('comments')
+                    .where('postId', '==', postId)
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                container.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Комментариев пока нет</div>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const comment = doc.data();
+                    const commentEl = document.createElement('div');
+                    commentEl.className = 'post';
+                    commentEl.style.border = 'none';
+                    commentEl.style.padding = '12px 0';
+                    
+                    const time = comment.timestamp ? getTimeAgo(comment.timestamp.toDate()) : 'только что';
+                    
+                    commentEl.innerHTML = `
+                        <div class="post-header">
+                            <img class="post-avatar" src="${comment.userAvatar}" style="width: 32px; height: 32px;">
+                            <div class="post-info">
+                                <div class="post-author">
+                                    <span class="post-author-name">${comment.userName}</span>
+                                    <span class="post-author-handle">${comment.userHandle}</span>
+                                    <span class="post-time">· ${time}</span>
+                                </div>
+                                <div class="post-content" style="font-size: 14px;">${escapeHtml(comment.text)}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(commentEl);
+                });
+            } catch (error) {
+                console.error('Error loading comments:', error);
+            }
+        }
+
+        async function loadSuggestions() {
+            try {
+                const snapshot = await db.collection('users')
+                    .where('uid', '!=', currentUser.uid)
+                    .limit(5)
+                    .get();
+
+                const container = document.getElementById('suggestions');
+                container.innerHTML = '';
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary);">Нет рекомендаций</div>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    container.appendChild(createSuggestionElement(user));
+                });
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+            }
+        }
+
+        function createSuggestionElement(user) {
+            const div = document.createElement('div');
+            div.className = 'user-suggestion';
+            
+            div.innerHTML = `
+                <img class="suggestion-avatar" src="${user.photoURL || 'https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=200'}" alt="">
+                <div class="suggestion-info">
+                    <div class="suggestion-name">${user.displayName || 'Пользователь'}</div>
+                    <div class="suggestion-handle">@${user.email.split('@')[0]}</div>
+                </div>
+                <button class="btn-follow">Читать</button>
+            `;
+
+            const followBtn = div.querySelector('.btn-follow');
+            followBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await handleFollow(user.uid, followBtn);
+            });
+
+            return div;
+        }
+
+        async function handleFollow(targetUserId, button) {
+            try {
+                const followRef = db.collection('follows').doc(`${currentUser.uid}_${targetUserId}`);
+                const followDoc = await followRef.get();
+
+                if (followDoc.exists) {
+                    await followDoc.ref.delete();
+                    await db.collection('users').doc(currentUser.uid).update({
+                        following: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    await db.collection('users').doc(targetUserId).update({
+                        followers: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    button.textContent = 'Читать';
+                    button.className = 'btn-follow';
+                } else {
+                    await followRef.set({
+                        followerId: currentUser.uid,
+                        followingId: targetUserId,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    await db.collection('users').doc(currentUser.uid).update({
+                        following: firebase.firestore.FieldValue.increment(1)
+                    });
+                    await db.collection('users').doc(targetUserId).update({
+                        followers: firebase.firestore.FieldValue.increment(1)
+                    });
+                    button.textContent = 'Читаю';
+                    button.className = 'btn-follow btn-following';
+                }
+            } catch (error) {
+                console.error('Error handling follow:', error);
+            }
+        }
+
+        async function loadProfile(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                
+                const postsSnapshot = await db.collection('posts')
+                    .where('userId', '==', userId)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                const profileContent = document.getElementById('profileContent');
+                profileContent.innerHTML = `
+                    <div class="profile-header">
+                        <div class="profile-banner"></div>
+                        <div class="profile-info-section">
+                            <div class="profile-avatar-container">
+                                <img class="profile-avatar-large" src="${userData.photoURL || 'https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=200'}" alt="">
+                            </div>
+                            ${userId === currentUser.uid ? `
+                                <div class="profile-actions">
+                                    <button class="btn-edit-profile" onclick="auth.signOut()">Выйти</button>
+                                </div>
+                            ` : ''}
+                            <div class="profile-name">${userData.displayName || 'Пользователь'}</div>
+                            <div class="profile-handle">@${userData.email.split('@')[0]}</div>
+                            ${userData.bio ? `<div class="profile-bio">${escapeHtml(userData.bio)}</div>` : ''}
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <strong>${userData.following || 0}</strong>
+                                    <span>читаю</span>
+                                </div>
+                                <div class="profile-stat">
+                                    <strong>${userData.followers || 0}</strong>
+                                    <span>читателей</span>
+                                </div>
+                                <div class="profile-stat">
+                                    <strong>${postsSnapshot.size}</strong>
+                                    <span>постов</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feed" id="userPosts"></div>
+                `;
+
+                const userPosts = document.getElementById('userPosts');
+                if (postsSnapshot.empty) {
+                    userPosts.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-feather"></i>
+                            <h3>Постов пока нет</h3>
+                        </div>
+                    `;
+                } else {
+                    postsSnapshot.forEach(doc => {
+                        const post = doc.data();
+                        post.id = doc.id;
+                        userPosts.appendChild(createPostElement(post));
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        async function loadAdminPanel() {
+            const adminPanel = document.getElementById('adminPanel');
+            adminPanel.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> Загрузка статистики...</div>';
+
+            try {
+                const usersSnapshot = await db.collection('users').get();
+                const postsSnapshot = await db.collection('posts').get();
+                const commentsSnapshot = await db.collection('comments').get();
+                
+                const onlineUsers = await getOnlineUsers();
+                
+                const now = new Date();
+                const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                const recentPosts = postsSnapshot.docs.filter(doc => 
+                    doc.data().timestamp?.toDate() > last24h
+                ).length;
+
+                const chartData = {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{
+                        label: 'Онлайн пользователей',
+                        data: [Math.floor(Math.random() * 50) + 20, Math.floor(Math.random() * 30) + 10, Math.floor(Math.random() * 100) + 50, Math.floor(Math.random() * 120) + 80, Math.floor(Math.random() * 90) + 60, Math.floor(Math.random() * 70) + 40],
+                        borderColor: 'rgb(124, 58, 237)',
+                        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                        tension: 0.4
+                    }]
+                };
+
+                adminPanel.innerHTML = `
+                    <div class="admin-stats">
+                        <div class="stat-card">
+                            <h3>Всего пользователей</h3>
+                            <div class="stat-value">${usersSnapshot.size}</div>
+                            <div class="stat-change">+${Math.floor(usersSnapshot.size * 0.12)} за неделю</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Онлайн сейчас</h3>
+                            <div class="stat-value">${onlineUsers}</div>
+                            <div class="stat-change">${Math.round((onlineUsers / usersSnapshot.size) * 100)}% от всех</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Всего постов</h3>
+                            <div class="stat-value">${postsSnapshot.size}</div>
+                            <div class="stat-change">+${recentPosts} за 24ч</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Всего комментариев</h3>
+                            <div class="stat-value">${commentsSnapshot.size}</div>
+                            <div class="stat-change">+${Math.floor(commentsSnapshot.size * 0.08)} за день</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>Активность пользователей онлайн</h3>
+                            <canvas id="onlineChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Распределение постов</h3>
+                            <canvas id="postsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="admin-users">
+                        <h3>Последние пользователи</h3>
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Пользователь</th>
+                                    <th>Email</th>
+                                    <th>Статус</th>
+                                    <th>Постов</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                const onlineCtx = document.getElementById('onlineChart').getContext('2d');
+                new Chart(onlineCtx, {
+                    type: 'line',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                const postsCtx = document.getElementById('postsChart').getContext('2d');
+                new Chart(postsCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['С фото', 'Без фото'],
+                        datasets: [{
+                            data: [
+                                postsSnapshot.docs.filter(doc => doc.data().imageUrl).length,
+                                postsSnapshot.docs.filter(doc => !doc.data().imageUrl).length
+                            ],
+                            backgroundColor: [
+                                'rgb(124, 58, 237)',
+                                'rgb(42, 42, 68)'
+                            ]
+                        }]
+                    }
+                });
+
+                const usersTableBody = document.getElementById('usersTableBody');
+                usersSnapshot.docs.slice(0, 10).forEach(doc => {
+                    const user = doc.data();
+                    const userPosts = postsSnapshot.docs.filter(post => post.data().userId === user.uid).length;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=200'}" style="width: 32px; height: 32px; border-radius: 50%;">
+                                <div>${user.displayName || 'Пользователь'}</div>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>
+                            <div class="user-status">
+                                <div class="status-dot ${Math.random() > 0.3 ? 'online' : ''}"></div>
+                                <span>${Math.random() > 0.3 ? 'Онлайн' : 'Не в сети'}</span>
+                            </div>
+                        </td>
+                        <td>${userPosts}</td>
+                        <td>
+                            <button class="btn-admin">Просмотр</button>
+                        </td>
+                    `;
+                    usersTableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error loading admin panel:', error);
+                adminPanel.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Ошибка загрузки данных</h3></div>';
+            }
+        }
+
+        async function getOnlineUsers() {
+            try {
+                const snapshot = await rtdb.ref('users').once('value');
+                const users = snapshot.val();
+                let onlineCount = 0;
+                
+                for (const uid in users) {
+                    if (users[uid].status === 'online') {
+                        onlineCount++;
+                    }
+                }
+                
+                return onlineCount;
+            } catch (error) {
+                console.error('Error getting online users:', error);
+                return Math.floor(Math.random() * 50) + 20;
+            }
+        }
+
+        document.getElementById('userProfileBtn').addEventListener('click', () => {
+            switchView('profile');
+        });
+
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function getErrorMessage(error) {
+            const messages = {
+                'auth/email-already-in-use': 'Email уже используется',
+                'auth/invalid-email': 'Неверный email',
+                'auth/weak-password': 'Слабый пароль',
+                'auth/user-not-found': 'Пользователь не найден',
+                'auth/wrong-password': 'Неверный пароль',
+                'auth/network-request-failed': 'Ошибка сети'
+            };
+            return messages[error.code] || 'Произошла ошибка';
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 60) return 'только что';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}м`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}ч`;
+            if (seconds < 604800) return `${Math.floor(seconds / 86400)}д`;
+            
+            return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                rtdb.ref(`users/${currentUser.uid}/status`).set('offline');
+                rtdb.ref(`users/${currentUser.uid}/lastSeen`).set(firebase.database.ServerValue.TIMESTAMP);
+            }
+        });
+
+        window.addEventListener('load', () => {
+            if (auth.currentUser) {
+                rtdb.ref(`users/${auth.currentUser.uid}/status`).set('online');
+            }
+        });
+    </script>
+</body>
+</html>
