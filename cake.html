@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskin cakes | Boutique Café</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #fcf9f5;
+            color: #2c1810;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Профиль */
+        .profile-bar {
+            background: #ffffff;
+            padding: 25px 0;
+            border-bottom: 1px solid #f0e1d4;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.03);
+        }
+
+        .profile-container {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: url('https://i.ibb.co/XrwdGnwJ/2026-03-09-110027.png') center/cover;
+            border: 4px solid #d4b08c;
+            box-shadow: 0 10px 25px rgba(180, 128, 90, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-info h1 {
+            font-size: 2.8rem;
+            color: #3d2419;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .profile-info .username {
+            color: #b4805a;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-info .username i {
+            font-size: 1rem;
+            color: #d4a373;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: #faf3ec;
+            padding: 8px 20px;
+            border-radius: 50px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a2e1e;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: #8b6f55;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Навигация */
+        header {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1488477304112-4944851de03d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+            height: 85vh;
+            min-height: 600px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background-attachment: fixed;
+        }
+
+        nav {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 50px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+            backdrop-filter: blur(5px);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Cormorant Garamond', serif;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: 0.3s;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 5px 0;
+        }
+
+        .nav-links a:hover {
+            border-bottom-color: #e8c9a8;
+        }
+
+        .hero h2 {
+            font-size: 5.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 15px rgba(0,0,0,0.6);
+            font-family: 'Cormorant Garamond', serif;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 35px;
+            text-shadow: 1px 1px 8px rgba(0,0,0,0.5);
+            max-width: 800px;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn {
+            display: inline-block;
+            background: #d4a373;
+            color: white;
+            padding: 16px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .btn:hover {
+            background: #b4805a;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #d4a373;
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: #d4a373;
+        }
+
+        /* Атмосфера */
+        .atmosphere {
+            padding: 80px 0;
+            background: #fff9f0;
+            text-align: center;
+            position: relative;
+        }
+
+        .atmosphere h3 {
+            font-size: 3rem;
+            color: #4a2e1e;
+            margin-bottom: 20px;
+        }
+
+        .atmosphere p {
+            font-size: 1.4rem;
+            color: #7b5e47;
+            font-style: italic;
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature {
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .feature i {
+            font-size: 2.5rem;
+            color: #d4a373;
+            margin-bottom: 20px;
+        }
+
+        .feature h4 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* Меню */
+        .menu-section {
+            padding: 80px 0;
+            background: #fff;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: #4a2e1e;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #b08b6b;
+            margin-bottom: 60px;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .menu-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .menu-tab {
+            padding: 12px 35px;
+            background: #f0e4d8;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a2e1e;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .menu-tab.active {
+            background: #d4a373;
+            color: white;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            display: none;
+        }
+
+        .products-grid.active {
+            display: grid;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            text-align: center;
+            border: 1px solid #f0e4d8;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: #d4b08c;
+        }
+
+        .product-img {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-img {
+            transform: scale(1.1);
+        }
+
+        .product-info {
+            padding: 25px 20px;
+        }
+
+        .product-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .product-info p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #b4805a;
+            margin-bottom: 20px;
+        }
+
+        .add-to-cart {
+            background: #f0e4d8;
+            color: #2c1810;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .add-to-cart:hover {
+            background: #d4a373;
+            color: white;
+        }
+
+        /* Галерея */
+        .gallery-section {
+            padding: 80px 0;
+            background: #fcf9f5;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .gallery-item {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .gallery-item::after {
+            content: '🔍';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .gallery-item:hover::after {
+            opacity: 1;
+        }
+
+        /* Контакты с картой */
+        .contact-section {
+            padding: 80px 0;
+            background: #fff;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-top: 40px;
+        }
+
+        .contact-info {
+            background: #fcf9f5;
+            padding: 40px;
+            border-radius: 20px;
+        }
+
+        .contact-info h3 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+        }
+
+        .contact-detail i {
+            width: 40px;
+            height: 40px;
+            background: #d4a373;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .map-container {
+            border-radius: 20px;
+            overflow: hidden;
+            height: 400px;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Заказ */
+        .order-section {
+            padding: 80px 0;
+            background: #fef3ed;
+        }
+
+        .order-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        .order-info {
+            background: #fff9f0;
+            padding: 40px;
+            border-radius: 20px;
+        }
+
+        .order-info h3 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #4a2e1e;
+        }
+
+        .order-info p {
+            margin-bottom: 15px;
+            color: #5a3e2b;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .order-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c1810;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #f0e4d8;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #d4a373;
+        }
+
+        .cart-items {
+            background: #f9f0e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #d4a373;
+        }
+
+        .cart-total {
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-align: right;
+            margin-top: 10px;
+            color: #4a2e1e;
+        }
+
+        /* Отзывы */
+        .reviews-section {
+            padding: 80px 0;
+            background: #fff;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .review-card {
+            background: #fcf9f5;
+            padding: 30px;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .review-card::before {
+            content: '"';
+            font-size: 5rem;
+            color: #d4a373;
+            opacity: 0.2;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+        }
+
+        .review-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .review-author {
+            font-weight: 700;
+            color: #4a2e1e;
+        }
+
+        .review-rating {
+            color: #ffb800;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background: #1a0f0a;
+            color: #b8a392;
+            padding: 50px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-family: 'Cormorant Garamond', serif;
+            color: #e8c9a8;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: #b8a392;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #e8c9a8;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: #b8a392;
+            font-size: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #e8c9a8;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #3d2a1f;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #d4a373;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: 0.3s;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #c44536;
+        }
+
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 3rem; }
+            .nav-links { display: none; }
+            .order-container { grid-template-columns: 1fr; }
+            .profile-stats { flex-wrap: wrap; }
+            .profile-container { justify-content: center; text-align: center; }
+            .features-grid { grid-template-columns: 1fr; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .reviews-grid { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Профиль Instagram -->
+    <div class="profile-bar">
+        <div class="container profile-container">
+            <div class="profile-avatar"></div>
+            <div class="profile-info">
+                <h1>taskin_cakes1</h1>
+                <div class="username">
+                    <i class="fas fa-check-circle"></i>
+                    Taskin cakes | Boutique Café
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">29</div>
+                        <div class="stat-label">публикаций</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1 292</div>
+                        <div class="stat-label">подписчиков</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">487</div>
+                        <div class="stat-label">подписок</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Шапка -->
+    <header>
+        <nav>
+            <div class="logo">Taskin cakes</div>
+            <div class="nav-links">
+                <a href="#">Главная</a>
+                <a href="#menu">Меню</a>
+                <a href="#gallery">Галерея</a>
+                <a href="#order">Заказ</a>
+                <a href="#contacts">Контакты</a>
+            </div>
+        </nav>
+        <div class="hero">
+            <h2>Boutique Café</h2>
+            <p>Авторские десерты и ароматный кофе<br>Атмосфера уюта, вкуса и эстетики</p>
+            <a href="#order" class="btn">Заказать онлайн</a>
+            <a href="#menu" class="btn btn-outline" style="margin-left: 20px;">Наше меню</a>
+        </div>
+    </header>
+
+    <!-- Атмосфера -->
+    <div class="atmosphere" id="about">
+        <div class="container">
+            <h3>Атмосфера уюта, вкуса и эстетики</h3>
+            <p>"Мы создаём десерты, которые дарят счастье"</p>
+            <div class="features-grid">
+                <div class="feature">
+                    <i class="fas fa-cake-candles"></i>
+                    <h4>Авторские рецепты</h4>
+                    <p>Уникальные десерты, которые вы не найдёте больше нигде</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-coffee"></i>
+                    <h4>Напитки на вынос</h4>
+                    <p>Ароматный кофе и авторские лимонады</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-heart"></i>
+                    <h4>Натуральные ингредиенты</h4>
+                    <p>Только свежие продукты высокого качества</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Меню с табами -->
+    <section class="menu-section" id="menu">
+        <div class="container">
+            <h2 class="section-title">Наше меню</h2>
+            <div class="section-subtitle">Авторские сладости и напитки</div>
+            
+            <div class="menu-tabs">
+                <button class="menu-tab active" data-category="cakes">Торты</button>
+                <button class="menu-tab" data-category="desserts">Десерты</button>
+                <button class="menu-tab" data-category="drinks">Напитки</button>
+            </div>
+
+            <div class="products-grid active" id="cakes-grid"></div>
+            <div class="products-grid" id="desserts-grid"></div>
+            <div class="products-grid" id="drinks-grid"></div>
+        </div>
+    </section>
+
+    <!-- Галерея -->
+    <section class="gallery-section" id="gallery">
+        <div class="container">
+            <h2 class="section-title">Наши работы</h2>
+            <div class="section-subtitle">Фотографии счастливых моментов</div>
+            <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
+    </section>
+
+    <!-- Отзывы -->
+    <section class="reviews-section">
+        <div class="container">
+            <h2 class="section-title">Отзывы наших гостей</h2>
+            <div class="section-subtitle">Что говорят о нас</div>
+            <div class="reviews-grid" id="reviewsGrid"></div>
+        </div>
+    </section>
+
+    <!-- Контакты с картой -->
+    <section class="contact-section" id="contacts">
+        <div class="container">
+            <h2 class="section-title">Как нас найти</h2>
+            <div class="section-subtitle">Ждём вас в гости</div>
+            
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Контакты</h3>
+                    <div class="contact-detail">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>18 мкр, напротив Джума Базара</span>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fas fa-phone"></i>
+                        <span>
+                            <strong>92-981-00-01</strong><br>
+                            <small>Ежедневно 11:00–23:00</small>
+                        </span>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fab fa-instagram"></i>
+                        <span>@taskin_cakes1</span>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fab fa-telegram"></i>
+                        <span>@taskin_cakes_bot</span>
+                    </div>
+                    <div class="work-time" style="margin-top: 30px; padding: 20px; background: #fff; border-radius: 10px;">
+                        <strong>Часы работы:</strong><br>
+                        Пн-Вс: 11:00 - 23:00<br>
+                        Без выходных
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2995.112234567891!2d69.12345678901234!3d41.12345678901234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDA3JzI0LjQiTiA2OcKwMDcnMjYuNCJF!5e0!3m2!1sru!2s!4v1234567890123" allowfullscreen loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Заказ -->
+    <section class="order-section" id="order">
+        <div class="container">
+            <h2 class="section-title">Оформить заказ</h2>
+            <div class="section-subtitle">Доставка и самовывоз</div>
+            
+            <div class="order-container">
+                <div class="order-info">
+                    <h3>Информация о доставке</h3>
+                    <p><i class="fas fa-check-circle" style="color: #d4a373;"></i> Минимальная сумма заказа: 500 ₽</p>
+                    <p><i class="fas fa-check-circle" style="color: #d4a373;"></i> Доставка по городу: 300 ₽</p>
+                    <p><i class="fas fa-check-circle" style="color: #d4a373;"></i> Самовывоз: бесплатно</p>
+                    <p><i class="fas fa-check-circle" style="color: #d4a373;"></i> Время доставки: от 40 минут</p>
+                    <p><i class="fas fa-check-circle" style="color: #d4a373;"></i> Оплата: наличными или переводом</p>
+                    <br>
+                    <h3>Способы связи</h3>
+                    <p><i class="fas fa-phone"></i> 92-981-00-01</p>
+                    <p><i class="fab fa-telegram"></i> Telegram: @taskin_cakes_bot</p>
+                    <p><i class="fab fa-instagram"></i> Direct: @taskin_cakes1</p>
+                </div>
+                
+                <div class="order-form">
+                    <h3 style="margin-bottom: 25px;">Ваш заказ</h3>
+                    
+                    <div id="cartContainer">
+                        <div class="cart-items" id="cartItems"></div>
+                        <div class="cart-total" id="cartTotal">Итого: 0 ₽</div>
+                    </div>
+
+                    <form id="orderForm">
+                        <div class="form-group">
+                            <label for="name">Ваше имя *</label>
+                            <input type="text" id="name" placeholder="Анна" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Телефон *</label>
+                            <input type="tel" id="phone" placeholder="92-981-00-01" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tg">Telegram (для связи)</label>
+                            <input type="text" id="tg" placeholder="@username">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pickup">Способ получения</label>
+                            <select id="pickup">
+                                <option value="Самовывоз (18 мкр)">Самовывоз (18 мкр) - бесплатно</option>
+                                <option value="Доставка по городу">Доставка по городу - 300 ₽</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date">Желаемое время</label>
+                            <input type="datetime-local" id="date">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Адрес доставки (если нужно)</label>
+                            <input type="text" id="address" placeholder="Улица, дом, квартира">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="comment">Комментарий к заказу</label>
+                            <textarea id="comment" rows="3" placeholder="Пожелания по декору, составу..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn" style="width: 100%;" id="submitBtn">Отправить заказ</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">Taskin cakes</div>
+                    <p>Авторские десерты и напитки<br>в уютной атмосфере</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Меню</h4>
+                    <a href="#menu">Торты</a>
+                    <a href="#menu">Десерты</a>
+                    <a href="#menu">Напитки</a>
+                    <a href="#gallery">Галерея</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Информация</h4>
+                    <a href="#about">О нас</a>
+                    <a href="#order">Доставка</a>
+                    <a href="#contacts">Контакты</a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2026 Taskin cakes | Boutique Café. Все права защищены.</p>
+                <p>18 мкр, напротив Джума Базара | Ежедневно 11:00–23:00</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // НАСТРОЙКИ TELEGRAM
+        const TELEGRAM_TOKEN = 'ВАШ_ТОКЕН_БОТА';
+        const CHAT_ID = 'ВАШ_CHAT_ID';
+
+        // Категории товаров
+        const products = {
+            cakes: [
+                { id: 1, name: 'Медовый торт', desc: 'Нежные медовые коржи со сметанным кремом', price: 1900, img: 'https://images.unsplash.com/photo-1587314168485-3236d6714c4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' },
+                { id: 2, name: 'Красный бархат', desc: 'Бисквит с сырным кремом и ягодами', price: 2200, img: 'https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' },
+                { id: 3, name: 'Наполеон', desc: 'Хрустящие коржи с заварным кремом', price: 1800, img: 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' }
+            ],
+            desserts: [
+                { id: 4, name: 'Капкейки', desc: 'Набор 6 шт. с разными начинками', price: 1200, img: 'https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' },
+                { id: 5, name: 'Чизкейк Нью-Йорк', desc: 'Классический с ягодным соусом', price: 1700, img: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' },
+                { id: 6, name: 'Макарон', desc: 'Набор 12 шт. (разные вкусы)', price: 800, img: 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' },
+                { id: 7, name: 'Эклеры', desc: 'Заварные с ванильным кремом, 3 шт', price: 650, img: 'https://images.unsplash.com/photo-1603532648955-039310d9ed75?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' }
+            ],
+            drinks: [
+                { id: 8, name: 'Капучино', desc: 'Классический 250 мл', price: 280, img: 'https://images.unsplash.com/photo-1534778101976-62847782c213?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' },
+                { id: 9, name: 'Раф кофе', desc: 'С ванильным сиропом', price: 320, img: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' },
+                { id: 10, name: 'Лимонад', desc: 'Домашний лимонад (малина/мята)', price: 250, img: 'https://images.unsplash.com/photo-1499638673689-79a0b5115d87?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' },
+                { id: 11, name: 'Глинтвейн', desc: 'Безалкогольный, с пряностями', price: 290, img: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80' }
+            ]
+        };
+
+        // Галерея
+        const galleryImages = [
+            'https://images.unsplash.com/photo-1488477304112-4944851de03d?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1587314168485-3236d6714c4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1569864358642-9d1684040f43?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1603532648955-039310d9ed75?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80'
+        ];
+
+        // Отзывы
+        const reviews = [
+            { author: 'Анна', rating: 5, text: 'Самые вкусные десерты в городе! Медовый торт просто тает во рту. Атмосфера очень уютная.' },
+            { author: 'Марат', rating: 5, text: 'Заказывали капкейки на день рождения - все гости были в восторге. Обязательно вернёмся!' },
+            { author: 'Елена', rating: 5, text: 'Обожаю их кофе и лимонады. Приятное место, вежливый персонал. Рекомендую!' }
+        ];
+
+        let cart = [];
+        let cartItemsDiv = document.getElementById('cartItems');
+        let cartTotalSpan = document.getElementById('cartTotal');
+        let notification = document.getElementById('notification');
+        let orderForm = document.getElementById('orderForm');
+
+        // Рендер товаров по категориям
+        function renderProducts() {
+            document.getElementById('cakes-grid').innerHTML = products.cakes.map(product => productCard(product)).join('');
+            document.getElementById('desserts-grid').innerHTML = products.desserts.map(product => productCard(product)).join('');
+            document.getElementById('drinks-grid').innerHTML = products.drinks.map(product => productCard(product)).join('');
+        }
+
+        function productCard(product) {
+            return `
+                <div class="product-card">
+                    <div class="product-img" style="background-image: url('${product.img}')"></div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p>${product.desc}</p>
+                        <div class="price">${product.price} ₽</div>
+                        <button class="add-to-cart" onclick="addToCart(${product.id})">В корзину</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Рендер галереи
+        function renderGallery() {
+            document.getElementById('galleryGrid').innerHTML = galleryImages.map(img => 
+                `<div class="gallery-item" style="background-image: url('${img}')"></div>`
+            ).join('');
+        }
+
+        // Рендер отзывов
+        function renderReviews() {
+            document.getElementById('reviewsGrid').innerHTML = reviews.map(review => `
+                <div class="review-card">
+                    <div class="review-rating">${'★'.repeat(review.rating)}</div>
+                    <p class="review-text">${review.text}</p>
+                    <div class="review-author">— ${review.author}</div>
+                </div>
+            `).join('');
+        }
+
+        window.addToCart = function(id) {
+            let product = null;
+            for (let category in products) {
+                product = products[category].find(p => p.id === id);
+                if (product) break;
+            }
+            
+            if (!product) return;
+
+            const existing = cart.find(item => item.id === id);
+            
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            updateCartDisplay();
+            showNotification('Товар добавлен в корзину');
+        };
+
+        function updateCartDisplay() {
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p style="text-align: center; color: #999;">Корзина пуста</p>';
+                cartTotalSpan.textContent = 'Итого: 0 ₽';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                html += `
+                    <div class="cart-item">
+                        <span>${item.name} (${item.quantity} шт.)</span>
+                        <span>${itemTotal} ₽</span>
+                    </div>
+                `;
+            });
+
+            cartItemsDiv.innerHTML = html;
+            cartTotalSpan.textContent = `Итого: ${total} ₽`;
+        }
+
+        function showNotification(text, isError = false) {
+            notification.textContent = isError ? '✗ ' + text : '✓ ' + text;
+            notification.classList.add('show');
+            if (isError) {
+                notification.classList.add('error');
+            } else {
+                notification.classList.remove('error');
+            }
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+
+        async function sendToTelegram(message) {
+            if (TELEGRAM_TOKEN === 'ВАШ_ТОКЕН_БОТА' || CHAT_ID === 'ВАШ_CHAT_ID') {
+                showNotification('Настройте Telegram бота в коде!', true);
+                console.log('Заказ:', message);
+                return false;
+            }
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                const data = await response.json();
+                return data.ok;
+            } catch (error) {
+                console.error('Ошибка:', error);
+                return false;
+            }
+        }
+
+        // Переключение табов меню
+        document.querySelectorAll('.menu-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const category = this.dataset.category;
+                document.querySelectorAll('.products-grid').forEach(grid => grid.classList.remove('active'));
+                document.getElementById(`${category}-grid`).classList.add('active');
+            });
+        });
+
+        orderForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (cart.length === 0) {
+                showNotification('Добавьте товары в корзину!', true);
+                return;
+            }
+
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const tg = document.getElementById('tg').value.trim() || 'не указан';
+            const pickup = document.getElementById('pickup').value;
+            const date = document.getElementById('date').value || 'не выбрано';
+            const address = document.getElementById('address').value.trim() || 'не указан';
+            const comment = document.getElementById('comment').value.trim() || 'нет';
+
+            if (!name || !phone) {
+                showNotification('Заполните имя и телефон!', true);
+                return;
+            }
+
+            let orderText = '🍰 <b>НОВЫЙ ЗАКАЗ | Taskin cakes</b>\n\n';
+            orderText += `👤 <b>Имя:</b> ${name}\n`;
+            orderText += `📞 <b>Телефон:</b> ${phone}\n`;
+            orderText += `📱 <b>Telegram:</b> ${tg}\n`;
+            orderText += `🚚 <b>Способ:</b> ${pickup}\n`;
+            if (pickup.includes('Доставка')) {
+                orderText += `🏠 <b>Адрес:</b> ${address}\n`;
+            }
+            orderText += `📅 <b>Время:</b> ${date}\n`;
+            orderText += `📝 <b>Комментарий:</b> ${comment}\n\n`;
+            orderText += `🛒 <b>Состав заказа:</b>\n`;
+            
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                orderText += `   • ${item.name} (${item.quantity} шт.) = ${itemTotal} ₽\n`;
+            });
+            
+            if (pickup.includes('Доставка')) {
+                total += 300;
+                orderText += `   • Доставка: 300 ₽\n`;
+            }
+            
+            orderText += `\n💰 <b>ИТОГО: ${total} ₽</b>`;
+
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Отправка...';
+            btn.disabled = true;
+
+            const sent = await sendToTelegram(orderText);
+
+            if (sent) {
+                showNotification('Заказ отправлен! Мы свяжемся с вами');
+                cart = [];
+                updateCartDisplay();
+                orderForm.reset();
+            } else {
+                showNotification('Ошибка отправки. Проверьте консоль.', true);
+            }
+
+            btn.textContent = originalText;
+            btn.disabled = false;
+        });
+
+        // Плавный скролл
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Инициализация
+        renderProducts();
+        renderGallery();
+        renderReviews();
+        updateCartDisplay();
+    </script>
+</body>
+</html>
