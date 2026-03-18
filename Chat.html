@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MuzaffR Chat · Telegram style + Gifts</title>
+    <title>MuzaffR Chat · Telegram Premium Gifts</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ========== СБРОС ========== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
 
-        /* ========== ПЕРЕМЕННЫЕ ========== */
         :root {
             --tg-bg: #e7ebf0;
             --tg-surface: #ffffff;
@@ -24,11 +22,14 @@
             --tg-message-out: #e2f0ff;
             --tg-message-in: #ffffff;
             --tg-primary: #2A6B9C;
+            --tg-primary-light: #3a7bb5;
             --tg-online: #2ba50f;
             --tg-offline: #8e9aa6;
             --tg-shadow: 0 2px 4px rgba(0,0,0,0.06);
             --tg-shadow-lg: 0 8px 20px rgba(0,0,0,0.12);
             --tg-hover: rgba(0,0,0,0.04);
+            --tg-gift-bg: linear-gradient(145deg, #ffd700, #ffa500);
+            --tg-premium: #8e77ff;
         }
 
         .dark-mode {
@@ -49,7 +50,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s, color 0.2s;
+            transition: all 0.2s ease;
             overflow: hidden;
         }
 
@@ -61,29 +62,34 @@
             background: var(--tg-surface);
             box-shadow: var(--tg-shadow-lg);
             overflow: hidden;
+            border-radius: 24px 0 0 24px;
         }
 
-        /* ========== БОКОВАЯ ПАНЕЛЬ ========== */
+        /* ========== Стильная боковая панель ========== */
         .sidebar {
-            width: 360px;
+            width: 380px;
             background: var(--tg-surface);
             border-right: 1px solid var(--tg-border);
             display: flex;
             flex-direction: column;
+            backdrop-filter: blur(10px);
         }
 
         .sidebar-header {
-            padding: 16px 20px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--tg-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: linear-gradient(90deg, var(--tg-surface) 0%, rgba(42,107,156,0.05) 100%);
         }
 
         .sidebar-header h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--tg-primary);
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--tg-primary), #8e77ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .icon-btn {
@@ -91,71 +97,92 @@
             border: none;
             color: var(--tg-text-secondary);
             font-size: 1.2rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .icon-btn:hover {
             background: var(--tg-hover);
+            color: var(--tg-primary);
+            transform: scale(1.05);
         }
 
         .search-box {
-            padding: 12px 20px;
+            padding: 16px 24px;
             border-bottom: 1px solid var(--tg-border);
         }
 
         .search-box input {
             width: 100%;
-            padding: 10px 16px;
+            padding: 12px 20px;
             background: var(--tg-bg);
             border: none;
             border-radius: 30px;
             color: var(--tg-text);
             font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: 2px solid var(--tg-primary);
+            background: var(--tg-surface);
         }
 
         .user-list {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 0;
+            padding: 12px 0;
         }
 
         .user-item {
             display: flex;
             align-items: center;
-            padding: 10px 20px;
+            padding: 12px 24px;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: all 0.2s;
+            position: relative;
+            margin: 2px 8px;
+            border-radius: 16px;
         }
-        .user-item:hover { background: var(--tg-hover); }
-        .user-item.active { background: rgba(42, 107, 156, 0.1); }
+
+        .user-item:hover {
+            background: var(--tg-hover);
+            transform: translateX(4px);
+        }
+
+        .user-item.active {
+            background: linear-gradient(90deg, rgba(42,107,156,0.1) 0%, transparent 100%);
+            border-left: 4px solid var(--tg-primary);
+        }
 
         .avatar {
-            width: 54px;
-            height: 54px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 1.3rem;
-            margin-right: 15px;
+            font-size: 1.4rem;
+            margin-right: 16px;
             flex-shrink: 0;
             position: relative;
-            background: var(--tg-primary);
+            background: linear-gradient(145deg, var(--tg-primary), #8e77ff);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+
         .avatar.online::after {
             content: '';
             position: absolute;
-            bottom: 2px;
-            right: 2px;
+            bottom: 3px;
+            right: 3px;
             width: 14px;
             height: 14px;
             border-radius: 50%;
@@ -163,19 +190,51 @@
             border: 2px solid var(--tg-surface);
         }
 
-        .user-info { flex:1; min-width:0; }
-        .user-row { display: flex; justify-content: space-between; margin-bottom:4px; }
-        .user-name { font-weight:600; white-space: nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .time-badge { font-size:0.7rem; color:var(--tg-text-secondary); }
-        .last-message { font-size:0.85rem; color:var(--tg-text-secondary); white-space: nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .time-badge {
+            font-size: 0.7rem;
+            color: var(--tg-text-secondary);
+            background: var(--tg-bg);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .last-message {
+            font-size: 0.9rem;
+            color: var(--tg-text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .unread-badge {
             background: var(--tg-primary);
             color: white;
-            border-radius: 20px;
-            padding: 2px 8px;
+            border-radius: 30px;
+            padding: 3px 10px;
             font-size: 0.7rem;
             font-weight: 600;
             margin-left: 8px;
+            box-shadow: 0 2px 6px rgba(42,107,156,0.3);
         }
 
         /* ========== ЧАТ ========== */
@@ -187,233 +246,616 @@
         }
 
         .chat-header {
-            padding: 12px 25px;
+            padding: 16px 28px;
             border-bottom: 1px solid var(--tg-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: var(--tg-surface);
         }
-        .chat-header-left { display: flex; align-items: center; gap:15px; }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
         .chat-header-avatar {
-            width: 48px; height:48px; border-radius:50%;
-            background: var(--tg-primary);
-            color:white; display:flex; align-items:center; justify-content:center;
-            font-weight:600; font-size:1.3rem; position:relative;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--tg-primary), #8e77ff);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.4rem;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
+
         .chat-header-avatar.online::after {
-            content:''; position:absolute; bottom:2px; right:2px;
-            width:14px; height:14px; border-radius:50%; background:var(--tg-online);
-            border:2px solid var(--tg-surface);
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--tg-online);
+            border: 2px solid var(--tg-surface);
         }
-        .chat-header-info h3 { font-size:1.2rem; font-weight:600; margin-bottom:4px; }
-        .chat-header-info span { font-size:0.85rem; color:var(--tg-text-secondary); display:flex; align-items:center; gap:4px; }
-        .chat-header-actions { display:flex; gap:10px; }
+
+        .chat-header-info h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--tg-text);
+        }
+
+        .chat-header-info span {
+            font-size: 0.9rem;
+            color: var(--tg-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+        }
 
         .messages-container {
             flex: 1;
-            padding: 20px 25px;
+            padding: 24px 28px;
             overflow-y: auto;
             background: var(--tg-bg);
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .date-separator {
             text-align: center;
-            margin: 15px 0;
+            margin: 20px 0;
         }
+
         .date-separator span {
             background: var(--tg-surface);
-            padding: 4px 16px;
+            padding: 6px 20px;
             border-radius: 30px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--tg-text-secondary);
             box-shadow: var(--tg-shadow);
+            backdrop-filter: blur(10px);
         }
 
         .message {
             max-width: 65%;
-            padding: 10px 14px;
-            border-radius: 18px;
+            padding: 12px 16px;
+            border-radius: 20px;
             word-wrap: break-word;
-            animation: fadeIn 0.2s;
-            font-size: 0.95rem;
+            animation: fadeIn 0.3s ease;
+            font-size: 1rem;
+            line-height: 1.5;
             box-shadow: var(--tg-shadow);
         }
+
         .message.out {
             background: var(--tg-message-out);
             align-self: flex-end;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 6px;
         }
+
         .message.in {
             background: var(--tg-message-in);
             align-self: flex-start;
-            border-bottom-left-radius: 4px;
+            border-bottom-left-radius: 6px;
         }
-        .message .reply-preview {
-            border-left: 3px solid var(--tg-primary);
-            padding-left: 10px;
-            margin-bottom: 6px;
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
-        .message .attachments { margin-top:6px; }
-        .message .attachments img { max-width:200px; border-radius:12px; cursor:pointer; }
-        .file-attach {
-            display: flex; align-items: center; gap:8px;
-            background: var(--tg-surface); padding:8px 12px; border-radius:12px; margin-top:4px;
-        }
-        .message-footer {
-            display: flex; align-items: center; justify-content: flex-end; gap:4px;
-            margin-top:4px; font-size:0.65rem; color:var(--tg-text-secondary);
-        }
-        .double-check.read { color: var(--tg-primary); }
 
-        /* Подарки */
+        /* Стили для подарков */
         .gift-message {
             text-align: center;
+            background: linear-gradient(145deg, #ffd70020, #ffa50020);
+            border-radius: 20px;
+            padding: 15px;
+            border: 2px solid #ffd700;
         }
+
         .gift-message img {
-            max-width: 150px;
-            border-radius: 15px;
-            margin-bottom: 5px;
+            max-width: 180px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .gift-message img:hover {
+            transform: scale(1.05);
+        }
+
+        .gift-message .gift-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 5px;
+        }
+
+        .gift-message .gift-price {
+            font-size: 0.9rem;
+            color: var(--tg-text-secondary);
+            margin-top: 5px;
+        }
+
+        .message-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 6px;
+            font-size: 0.7rem;
+            color: var(--tg-text-secondary);
+        }
+
+        .double-check.read {
+            color: var(--tg-primary);
         }
 
         .typing-indicator {
-            display: flex; align-items: center; gap:4px; padding:8px 16px;
-            background: var(--tg-message-in); border-radius:18px; align-self:flex-start;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 12px 20px;
+            background: var(--tg-message-in);
+            border-radius: 25px;
+            align-self: flex-start;
             box-shadow: var(--tg-shadow);
         }
-        .typing-dots { display:flex; gap:3px; }
-        .typing-dots span {
-            width:6px; height:6px; background:var(--tg-text-secondary);
-            border-radius:50%; animation: typing 1.4s infinite;
-        }
-        @keyframes typing { 0%,60%,100%{ opacity:0.3; } 30%{ opacity:1; } }
 
-        /* Ввод */
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--tg-text-secondary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        @keyframes typing {
+            0%,60%,100% { opacity: 0.3; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-5px); }
+        }
+
+        /* ========== ОБЛАСТЬ ВВОДА ========== */
         .input-area {
-            padding: 15px 25px;
+            padding: 20px 28px;
             border-top: 1px solid var(--tg-border);
             background: var(--tg-surface);
         }
-        .reply-bar {
-            background: var(--tg-bg); border-radius:12px; padding:8px 15px; margin-bottom:10px;
-            display:flex; align-items:center; justify-content:space-between; font-size:0.9rem;
-        }
-        .reply-author { font-weight:600; color:var(--tg-primary); }
-        .reply-cancel { cursor:pointer; color:var(--tg-text-secondary); }
-        .attachment-previews { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
-        .attach-preview-item {
-            position:relative; width:70px; height:70px; border-radius:12px; overflow:hidden; background:var(--tg-bg);
-        }
-        .attach-preview-item img { width:100%; height:100%; object-fit:cover; }
-        .attach-preview-item .remove {
-            position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.5); color:white;
-            width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-            font-size:12px; cursor:pointer;
-        }
-        .message-input-wrapper {
-            display:flex; align-items:flex-end; gap:8px; background:var(--tg-bg);
-            border-radius:30px; padding:6px 8px 6px 18px;
-        }
-        .message-input-wrapper textarea {
-            flex:1; background:transparent; border:none; padding:10px 0; max-height:120px;
-            resize:none; color:var(--tg-text); font-size:0.95rem; outline:none;
-        }
-        .input-actions { display:flex; gap:4px; }
 
-        /* Эмодзи-пикер и панель подарков */
+        .reply-bar {
+            background: var(--tg-bg);
+            border-radius: 16px;
+            padding: 10px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--tg-primary);
+        }
+
+        .reply-author {
+            font-weight: 700;
+            color: var(--tg-primary);
+        }
+
+        .reply-cancel {
+            cursor: pointer;
+            color: var(--tg-text-secondary);
+            transition: color 0.2s;
+        }
+
+        .reply-cancel:hover {
+            color: #e53935;
+        }
+
+        .attachment-previews {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .attach-preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--tg-bg);
+            box-shadow: var(--tg-shadow);
+        }
+
+        .attach-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .attach-preview-item .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .attach-preview-item .remove:hover {
+            background: #e53935;
+            transform: scale(1.1);
+        }
+
+        .message-input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: var(--tg-bg);
+            border-radius: 30px;
+            padding: 8px 10px 8px 22px;
+            transition: all 0.2s;
+        }
+
+        .message-input-wrapper:focus-within {
+            box-shadow: 0 0 0 2px var(--tg-primary);
+        }
+
+        .message-input-wrapper textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 0;
+            max-height: 120px;
+            resize: none;
+            color: var(--tg-text);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* ========== ЭМОДЗИ И ПОДАРКИ ========== */
         .emoji-picker, .gift-picker {
             position: absolute;
-            bottom: 90px;
+            bottom: 100px;
             right: 30px;
-            width: 340px;
+            width: 360px;
             background: var(--tg-surface);
-            border-radius: 20px;
+            border-radius: 24px;
             box-shadow: var(--tg-shadow-lg);
             border: 1px solid var(--tg-border);
             display: none;
             flex-direction: column;
             z-index: 1000;
+            backdrop-filter: blur(20px);
         }
-        .emoji-picker.show, .gift-picker.show { display: flex; }
+
+        .emoji-picker.show, .gift-picker.show {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .emoji-header {
-            padding: 12px;
+            padding: 16px;
             border-bottom: 1px solid var(--tg-border);
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
         }
+
         .emoji-categories {
-            display: flex; gap:8px; padding:8px 12px; border-bottom:1px solid var(--tg-border);
+            display: flex;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--tg-border);
         }
-        .emoji-cat { cursor:pointer; opacity:0.6; transition:0.2s; font-size:1.2rem; }
-        .emoji-cat.active { opacity:1; }
+
+        .emoji-cat {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s;
+            font-size: 1.3rem;
+            padding: 5px;
+            border-radius: 12px;
+        }
+
+        .emoji-cat:hover {
+            opacity: 1;
+            background: var(--tg-hover);
+            transform: scale(1.1);
+        }
+
+        .emoji-cat.active {
+            opacity: 1;
+            background: var(--tg-hover);
+        }
+
         .emoji-grid {
-            display: grid; grid-template-columns: repeat(8,1fr); gap:4px;
-            padding:12px; max-height:200px; overflow-y:auto;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            padding: 16px;
+            max-height: 250px;
+            overflow-y: auto;
         }
-        .emoji-item { font-size:1.5rem; text-align:center; padding:4px; cursor:pointer; border-radius:8px; }
-        .emoji-item:hover { background:var(--tg-hover); }
 
+        .emoji-item {
+            font-size: 1.7rem;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .emoji-item:hover {
+            background: var(--tg-hover);
+            transform: scale(1.1);
+        }
+
+        /* Стили для подарков (Telegram Premium) */
         .gift-grid {
-            display: grid; grid-template-columns: repeat(3,1fr); gap:12px; padding:15px; max-height:250px; overflow-y:auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 20px;
+            max-height: 350px;
+            overflow-y: auto;
         }
-        .gift-item {
-            text-align:center; cursor:pointer; border-radius:12px; padding:10px; transition:background 0.2s;
-        }
-        .gift-item:hover { background:var(--tg-hover); }
-        .gift-item img { width:60px; height:60px; object-fit:contain; border-radius:10px; }
-        .gift-item span { display:block; font-size:0.8rem; margin-top:5px; color:var(--tg-text-secondary); }
 
-        /* Модалки */
+        .gift-item {
+            text-align: center;
+            cursor: pointer;
+            border-radius: 20px;
+            padding: 16px;
+            transition: all 0.3s;
+            background: linear-gradient(145deg, var(--tg-surface), var(--tg-bg));
+            border: 1px solid var(--tg-border);
+        }
+
+        .gift-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--tg-shadow-lg);
+            border-color: var(--tg-primary);
+        }
+
+        .gift-item img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            border-radius: 18px;
+            margin-bottom: 10px;
+        }
+
+        .gift-item .gift-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--tg-text);
+            margin-bottom: 4px;
+        }
+
+        .gift-item .gift-price {
+            font-size: 0.8rem;
+            color: var(--tg-text-secondary);
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+
+        /* Модальные окна */
         .modal {
-            position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;
-            z-index:3000; opacity:0; pointer-events:none; transition:0.2s;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
         }
-        .modal.show { opacity:1; pointer-events:auto; }
+
+        .modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .modal-content {
-            background:var(--tg-surface); border-radius:30px; width:400px; max-width:90%; padding:30px; text-align:center;
+            background: var(--tg-surface);
+            border-radius: 32px;
+            width: 440px;
+            max-width: 90%;
+            padding: 36px;
+            text-align: center;
+            box-shadow: var(--tg-shadow-lg);
+            animation: modalPop 0.3s ease;
         }
-        .modal-content .user-list { max-height:300px; overflow-y:auto; margin-top:20px; }
+
+        @keyframes modalPop {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content .avatar {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 30px;
+            border: 2px solid var(--tg-border);
+            background: var(--tg-bg);
+            color: var(--tg-text);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .modal-content input:focus {
+            border-color: var(--tg-primary);
+            outline: none;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 16px;
+            background: var(--tg-primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-content button:hover {
+            background: #1e4f7a;
+            transform: translateY(-2px);
+            box-shadow: var(--tg-shadow-lg);
+        }
 
         /* Адаптация */
-        @media (max-width:800px) {
-            .sidebar { position:absolute; left:-360px; top:0; bottom:0; z-index:100; transition:left 0.2s; box-shadow:var(--tg-shadow-lg); }
-            .sidebar.mobile-show { left:0; }
-            #menuBtn { display:block; }
+        @media (max-width: 800px) {
+            .sidebar {
+                position: absolute;
+                left: -380px;
+                top: 0;
+                bottom: 0;
+                z-index: 100;
+                transition: left 0.3s;
+                box-shadow: var(--tg-shadow-lg);
+            }
+            .sidebar.mobile-show {
+                left: 0;
+            }
+            #menuBtn {
+                display: block;
+            }
         }
-        #menuBtn { display:none; }
+        #menuBtn { display: none; }
 
         .theme-toggle {
-            position:fixed; bottom:20px; right:20px; width:50px; height:50px; border-radius:50%;
-            background:var(--tg-surface); box-shadow:var(--tg-shadow-lg); border:1px solid var(--tg-border);
-            display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:1000;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            border-radius: 18px;
+            background: var(--tg-surface);
+            box-shadow: var(--tg-shadow-lg);
+            border: 1px solid var(--tg-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.2s;
+            font-size: 1.3rem;
+            color: var(--tg-text-secondary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--tg-primary);
+            color: white;
+            transform: rotate(180deg);
         }
 
         .notification {
-            position:fixed; top:20px; right:20px; background:var(--tg-surface);
-            border-left:4px solid var(--tg-primary); border-radius:12px; padding:12px 20px;
-            box-shadow:var(--tg-shadow-lg); z-index:4000; animation:slideIn 0.3s;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--tg-surface);
+            border-left: 6px solid var(--tg-primary);
+            border-radius: 16px;
+            padding: 16px 24px;
+            box-shadow: var(--tg-shadow-lg);
+            z-index: 4000;
+            animation: slideIn 0.3s;
+            font-weight: 500;
         }
-        @keyframes slideIn { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
 
-        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
     <!-- Модалка авторизации -->
     <div id="authModal" class="modal show">
         <div class="modal-content">
-            <div style="font-size: 3rem; margin-bottom: 20px; color: var(--tg-primary);">💬</div>
-            <h2 style="margin-bottom: 25px;">MuzaffR Chat</h2>
+            <div style="font-size: 4rem; margin-bottom: 20px;">💬</div>
+            <h2 style="margin-bottom: 25px; font-size: 2rem;">MuzaffR Chat</h2>
             <div id="authError" style="color: #e53935; margin-bottom: 15px; display: none;"></div>
-            <input type="text" id="username" placeholder="Имя пользователя" style="width: 100%; padding: 14px; border-radius: 30px; border: 1px solid var(--tg-border); background: var(--tg-bg); color: var(--tg-text); margin-bottom: 15px;">
-            <input type="password" id="password" placeholder="Пароль" style="width: 100%; padding: 14px; border-radius: 30px; border: 1px solid var(--tg-border); background: var(--tg-bg); color: var(--tg-text); margin-bottom: 20px;">
-            <button id="authBtn" class="icon-btn" style="width: 100%; background: var(--tg-primary); color: white; border-radius: 30px; padding: 14px; font-size: 1rem;">Войти</button>
-            <button id="switchAuthBtn" style="margin-top: 20px; background: none; border: none; color: var(--tg-primary); cursor: pointer;">У меня нет аккаунта</button>
+            <input type="text" id="username" placeholder="Имя пользователя">
+            <input type="password" id="password" placeholder="Пароль">
+            <button id="authBtn">Войти</button>
+            <button id="switchAuthBtn" style="background: transparent; color: var(--tg-primary); margin-top: 10px;">У меня нет аккаунта</button>
         </div>
     </div>
 
@@ -428,7 +870,7 @@
                 </div>
             </div>
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Поиск...">
+                <input type="text" id="searchInput" placeholder="🔍 Поиск...">
             </div>
             <div id="userList" class="user-list"></div>
         </div>
@@ -451,16 +893,13 @@
 
             <div id="messagesContainer" class="messages-container"></div>
 
-            <!-- Строка ответа -->
             <div id="replyPreview" class="reply-bar" style="display: none;">
                 <span><span class="reply-author" id="replyAuthor"></span>: <span id="replyText"></span></span>
                 <span class="reply-cancel" id="replyCancel"><i class="fas fa-times"></i></span>
             </div>
 
-            <!-- Превью вложений -->
             <div id="attachmentPreview" class="attachment-previews" style="display: none;"></div>
 
-            <!-- Область ввода -->
             <div class="input-area">
                 <div class="message-input-wrapper">
                     <textarea id="messageInput" placeholder="Сообщение" rows="1"></textarea>
@@ -488,14 +927,16 @@
             <span class="emoji-cat" data-cat="nature">🐶</span>
             <span class="emoji-cat" data-cat="food">🍎</span>
             <span class="emoji-cat" data-cat="activity">⚽</span>
+            <span class="emoji-cat" data-cat="travel">🚗</span>
+            <span class="emoji-cat" data-cat="objects">💡</span>
         </div>
         <div id="emojiGrid" class="emoji-grid"></div>
     </div>
 
-    <!-- Панель подарков -->
+    <!-- Панель подарков (Telegram Premium Style) -->
     <div id="giftPicker" class="gift-picker">
         <div class="emoji-header">
-            <span>Подарки</span>
+            <span>🎁 Подарки Telegram</span>
             <span class="reply-cancel" id="closeGiftPicker"><i class="fas fa-times"></i></span>
         </div>
         <div id="giftGrid" class="gift-grid"></div>
@@ -504,10 +945,10 @@
     <!-- Модалка профиля -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
-            <div class="avatar" style="width:80px; height:80px; margin:0 auto 20px; font-size:2rem;" id="profileAvatar">U</div>
+            <div class="avatar" id="profileAvatar">U</div>
             <h3 id="profileName">Имя</h3>
             <p id="profileStatus">статус</p>
-            <button class="icon-btn" style="margin-top:20px; background:var(--tg-primary); color:white;" id="closeProfile">Закрыть</button>
+            <button id="closeProfile">Закрыть</button>
         </div>
     </div>
 
@@ -515,9 +956,9 @@
     <div id="newChatModal" class="modal">
         <div class="modal-content">
             <h3>Новый чат</h3>
-            <input type="text" id="newChatSearch" placeholder="Введите имя пользователя" style="width:100%; padding:12px; border-radius:30px; border:1px solid var(--tg-border); background:var(--tg-bg); color:var(--tg-text); margin:15px 0;">
-            <div id="newChatUserList" class="user-list" style="max-height:200px;"></div>
-            <button class="icon-btn" id="closeNewChat" style="margin-top:15px;">Отмена</button>
+            <input type="text" id="newChatSearch" placeholder="Введите имя пользователя">
+            <div id="newChatUserList" class="user-list" style="max-height: 250px;"></div>
+            <button id="closeNewChat">Отмена</button>
         </div>
     </div>
 
@@ -525,12 +966,10 @@
     <div class="theme-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></div>
 
     <script type="module">
-        // Импорты Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onChildAdded, onValue, get, update, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // Конфиг Firebase (ваш)
         const firebaseConfig = {
             apiKey: "AIzaSyCczUiqXKnCN7LDTv2zeSU7yzP3AO1N",
             authDomain: "doroschat.firebaseapp.com",
@@ -555,13 +994,64 @@
         let messagesListener = null;
         let typingTimeout = null;
 
-        // ---------- ПОДАРКИ ----------
+        // ---------- ПОДАРКИ (Telegram Premium Style) ----------
         const gifts = [
-            { id: 'cake', emoji: '🎂', name: 'Тортик', gif: 'https://i.giphy.com/media/3o7abAHdYvZdBNnGZq/giphy.gif' },
-            { id: 'heart', emoji: '❤️', name: 'Сердечко', gif: 'https://i.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif' },
-            { id: 'stars', emoji: '✨', name: 'Звёздочки', gif: 'https://i.giphy.com/media/3o7abB06u9bNzA8LC8/giphy.gif' },
-            { id: 'cat', emoji: '🐱', name: 'Котик', gif: 'https://i.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif' },
-            { id: 'fire', emoji: '🔥', name: 'Огонь', gif: 'https://i.giphy.com/media/l0MYt5jH6gkTWm8qo/giphy.gif' },
+            { 
+                id: 'birthday', 
+                emoji: '🎂', 
+                name: 'День рождения', 
+                gif: 'https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/birthday.gif',
+                price: 'Premium'
+            },
+            { 
+                id: 'love', 
+                emoji: '❤️', 
+                name: 'Любовь', 
+                gif: 'https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/love.gif',
+                price: 'Premium'
+            },
+            { 
+                id: 'stars', 
+                emoji: '✨', 
+                name: 'Звёзды', 
+                gif: 'https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/stars.gif',
+                price: 'Premium'
+            },
+            { 
+                id: 'cat', 
+                emoji: '🐱', 
+                name: 'Котик', 
+                gif: 'https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/cat.gif',
+                price: 'Premium'
+            },
+            { 
+                id: 'fire', 
+                emoji: '🔥', 
+                name: 'Огонь', 
+                gif: 'https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/fire.gif',
+                price: 'Premium'
+            },
+            { 
+                id: 'crown', 
+                emoji: '👑', 
+                name: 'Корона', 
+                gif: 'https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/crown.gif',
+                price: 'Premium'
+            },
+            { 
+                id: 'gift', 
+                emoji: '🎁', 
+                name: 'Подарок', 
+                gif: 'https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/gift.gif',
+                price: 'Premium'
+            },
+            { 
+                id: 'balloon', 
+                emoji: '🎈', 
+                name: 'Шарики', 
+                gif: 'https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/balloon.gif',
+                price: 'Premium'
+            }
         ];
 
         // ---------- DOM ЭЛЕМЕНТЫ ----------
@@ -623,12 +1113,12 @@
         function setupEventListeners() {
             authBtn.addEventListener('click', handleAuth);
             switchAuthBtn.addEventListener('click', toggleAuthMode);
-            usernameInp.addEventListener('keypress', e => e.key==='Enter' && handleAuth());
-            passwordInp.addEventListener('keypress', e => e.key==='Enter' && handleAuth());
+            usernameInp.addEventListener('keypress', e => e.key === 'Enter' && handleAuth());
+            passwordInp.addEventListener('keypress', e => e.key === 'Enter' && handleAuth());
 
             searchInput.addEventListener('input', filterChats);
             messageInput.addEventListener('input', handleTyping);
-            messageInput.addEventListener('keypress', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+            messageInput.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
             sendBtn.addEventListener('click', sendMessage);
 
             attachBtn.addEventListener('click', () => fileInput.click());
@@ -652,8 +1142,8 @@
             closeNewChat.addEventListener('click', () => newChatModal.classList.remove('show'));
             newChatSearch.addEventListener('input', searchNewChat);
 
-            callBtn.addEventListener('click', () => showNotification('Звонки пока не поддерживаются'));
-            searchChatBtn.addEventListener('click', () => showNotification('Поиск по чату будет позже'));
+            callBtn.addEventListener('click', () => showNotification('📞 Звонки появятся скоро'));
+            searchChatBtn.addEventListener('click', () => showNotification('🔍 Поиск по чату в разработке'));
 
             document.querySelectorAll('.emoji-cat').forEach(cat => {
                 cat.addEventListener('click', () => {
@@ -664,7 +1154,7 @@
             });
 
             document.getElementById('emojiGrid').addEventListener('click', e => {
-                if(e.target.classList.contains('emoji-item')) insertEmoji(e.target.textContent);
+                if (e.target.classList.contains('emoji-item')) insertEmoji(e.target.textContent);
             });
 
             document.addEventListener('click', (e) => {
@@ -672,7 +1162,7 @@
                 if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) emojiPicker.classList.remove('show');
             });
 
-            messageInput.addEventListener('input', function() {
+            messageInput.addEventListener('input', function () {
                 this.style.height = 'auto';
                 this.style.height = this.scrollHeight + 'px';
             });
@@ -681,7 +1171,7 @@
         // ---------- АВТОРИЗАЦИЯ ----------
         function checkAuthState() {
             const saved = localStorage.getItem('muzaffr_user');
-            if(saved) {
+            if (saved) {
                 currentUser = saved;
                 afterLogin();
             } else {
@@ -692,14 +1182,14 @@
         function handleAuth() {
             const username = usernameInp.value.trim();
             const password = passwordInp.value.trim();
-            if(!username || !password) return showAuthError('Заполните поля');
+            if (!username || !password) return showAuthError('Заполните поля');
 
-            if(authBtn.textContent === 'Регистрация') {
+            if (authBtn.textContent === 'Регистрация') {
                 get(ref(db, `users/${username}`)).then(snap => {
-                    if(snap.exists()) showAuthError('Имя занято');
+                    if (snap.exists()) showAuthError('Имя занято');
                     else {
                         set(ref(db, `users/${username}`), { password, createdAt: Date.now(), lastSeen: Date.now(), status: 'online' })
-                        .then(() => loginUser(username, password));
+                            .then(() => loginUser(username, password));
                     }
                 });
             } else {
@@ -709,11 +1199,11 @@
 
         function loginUser(username, password) {
             get(ref(db, `users/${username}`)).then(snap => {
-                if(!snap.exists()) return showAuthError('Пользователь не найден');
-                if(snap.val().password !== password) return showAuthError('Неверный пароль');
+                if (!snap.exists()) return showAuthError('Пользователь не найден');
+                if (snap.val().password !== password) return showAuthError('Неверный пароль');
                 currentUser = username;
                 localStorage.setItem('muzaffr_user', username);
-                update(ref(db, `users/${username}`), { status:'online', lastSeen: Date.now() });
+                update(ref(db, `users/${username}`), { status: 'online', lastSeen: Date.now() });
                 afterLogin();
             });
         }
@@ -724,7 +1214,7 @@
             chatUserAvatar.textContent = currentUser[0].toUpperCase();
             loadUserList();
             setupPresence();
-            showNotification(`Добро пожаловать, ${currentUser}!`);
+            showNotification(`✨ Добро пожаловать, ${currentUser}!`);
         }
 
         function showAuthError(msg) {
@@ -746,10 +1236,10 @@
                 const usersSnap = await get(ref(db, 'users'));
                 const allUsers = usersSnap.val();
 
-                const sorted = Object.entries(chats).sort((a,b) => (b[1].lastMessage?.timestamp || 0) - (a[1].lastMessage?.timestamp || 0));
-                for(const [chat, data] of sorted) {
+                const sorted = Object.entries(chats).sort((a, b) => (b[1].lastMessage?.timestamp || 0) - (a[1].lastMessage?.timestamp || 0));
+                for (const [chat, data] of sorted) {
                     const other = chat.split('_').find(u => u !== currentUser);
-                    if(allUsers[other]) {
+                    if (allUsers[other]) {
                         const unread = await getUnreadCount(chat);
                         addUserToList(other, allUsers[other], data.lastMessage, unread);
                     }
@@ -762,7 +1252,7 @@
             let count = 0;
             snapshot.forEach(child => {
                 const msg = child.val();
-                if(msg.sender !== currentUser && !msg.read) count++;
+                if (msg.sender !== currentUser && !msg.read) count++;
             });
             return count;
         }
@@ -777,7 +1267,7 @@
                         <span class="user-name">${username}</span>
                         <span class="time-badge">${lastMsg.timestamp ? formatTime(lastMsg.timestamp) : ''}</span>
                     </div>
-                    <div class="last-message">${lastMsg.text ? (lastMsg.text.length>20 ? lastMsg.text.substr(0,20)+'…' : lastMsg.text) : 'Нет сообщений'}</div>
+                    <div class="last-message">${lastMsg.text ? (lastMsg.text.length > 20 ? lastMsg.text.substr(0, 20) + '…' : lastMsg.text) : 'Нет сообщений'}</div>
                 </div>
                 ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}
             `;
@@ -785,7 +1275,7 @@
                 selectUser(username);
                 document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
                 div.classList.add('active');
-                if(window.innerWidth <= 800) sidebar.classList.remove('mobile-show');
+                if (window.innerWidth <= 800) sidebar.classList.remove('mobile-show');
             });
             userListDiv.appendChild(div);
         }
@@ -807,7 +1297,7 @@
         async function loadAllUsersForNewChat() {
             const usersSnap = await get(ref(db, 'users'));
             const users = [];
-            usersSnap.forEach(child => { if(child.key !== currentUser) users.push({ name: child.key }); });
+            usersSnap.forEach(child => { if (child.key !== currentUser) users.push({ name: child.key }); });
             renderNewChatList(users);
         }
 
@@ -827,7 +1317,7 @@
             get(ref(db, 'users')).then(snap => {
                 const filtered = [];
                 snap.forEach(child => {
-                    if(child.key !== currentUser && child.key.toLowerCase().includes(term))
+                    if (child.key !== currentUser && child.key.toLowerCase().includes(term))
                         filtered.push({ name: child.key });
                 });
                 renderNewChatList(filtered);
@@ -851,7 +1341,7 @@
             chatUserAvatar.textContent = username[0].toUpperCase();
             updateUserStatusInHeader();
 
-            if(messagesListener) messagesListener();
+            if (messagesListener) messagesListener();
             messagesContainer.innerHTML = '';
 
             messagesListener = onChildAdded(ref(db, `chats/${chatId}/messages`), (snap) => {
@@ -861,8 +1351,8 @@
 
             onValue(ref(db, `typing/${chatId}/${username}`), (snap) => {
                 const typingDiv = document.getElementById('typingIndicator');
-                if(snap.val()) {
-                    if(!typingDiv) {
+                if (snap.val()) {
+                    if (!typingDiv) {
                         const div = document.createElement('div');
                         div.id = 'typingIndicator';
                         div.className = 'typing-indicator';
@@ -870,14 +1360,14 @@
                         messagesContainer.appendChild(div);
                         messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     }
-                } else if(typingDiv) typingDiv.remove();
+                } else if (typingDiv) typingDiv.remove();
             });
 
             markMessagesAsRead();
         }
 
         function updateUserStatusInHeader() {
-            if(onlineStatus[selectedUser] === 'online') {
+            if (onlineStatus[selectedUser] === 'online') {
                 chatUserStatus.innerHTML = '<span class="status-dot online"></span> online';
                 chatUserAvatar.classList.add('online');
             } else {
@@ -890,7 +1380,7 @@
         function addMessageToChat(msg, msgId) {
             const lastDateDiv = messagesContainer.lastElementChild;
             const msgDate = new Date(msg.timestamp).toDateString();
-            if(!lastDateDiv || !lastDateDiv.classList.contains('date-separator') || lastDateDiv.dataset.date !== msgDate) {
+            if (!lastDateDiv || !lastDateDiv.classList.contains('date-separator') || lastDateDiv.dataset.date !== msgDate) {
                 const sep = document.createElement('div');
                 sep.className = 'date-separator';
                 sep.dataset.date = msgDate;
@@ -903,30 +1393,31 @@
             div.dataset.id = msgId;
 
             let html = '';
-            if(msg.replyTo) {
+            if (msg.replyTo) {
                 html += `<div class="reply-preview"><strong>${msg.replyTo.sender === currentUser ? 'Вы' : msg.replyTo.sender}</strong>: ${msg.replyTo.text || '📎'}</div>`;
             }
 
-            // Подарок
-            if(msg.type === 'gift' && msg.gift) {
+            // Подарок (Telegram Premium Style)
+            if (msg.type === 'gift' && msg.gift) {
                 html += `
                     <div class="gift-message">
-                        <img src="${msg.gift.gif}" alt="${msg.gift.name}" onerror="this.src='https://via.placeholder.com/150?text=${msg.gift.emoji}'">
-                        <div>🎁 ${msg.gift.name}</div>
+                        <img src="${msg.gift.gif}" alt="${msg.gift.name}" onerror="this.src='https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/gift.gif'">
+                        <div class="gift-name">🎁 ${msg.gift.name}</div>
+                        <div class="gift-price">⭐️ Премиум подарок</div>
                     </div>
                 `;
             } else {
-                if(msg.text) {
+                if (msg.text) {
                     const linkedText = msg.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: var(--tg-primary);">$1</a>');
                     html += `<div>${linkedText}</div>`;
                 }
-                if(msg.attachments) {
+                if (msg.attachments) {
                     html += '<div class="attachments">';
                     msg.attachments.forEach(att => {
-                        if(att.type.startsWith('image/'))
+                        if (att.type.startsWith('image/'))
                             html += `<img src="${att.url}" onclick="window.open('${att.url}')">`;
                         else
-                            html += `<div class="file-attach"><i class="fas fa-file"></i> ${att.name} (${formatFileSize(att.size)})</div>`;
+                            html += `<div class="file-attach"><i class="fas fa-file"></i> ${att.name}</div>`;
                     });
                     html += '</div>';
                 }
@@ -942,22 +1433,22 @@
 
         function sendMessage() {
             const text = messageInput.value.trim();
-            if(!text && attachments.length === 0) return;
+            if (!text && attachments.length === 0) return;
 
             const newMsg = {
                 sender: currentUser,
                 timestamp: Date.now(),
                 read: false
             };
-            if(text) newMsg.text = text;
-            if(replyingTo) {
+            if (text) newMsg.text = text;
+            if (replyingTo) {
                 newMsg.replyTo = {
                     messageId: replyingTo.id,
                     sender: replyingTo.sender,
                     text: replyingTo.text
                 };
             }
-            if(attachments.length) newMsg.attachments = attachments;
+            if (attachments.length) newMsg.attachments = attachments;
 
             const msgRef = push(ref(db, `chats/${chatId}/messages`));
             set(msgRef, newMsg).then(() => {
@@ -995,27 +1486,28 @@
                     [`users/${currentUser}/chats/${chatId}/lastMessage`]: lastMsg,
                     [`users/${selectedUser}/chats/${chatId}/lastMessage`]: lastMsg
                 });
+                showNotification(`✨ Вы отправили подарок "${gift.name}"`);
             });
         }
 
         function markMessagesAsRead() {
-            if(!chatId) return;
+            if (!chatId) return;
             get(ref(db, `chats/${chatId}/messages`)).then(snap => {
                 const updates = {};
                 snap.forEach(child => {
                     const msg = child.val();
-                    if(msg.sender !== currentUser && !msg.read) {
+                    if (msg.sender !== currentUser && !msg.read) {
                         updates[`chats/${chatId}/messages/${child.key}/read`] = true;
                     }
                 });
-                if(Object.keys(updates).length) update(ref(db), updates).then(() => loadUserList());
+                if (Object.keys(updates).length) update(ref(db), updates).then(() => loadUserList());
             });
         }
 
         function handleTyping() {
-            if(!chatId) return;
+            if (!chatId) return;
             set(ref(db, `typing/${chatId}/${currentUser}`), true);
-            if(typingTimeout) clearTimeout(typingTimeout);
+            if (typingTimeout) clearTimeout(typingTimeout);
             typingTimeout = setTimeout(() => remove(ref(db, `typing/${chatId}/${currentUser}`)), 2000);
         }
 
@@ -1023,7 +1515,7 @@
         function handleFileUpload(e) {
             const files = Array.from(e.target.files);
             files.forEach(file => {
-                if(file.size > 10*1024*1024) return alert('Файл >10MB');
+                if (file.size > 10 * 1024 * 1024) return alert('Файл >10MB');
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     const item = document.createElement('div');
@@ -1036,15 +1528,15 @@
                     item.querySelector('.remove').addEventListener('click', () => {
                         removeAttachment(file.name);
                         item.remove();
-                        if(attachmentPreview.children.length===0) attachmentPreview.style.display='none';
+                        if (attachmentPreview.children.length === 0) attachmentPreview.style.display = 'none';
                     });
 
                     const fileRef = storageRef(storage, `attachments/${currentUser}/${Date.now()}_${file.name}`);
                     uploadBytes(fileRef, file).then(snap => getDownloadURL(snap.ref)).then(url => {
-                        attachments.push({ name:file.name, type:file.type, size:file.size, url });
+                        attachments.push({ name: file.name, type: file.type, size: file.size, url });
                     });
                 };
-                if(file.type.startsWith('image/')) reader.readAsDataURL(file);
+                if (file.type.startsWith('image/')) reader.readAsDataURL(file);
                 else reader.readAsArrayBuffer(file);
             });
             fileInput.value = '';
@@ -1057,9 +1549,10 @@
         // ---------- ПОДАРКИ ----------
         function renderGifts() {
             giftGrid.innerHTML = gifts.map(g => `
-                <div class="gift-item" data-id="${g.id}" data-emoji="${g.emoji}" data-gif="${g.gif}" data-name="${g.name}">
-                    <img src="${g.gif}" alt="${g.name}" onerror="this.src='https://via.placeholder.com/60?text=${g.emoji}'">
-                    <span>${g.name}</span>
+                <div class="gift-item" data-id="${g.id}" data-emoji="${g.emoji}" data-gif="${g.gif}" data-name="${g.name}" data-price="${g.price}">
+                    <img src="${g.gif}" alt="${g.name}" onerror="this.src='https://cdn.jsdelivr.net/gh/telegram-emoji/gifts/gift.gif'">
+                    <div class="gift-name">${g.name}</div>
+                    <div class="gift-price">⭐️ ${g.price}</div>
                 </div>
             `).join('');
             document.querySelectorAll('.gift-item').forEach(item => {
@@ -1068,7 +1561,8 @@
                         id: item.dataset.id,
                         emoji: item.dataset.emoji,
                         gif: item.dataset.gif,
-                        name: item.dataset.name
+                        name: item.dataset.name,
+                        price: item.dataset.price
                     };
                     sendGift(gift);
                     giftPicker.classList.remove('show');
@@ -1088,9 +1582,11 @@
             nature: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🦄','🐔','🐧','🐦','🐤','🦆','🦅','🦉','🐺'],
             food: ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒','🌽','🥕','🧄'],
             activity: ['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🏓','🏸','🏒','🏑','🥍','🏏','🪃','🥅','⛳','🏹'],
+            travel: ['🚗','🚕','🚙','🚌','🚎','🏎','🚓','🚑','🚒','🚐','🚚','🚛','🚜','🛴','🚲','🛵','🏍','✈️','🚀','🛸','🚁'],
+            objects: ['💡','🔦','📱','📲','💻','🖥','🖨','🖱','🖲','🕹','🗜','💽','💾','💿','📀','📷','📸','📹','🎥','📽']
         };
 
-        function loadEmojis(cat='smile') {
+        function loadEmojis(cat = 'smile') {
             const grid = document.getElementById('emojiGrid');
             grid.innerHTML = emojiLibrary[cat].map(e => `<div class="emoji-item">${e}</div>`).join('');
         }
@@ -1102,17 +1598,17 @@
 
         // ---------- ПРИСУТСТВИЕ ----------
         function setupPresence() {
-            update(ref(db, `users/${currentUser}`), { status:'online', lastSeen:Date.now() });
-            onDisconnect(ref(db, `users/${currentUser}`)).update({ status:'offline', lastSeen:Date.now() });
+            update(ref(db, `users/${currentUser}`), { status: 'online', lastSeen: Date.now() });
+            onDisconnect(ref(db, `users/${currentUser}`)).update({ status: 'offline', lastSeen: Date.now() });
 
             onValue(ref(db, 'users'), (snap) => {
                 const users = snap.val();
                 onlineStatus = {};
-                for(let u in users) if(u !== currentUser) onlineStatus[u] = users[u].status;
-                if(selectedUser) updateUserStatusInHeader();
+                for (let u in users) if (u !== currentUser) onlineStatus[u] = users[u].status;
+                if (selectedUser) updateUserStatusInHeader();
                 document.querySelectorAll('.user-item .avatar').forEach(av => {
                     const name = av.parentElement.querySelector('.user-name').textContent;
-                    if(onlineStatus[name] === 'online') av.classList.add('online');
+                    if (onlineStatus[name] === 'online') av.classList.add('online');
                     else av.classList.remove('online');
                 });
             });
@@ -1120,7 +1616,7 @@
 
         // ---------- ПРОФИЛЬ ----------
         function showProfile() {
-            if(!selectedUser) return showNotification('Выберите чат');
+            if (!selectedUser) return showNotification('Выберите чат');
             profileAvatar.textContent = selectedUser[0].toUpperCase();
             profileName.textContent = selectedUser;
             profileStatus.textContent = onlineStatus[selectedUser] === 'online' ? 'в сети' : 'был(а) недавно';
@@ -1129,7 +1625,7 @@
 
         // ---------- ТЕМА ----------
         function loadTheme() {
-            if(localStorage.getItem('darkMode') === 'true') {
+            if (localStorage.getItem('darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
                 darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
             }
@@ -1152,21 +1648,16 @@
 
         // ---------- УТИЛИТЫ ----------
         function formatTime(ts) {
-            if(!ts) return '';
-            return new Date(ts).toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit' });
+            if (!ts) return '';
+            return new Date(ts).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
         }
         function formatDate(ts) {
             const d = new Date(ts);
             const today = new Date();
-            if(d.toDateString() === today.toDateString()) return 'Сегодня';
-            const yest = new Date(today.setDate(today.getDate()-1));
-            if(d.toDateString() === yest.toDateString()) return 'Вчера';
-            return d.toLocaleDateString('ru', { day:'numeric', month:'long' });
-        }
-        function formatFileSize(bytes) {
-            if(bytes<1024) return bytes+' B';
-            if(bytes<1024*1024) return (bytes/1024).toFixed(1)+' KB';
-            return (bytes/(1024*1024)).toFixed(1)+' MB';
+            if (d.toDateString() === today.toDateString()) return 'Сегодня';
+            const yest = new Date(today.setDate(today.getDate() - 1));
+            if (d.toDateString() === yest.toDateString()) return 'Вчера';
+            return d.toLocaleDateString('ru', { day: 'numeric', month: 'long' });
         }
     </script>
 </body>
