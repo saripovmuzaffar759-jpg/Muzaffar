@@ -2,12 +2,11 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Javoni Lyceum · Электронный журнал</title>
+    <title>Javoni Lyceum · ИИ-Журнал</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Стили без изменений */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: "Inter", sans-serif;
@@ -26,7 +25,7 @@
             height: 200%;
             top: -50%;
             left: -50%;
-            background: radial-gradient(circle at 30% 40%, rgba(0, 180, 255, 0.15) 0%, transparent 30%),
+            background: radial-gradient(circle at 30% 40%, rgba(0, 212, 255, 0.15) 0%, transparent 30%),
                         radial-gradient(circle at 70% 60%, rgba(150, 50, 255, 0.12) 0%, transparent 35%),
                         radial-gradient(circle at 10% 80%, rgba(255, 100, 100, 0.08) 0%, transparent 40%),
                         #0b141f;
@@ -39,7 +38,7 @@
         }
         .card {
             width: 100%;
-            max-width: 1400px;
+            max-width: 1500px;
             background: rgba(18, 28, 40, 0.85);
             backdrop-filter: blur(20px);
             border-radius: 50px;
@@ -276,23 +275,121 @@
         .footer-note i {
             margin-right: 6px;
         }
+        .tab-bar {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            border-bottom: 1px solid #1e3349;
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #98a9c7;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            background: #1f2f4a;
+            color: white;
+        }
+        .tab-btn.active {
+            background: #2f80ff;
+            color: white;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-item {
+            background: #1e2f40;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #3f5f8f;
+        }
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2f80ff;
+            line-height: 1.2;
+        }
+        .stat-label {
+            color: #98b9e6;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .recommendation-list {
+            list-style: none;
+            padding: 0;
+        }
+        .recommendation-item {
+            background: #1e2f40;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-left: 5px solid;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .rec-emergency { border-color: #ff4d4d; }
+        .rec-warning { border-color: #ffaa33; }
+        .rec-good { border-color: #33cc99; }
+        .rec-icon { font-size: 1.5rem; width: 30px; }
+        .rec-text { flex: 1; color: #c9dfff; }
+        .topics-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .topic-tag {
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            border: 1px solid;
+        }
+        .topic-critical { background: #ff4d4d30; border-color: #ff4d4d; color: #ffb3b3; }
+        .topic-warning { background: #ffaa3330; border-color: #ffaa33; color: #ffd9b3; }
+        .topic-good { background: #33cc9930; border-color: #33cc99; color: #b3ffd9; }
+        .topic-excellent { background: #2f80ff30; border-color: #2f80ff; color: #b3d9ff; }
+        
+        .grade-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .grade-1-3 { background: #ff4d4d; color: white; }
+        .grade-4-6 { background: #ffaa33; color: white; }
+        .grade-7-8 { background: #33cc99; color: white; }
+        .grade-9-10 { background: #2f80ff; color: white; }
+        
         @media (max-width: 700px) {
             .card { padding: 25px; border-radius: 35px; }
             h2 { font-size: 2rem; }
             .student-name { font-size: 1.6rem; }
             .avatar { width: 55px; height: 55px; font-size: 1.6rem; }
-            th, td { padding: 10px 8px; font-size: 0.9rem; }
-            .subjects-bar { border-radius: 30px; padding: 8px; }
-            .subject-btn { font-size: 0.9rem; padding: 8px 16px; }
-            .control-panel { flex-direction: column; }
-            .action-btn { padding: 15px 25px; }
+            .tab-btn { font-size: 0.9rem; padding: 8px 15px; }
         }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2><i class="fas fa-gem"></i> Javoni Lyceum</h2>
-        <div class="subtitle"><i class="fas fa-book-open"></i> Выберите предмет</div>
+        <h2><i class="fas fa-robot"></i> Javoni Lyceum · ИИ-Журнал</h2>
+        <div class="subtitle"><i class="fas fa-chart-line"></i> Выберите предмет и введите код ученика</div>
 
         <!-- Панель выбора предметов -->
         <div class="subjects-bar" id="subjectsBar"></div>
@@ -301,10 +398,11 @@
         <div class="control-panel">
             <div class="input-field">
                 <i class="fas fa-key"></i>
-                <input type="text" id="codeInput" placeholder="Введите код для поиска" autocomplete="off">
+                <input type="text" id="codeInput" placeholder="Введите код ученика" autocomplete="off">
             </div>
             <button class="action-btn" id="searchBtn"><i class="fas fa-magnifying-glass"></i> Найти</button>
-            <button class="action-btn" id="showAllBtn"><i class="fas fa-table"></i> Показать всех</button>
+            <button class="action-btn" id="showAllBtn"><i class="fas fa-table"></i> Все ученики</button>
+            <button class="action-btn" id="debugBtn"><i class="fas fa-bug"></i> Диагностика</button>
         </div>
 
         <!-- Индикатор загрузки -->
@@ -317,39 +415,41 @@
         <div id="result" class="result"></div>
 
         <div class="footer-note">
-            <i class="fas fa-cloud-arrow-up"></i> Данные из Google Таблицы
+            <i class="fas fa-cloud-arrow-up"></i> Данные из Google Таблицы · ИИ-аналитика для каждого ученика
         </div>
     </div>
 
     <script>
         (function() {
             // ==================================================================
-            // ⚙️ ID вашей таблицы (можно взять из ссылки)
+            // ⚙️ НАСТРОЙКИ
             // ==================================================================
             const SPREADSHEET_ID = '1EwVlRXOyJAV8C46vsfILuQBRlLimIMEe7JkhCqyjfY0';
             
-            // Соответствие названий предметов и имён листов (как они называются в таблице)
             const subjects = [
-                { name: '⚛️ Физика', sheetName: 'физика' },
-                { name: '📐 Алгебра', sheetName: 'алгебра' },
-                { name: '🔨 Крафт', sheetName: 'крафт' }
+                { name: '⚛️ Физика', sheetName: 'физика', gid: '425210832' },
+                { name: '📐 Алгебра', sheetName: 'алгебра', gid: '1623574883' },
+                { name: '🔨 Крафт', sheetName: 'крафт', gid: '710025517' }
             ];
 
-            // Индексы столбцов (A - код, B - имя, C и далее - данные)
-            const CODE_COLUMN = 0;
-            const NAME_COLUMN = 1;
-            const FIRST_DATA_COLUMN = 2;
+            const CODE_COLUMN = 0;      // колонка с кодом (A)
+            const NAME_COLUMN = 1;       // колонка с именем (B)
+            const FIRST_DATA_COLUMN = 2; // первая колонка с данными (C)
 
             // ==================================================================
             let currentSubjectIndex = 0;
             let students = [];
             let dataHeaders = [];
             let isLoading = false;
+            let currentStudent = null;
+            let activeTab = 'grades';
+            let rawData = '';
 
             const subjectsBar = document.getElementById('subjectsBar');
             const codeInput = document.getElementById('codeInput');
             const searchBtn = document.getElementById('searchBtn');
             const showAllBtn = document.getElementById('showAllBtn');
+            const debugBtn = document.getElementById('debugBtn');
             const loadingDiv = document.getElementById('loading');
             const resultDiv = document.getElementById('result');
 
@@ -373,6 +473,7 @@
                 resultDiv.style.display = 'none';
                 resultDiv.innerHTML = '';
                 codeInput.value = '';
+                currentStudent = null;
                 loadData();
             }
 
@@ -382,17 +483,26 @@
                 loadingDiv.style.display = 'flex';
                 resultDiv.style.display = 'none';
 
-                // Используем альтернативный URL, который гарантированно работает
                 const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
                 
                 try {
                     const response = await fetch(url);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
+                    
                     const csv = await response.text();
+                    rawData = csv;
+                    
+                    if (csv.length < 10) {
+                        showError('Получен пустой ответ от сервера. Проверьте название листа.');
+                        return;
+                    }
+                    
                     parseCSV(csv);
+                    
                 } catch (e) {
-                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-circle-exclamation"></i> Ошибка загрузки: ${e.message}. Проверьте названия листов.</div>`;
-                    resultDiv.style.display = 'block';
+                    console.error('Ошибка загрузки:', e);
+                    showError(`Ошибка загрузки: ${e.message}. Проверьте названия листов (должны быть: физика, алгебра, крафт).`);
                 } finally {
                     isLoading = false;
                     loadingDiv.style.display = 'none';
@@ -404,37 +514,36 @@
                     line.split(',').map(cell => cell.trim().replace(/^"(.*)"$/, '$1'))
                 );
 
-                // Ищем первую строку, где первый столбец похож на число (код)
-                let startRow = -1;
-                for (let i = 0; i < lines.length; i++) {
-                    const cell = lines[i][CODE_COLUMN];
-                    if (cell && cell.trim() !== '' && !isNaN(parseFloat(cell))) {
-                        startRow = i;
-                        break;
-                    }
-                }
-                if (startRow === -1) {
-                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-triangle-exclamation"></i> Не удалось найти данные учеников на этом листе.</div>`;
-                    resultDiv.style.display = 'block';
-                    students = [];
-                    dataHeaders = [];
+                if (lines.length < 2) {
+                    showError('В таблице меньше 2 строк. Нужны минимум заголовок и один ученик.');
                     return;
                 }
 
-                // Заголовки данных — из предыдущей строки, если есть
-                let headerRow = (startRow > 0) ? lines[startRow - 1] : lines[startRow];
+                // Заголовки (темы уроков) - первая строка, начиная с колонки C
                 dataHeaders = [];
-                for (let i = FIRST_DATA_COLUMN; i < headerRow.length; i++) {
-                    dataHeaders.push(headerRow[i] || `Колонка ${i+1}`);
+                if (lines.length > 0) {
+                    for (let i = FIRST_DATA_COLUMN; i < lines[0].length; i++) {
+                        let header = lines[0][i] || `Тема ${i - FIRST_DATA_COLUMN + 1}`;
+                        if (header.trim() === '') {
+                            header = `Тема ${i - FIRST_DATA_COLUMN + 1}`;
+                        }
+                        dataHeaders.push(header);
+                    }
                 }
 
-                // Парсим учеников
+                // Парсим учеников (со второй строки)
                 students = [];
-                for (let i = startRow; i < lines.length; i++) {
+                for (let i = 1; i < lines.length; i++) {
                     const row = lines[i];
+                    
+                    if (row.length < 2) continue;
+                    
                     const code = row[CODE_COLUMN]?.trim();
                     const name = row[NAME_COLUMN]?.trim();
-                    if (!code || !name) continue;
+                    
+                    if (!code || !name || code === '' || name === '') {
+                        continue;
+                    }
 
                     const data = [];
                     for (let j = FIRST_DATA_COLUMN; j < row.length; j++) {
@@ -444,15 +553,296 @@
                 }
             }
 
+            function showError(message) {
+                resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
+                resultDiv.style.display = 'block';
+            }
+
+            function showDebugInfo() {
+                let html = '<div class="error-message" style="background:#1a3344; flex-direction:column; align-items:flex-start;">';
+                html += '<h3 style="color:white;"><i class="fas fa-bug"></i> Диагностика</h3>';
+                
+                html += `<p><strong>Текущий предмет:</strong> ${subjects[currentSubjectIndex].name}</p>`;
+                html += `<p><strong>Лист:</strong> ${subjects[currentSubjectIndex].sheetName}</p>`;
+                html += `<p><strong>URL загрузки:</strong> https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${subjects[currentSubjectIndex].sheetName}</p>`;
+                html += `<p><strong>Статус:</strong> ${isLoading ? 'Загружается...' : 'Готово'}</p>`;
+                html += `<p><strong>Найдено учеников:</strong> ${students.length}</p>`;
+                html += `<p><strong>Тем (заголовков):</strong> ${dataHeaders.length}</p>`;
+                
+                if (dataHeaders.length > 0) {
+                    html += '<p><strong>Первые 5 тем:</strong></p><ul>';
+                    dataHeaders.slice(0, 5).forEach((header, idx) => {
+                        html += `<li>${idx + 1}. ${header}</li>`;
+                    });
+                    if (dataHeaders.length > 5) html += '<li>...</li>';
+                    html += '</ul>';
+                }
+                
+                if (students.length > 0) {
+                    html += '<p><strong>Пример ученика:</strong></p>';
+                    html += '<pre style="background:#0a1a28; padding:10px; border-radius:10px; overflow:auto;">';
+                    html += `Код: ${students[0].code}\n`;
+                    html += `Имя: ${students[0].name}\n`;
+                    html += `Оценки: ${students[0].data.join(', ')}`;
+                    html += '</pre>';
+                    
+                    html += '<p><strong>Доступные коды:</strong> ' + students.slice(0, 10).map(s => s.code).join(', ') + (students.length > 10 ? '...' : '') + '</p>';
+                }
+                
+                if (rawData) {
+                    html += '<h4 style="color:white; margin-top:15px;">Первые 3 строки CSV:</h4>';
+                    html += '<pre style="background:#0a1a28; padding:10px; border-radius:10px; overflow:auto; font-size:12px;">';
+                    const lines = rawData.split('\n').slice(0, 3);
+                    lines.forEach((line, index) => {
+                        html += `Строка ${index}: ${line}\n`;
+                    });
+                    html += '</pre>';
+                }
+                
+                html += '</div>';
+                
+                resultDiv.innerHTML = html;
+                resultDiv.style.display = 'block';
+            }
+
+            function generateAIAnalysis(student) {
+                if (!student || student.data.length === 0) {
+                    return {
+                        avgGrade: 'Нет оценок',
+                        grades1_3: [],
+                        grades4_6: [],
+                        grades7_8: [],
+                        grades9_10: [],
+                        recommendations: [{
+                            type: 'warning',
+                            icon: '📝',
+                            text: 'У ученика пока нет оценок по этому предмету.'
+                        }],
+                        totalGrades: 0
+                    };
+                }
+
+                const allGrades = [];
+                
+                student.data.forEach((grade, index) => {
+                    const trimmedGrade = String(grade).trim();
+                    if (trimmedGrade !== '' && !isNaN(parseFloat(trimmedGrade)) && isFinite(trimmedGrade)) {
+                        const numGrade = parseFloat(trimmedGrade);
+                        allGrades.push({
+                            topic: dataHeaders[index] || `Тема ${index + 1}`,
+                            grade: numGrade
+                        });
+                    }
+                });
+                
+                const grades1_3 = allGrades.filter(g => g.grade >= 1 && g.grade <= 3);
+                const grades4_6 = allGrades.filter(g => g.grade >= 4 && g.grade <= 6);
+                const grades7_8 = allGrades.filter(g => g.grade >= 7 && g.grade <= 8);
+                const grades9_10 = allGrades.filter(g => g.grade >= 9 && g.grade <= 10);
+                
+                const avgGrade = allGrades.length > 0 
+                    ? (allGrades.reduce((a, b) => a + b.grade, 0) / allGrades.length).toFixed(2)
+                    : 'Нет оценок';
+                
+                const recommendations = [];
+                
+                if (grades1_3.length > 0) {
+                    recommendations.push({
+                        type: 'emergency',
+                        icon: '🚨',
+                        text: `Критически низкие оценки (1-3 балла): ${grades1_3.map(g => `${g.topic} (${g.grade})`).join(', ')}`
+                    });
+                }
+                
+                if (grades4_6.length > 0) {
+                    recommendations.push({
+                        type: 'warning',
+                        icon: '⚠️',
+                        text: `Нужно подтянуть (4-6 баллов): ${grades4_6.map(g => `${g.topic} (${g.grade})`).join(', ')}`
+                    });
+                }
+                
+                if (grades7_8.length > 0) {
+                    recommendations.push({
+                        type: 'good',
+                        icon: '👍',
+                        text: `Хорошие результаты (7-8 баллов): ${grades7_8.map(g => `${g.topic} (${g.grade})`).join(', ')}`
+                    });
+                }
+                
+                if (grades9_10.length > 0) {
+                    recommendations.push({
+                        type: 'good',
+                        icon: '🏆',
+                        text: `Отличные результаты (9-10 баллов): ${grades9_10.map(g => `${g.topic} (${g.grade})`).join(', ')}`
+                    });
+                }
+                
+                if (avgGrade !== 'Нет оценок') {
+                    const avg = parseFloat(avgGrade);
+                    if (avg <= 3) {
+                        recommendations.push({
+                            type: 'emergency',
+                            icon: '🎯',
+                            text: `Средний балл ${avgGrade}. Нужно срочно исправлять оценки!`
+                        });
+                    } else if (avg <= 5) {
+                        recommendations.push({
+                            type: 'warning',
+                            icon: '📚',
+                            text: `Средний балл ${avgGrade}. Есть куда расти.`
+                        });
+                    } else if (avg <= 7) {
+                        recommendations.push({
+                            type: 'good',
+                            icon: '👍',
+                            text: `Средний балл ${avgGrade}. Хороший результат!`
+                        });
+                    } else {
+                        recommendations.push({
+                            type: 'good',
+                            icon: '🏆',
+                            text: `Средний балл ${avgGrade}. Отличный результат!`
+                        });
+                    }
+                }
+                
+                return {
+                    avgGrade,
+                    grades1_3,
+                    grades4_6,
+                    grades7_8,
+                    grades9_10,
+                    recommendations,
+                    totalGrades: allGrades.length
+                };
+            }
+
+            function showGradesTab(student) {
+                let html = `
+                    <div class="student-header">
+                        <div class="avatar"><i class="fas fa-user-graduate"></i></div>
+                        <span class="student-name">${student.name}</span>
+                    </div>
+                    
+                    <div class="tab-bar">
+                        <button class="tab-btn active" onclick="window.switchTab('grades')"><i class="fas fa-list"></i> Оценки и темы</button>
+                        <button class="tab-btn" onclick="window.switchTab('ai')"><i class="fas fa-robot"></i> ИИ-Аналитика</button>
+                    </div>
+                `;
+                
+                if (dataHeaders.length > 0 && student.data.length > 0) {
+                    html += '<div class="table-wrapper"><table><tr>';
+                    dataHeaders.forEach(h => html += `<th>${h}</th>`);
+                    html += '</tr><tr>';
+                    student.data.forEach(v => {
+                        html += `<td>${v || '-'}</td>`;
+                    });
+                    html += '</tr></table></div>';
+                    
+                    html += '<div style="margin-top: 15px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">';
+                    html += '<span><span style="color: #ff4d4d;">●</span> 1-3 (критично)</span>';
+                    html += '<span><span style="color: #ffaa33;">●</span> 4-6 (нужно подтянуть)</span>';
+                    html += '<span><span style="color: #33cc99;">●</span> 7-8 (хорошо)</span>';
+                    html += '<span><span style="color: #2f80ff;">●</span> 9-10 (отлично)</span>';
+                    html += '</div>';
+                } else {
+                    html += '<p style="color:#7f9bc0; text-align:center;">Нет данных об оценках</p>';
+                }
+                
+                return html;
+            }
+            
+            function showAITab(student) {
+                const analysis = generateAIAnalysis(student);
+                
+                let html = `
+                    <div class="student-header">
+                        <div class="avatar"><i class="fas fa-robot"></i></div>
+                        <span class="student-name">ИИ-Аналитика для ${student.name}</span>
+                    </div>
+                    
+                    <div class="tab-bar">
+                        <button class="tab-btn" onclick="window.switchTab('grades')"><i class="fas fa-list"></i> Оценки и темы</button>
+                        <button class="tab-btn active" onclick="window.switchTab('ai')"><i class="fas fa-robot"></i> ИИ-Аналитика</button>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">${analysis.avgGrade}</div>
+                            <div class="stat-label">Средний балл</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${analysis.totalGrades}</div>
+                            <div class="stat-label">Всего оценок</div>
+                        </div>
+                    </div>
+                `;
+                
+                if (analysis.grades9_10.length > 0) {
+                    html += '<h3 style="color:white; margin:20px 0 10px;">🏆 Отличные результаты (9-10 баллов):</h3>';
+                    html += '<div class="topics-container">';
+                    analysis.grades9_10.forEach(item => {
+                        html += `<span class="topic-tag topic-excellent">${item.topic} <span class="grade-badge grade-9-10">${item.grade}</span></span>`;
+                    });
+                    html += '</div>';
+                }
+                
+                if (analysis.grades7_8.length > 0) {
+                    html += '<h3 style="color:white; margin:20px 0 10px;">👍 Хорошие результаты (7-8 баллов):</h3>';
+                    html += '<div class="topics-container">';
+                    analysis.grades7_8.forEach(item => {
+                        html += `<span class="topic-tag topic-good">${item.topic} <span class="grade-badge grade-7-8">${item.grade}</span></span>`;
+                    });
+                    html += '</div>';
+                }
+                
+                if (analysis.grades4_6.length > 0) {
+                    html += '<h3 style="color:white; margin:20px 0 10px;">⚠️ Нужно подтянуть (4-6 баллов):</h3>';
+                    html += '<div class="topics-container">';
+                    analysis.grades4_6.forEach(item => {
+                        html += `<span class="topic-tag topic-warning">${item.topic} <span class="grade-badge grade-4-6">${item.grade}</span></span>`;
+                    });
+                    html += '</div>';
+                }
+                
+                if (analysis.grades1_3.length > 0) {
+                    html += '<h3 style="color:white; margin:20px 0 10px;">🚨 Критически низкие оценки (1-3 балла):</h3>';
+                    html += '<div class="topics-container">';
+                    analysis.grades1_3.forEach(item => {
+                        html += `<span class="topic-tag topic-critical">${item.topic} <span class="grade-badge grade-1-3">${item.grade}</span></span>`;
+                    });
+                    html += '</div>';
+                }
+                
+                html += '<h3 style="color:white; margin:20px 0 10px;">💡 Персональные рекомендации:</h3>';
+                html += '<div class="recommendation-list">';
+                
+                analysis.recommendations.forEach(rec => {
+                    let recClass = 'rec-good';
+                    if (rec.type === 'emergency') recClass = 'rec-emergency';
+                    if (rec.type === 'warning') recClass = 'rec-warning';
+                    
+                    html += `
+                        <div class="recommendation-item ${recClass}">
+                            <div class="rec-icon">${rec.icon}</div>
+                            <div class="rec-text">${rec.text}</div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                
+                return html;
+            }
+
             function showAllStudents() {
                 if (isLoading) {
-                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-spinner fa-pulse"></i> Данные загружаются...</div>`;
-                    resultDiv.style.display = 'block';
+                    showError('Данные загружаются, подожди...');
                     return;
                 }
                 if (students.length === 0) {
-                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-info-circle"></i> Нет данных для отображения</div>`;
-                    resultDiv.style.display = 'block';
+                    showError('Нет данных для отображения');
                     return;
                 }
 
@@ -462,66 +852,75 @@
                         <span class="student-name">Все ученики (${students.length})</span>
                     </div>
                 `;
+                
                 html += '<div class="table-wrapper"><table><tr>';
                 html += '<th>Код</th><th>Имя</th>';
                 dataHeaders.forEach(h => html += `<th>${h}</th>`);
                 html += '</tr>';
+                
                 students.forEach(s => {
                     html += '<tr>';
                     html += `<td>${s.code}</td>`;
                     html += `<td>${s.name}</td>`;
-                    s.data.forEach(v => html += `<td>${v}</td>`);
+                    s.data.forEach(v => html += `<td>${v || '-'}</td>`);
                     html += '</tr>';
                 });
+                
                 html += '</table></div>';
+                
                 resultDiv.innerHTML = html;
                 resultDiv.style.display = 'block';
             }
 
             function findStudent() {
                 const query = codeInput.value.trim();
+
                 if (isLoading) {
-                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-spinner fa-pulse"></i> Данные загружаются...</div>`;
-                    resultDiv.style.display = 'block';
+                    showError('Данные загружаются, подожди...');
                     return;
                 }
+
                 if (!query) {
-                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Введите код</div>`;
-                    resultDiv.style.display = 'block';
+                    showError('Введите код ученика');
+                    return;
+                }
+
+                if (students.length === 0) {
+                    showError('Нет данных об учениках. Нажми "Диагностика" чтобы узнать причину.');
                     return;
                 }
 
                 const student = students.find(s => s.code === query);
                 if (!student) {
-                    resultDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Ученик с кодом «${query}» не найден</div>`;
-                    resultDiv.style.display = 'block';
+                    showError(`Ученик с кодом «${query}» не найден.`);
                     return;
                 }
 
-                let html = `
-                    <div class="student-header">
-                        <div class="avatar"><i class="fas fa-user-astronaut"></i></div>
-                        <span class="student-name">${student.name}</span>
-                    </div>
-                `;
-                if (dataHeaders.length > 0 && student.data.length > 0) {
-                    html += '<div class="table-wrapper"><table><tr>';
-                    dataHeaders.forEach(h => html += `<th>${h}</th>`);
-                    html += '</tr><tr>';
-                    student.data.forEach(v => html += `<td>${v}</td>`);
-                    html += '</tr></table></div>';
-                } else {
-                    html += '<p style="color:#7f9bc0; text-align:center;">Нет дополнительных данных</p>';
-                }
-                resultDiv.innerHTML = html;
+                currentStudent = student;
+                activeTab = 'grades';
+                resultDiv.innerHTML = showGradesTab(student);
                 resultDiv.style.display = 'block';
             }
+            
+            window.switchTab = function(tab) {
+                if (!currentStudent) return;
+                activeTab = tab;
+                
+                if (tab === 'grades') {
+                    resultDiv.innerHTML = showGradesTab(currentStudent);
+                } else {
+                    resultDiv.innerHTML = showAITab(currentStudent);
+                }
+            };
 
+            // Инициализация
             buildSubjectsBar();
             loadData();
 
+            // Обработчики
             searchBtn.addEventListener('click', findStudent);
             showAllBtn.addEventListener('click', showAllStudents);
+            debugBtn.addEventListener('click', showDebugInfo);
             codeInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') findStudent();
             });
