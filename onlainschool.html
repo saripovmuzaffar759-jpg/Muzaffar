@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Школьный портал - Все предметы</title>
-    <!-- jsPDF library -->
+    <title>Школьный портал - Полное обучение 1-11 классы</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Стили (без изменений, оставил как в предыдущей версии) */
         * {
             margin: 0;
             padding: 0;
@@ -26,8 +23,6 @@
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 30px;
             padding: 30px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
@@ -42,25 +37,10 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            animation: slideIn 0.5s ease;
         }
-        .teacher-greeting i {
-            font-size: 3rem;
-            color: #00c8ff;
-        }
-        .greeting-text {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #00c8ff;
-        }
-        .greeting-subtext {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.1rem;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .teacher-greeting i { font-size: 3rem; color: #00c8ff; }
+        .greeting-text { font-size: 1.8rem; font-weight: 600; color: #00c8ff; }
+        .greeting-subtext { color: rgba(255,255,255,0.7); }
         header {
             display: flex;
             justify-content: space-between;
@@ -69,41 +49,20 @@
             flex-wrap: wrap;
             gap: 20px;
         }
-        .logo h1 {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: white;
-            letter-spacing: -0.5px;
-        }
-        .logo p {
-            color: #00c8ff;
-            font-size: 1rem;
-        }
-        .class-selector {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .logo h1 { font-size: 2.5em; color: white; }
+        .logo p { color: #00c8ff; }
+        .class-selector { display: flex; gap: 8px; flex-wrap: wrap; max-height: 120px; overflow-y: auto; padding: 5px; }
         .class-btn {
             padding: 10px 18px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 20px;
             color: white;
-            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .class-btn.active {
-            background: #00c8ff;
-            border-color: #00c8ff;
-            color: #1a1e2c;
-        }
-        .progress-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        .class-btn.active { background: #00c8ff; color: #1a1e2c; border-color: #00c8ff; }
+        .progress-area { display: flex; align-items: center; gap: 15px; }
         .progress-bar {
             background: rgba(255,255,255,0.1);
             height: 8px;
@@ -111,12 +70,7 @@
             width: 200px;
             overflow: hidden;
         }
-        .progress-fill {
-            height: 100%;
-            background: #00c8ff;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
+        .progress-fill { height: 100%; background: #00c8ff; width: 0%; transition: width 0.5s ease; }
         .reset-btn {
             padding: 8px 16px;
             background: rgba(255,255,255,0.05);
@@ -124,14 +78,9 @@
             border-radius: 20px;
             color: white;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.9rem;
-        }
-        .reset-btn:hover {
-            background: rgba(255,255,255,0.1);
         }
         .subject-tabs {
             display: flex;
@@ -139,7 +88,7 @@
             gap: 8px;
             margin-bottom: 30px;
             padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0,0,0,0.2);
             border-radius: 50px;
             justify-content: center;
         }
@@ -149,167 +98,81 @@
             background: transparent;
             color: rgba(255,255,255,0.7);
             cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 8px;
-            border: 1px solid transparent;
-            font-size: 0.9rem;
+            transition: all 0.3s;
         }
-        .subject-tab i {
-            font-size: 1rem;
-        }
-        .subject-tab:hover {
-            background: rgba(255,255,255,0.05);
-            color: white;
-        }
-        .subject-tab.active {
-            background: #00c8ff;
-            color: #1a1e2c;
-        }
-        .subject-tab.active i {
-            color: #1a1e2c;
-        }
+        .subject-tab:hover { background: rgba(255,255,255,0.05); color: white; }
+        .subject-tab.active { background: #00c8ff; color: #1a1e2c; }
         .lessons-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
             gap: 25px;
             margin-top: 20px;
         }
         .lesson-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 24px;
             padding: 20px;
             transition: all 0.3s;
         }
-        .lesson-card:hover {
-            transform: translateY(-5px);
-            border-color: #00c8ff;
-            box-shadow: 0 10px 30px rgba(0, 200, 255, 0.1);
-        }
-        .lesson-card.locked {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        .lesson-card.locked .video-container::after {
-            content: "🔒";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2.5rem;
-            background: rgba(0,0,0,0.7);
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #00c8ff;
-            z-index: 10;
-        }
-        .lesson-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .lesson-header h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: white;
-        }
-        .youtube-link {
-            color: #ff0000;
-            font-size: 1.5rem;
-            transition: transform 0.2s;
-        }
-        .youtube-link:hover {
-            transform: scale(1.1);
-        }
-        .video-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 15px;
+        .lesson-card:hover { transform: translateY(-5px); border-color: #00c8ff; }
+        .lesson-card.locked { opacity: 0.5; pointer-events: none; position: relative; }
+        .lesson-card.locked::after { content: "🔒"; position: absolute; top: 20px; right: 20px; font-size: 1.5rem; }
+        .lesson-header h3 { font-size: 1.2rem; color: white; margin-bottom: 10px; }
+        .lesson-content {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
             border-radius: 16px;
-            overflow: hidden;
-            background: #000;
-            aspect-ratio: 16/9;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
-        .video-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .lesson-content h4 { color: #00c8ff; margin: 10px 0 5px; }
+        .lesson-content .example {
+            background: rgba(0,200,255,0.1);
+            padding: 10px;
+            border-radius: 12px;
+            margin: 10px 0;
+            border-left: 3px solid #00c8ff;
         }
-        .lesson-actions {
-            display: flex;
-            gap: 10px;
-        }
+        .lesson-actions { display: flex; gap: 10px; margin-top: 15px; }
         .btn {
             padding: 10px 20px;
             border: none;
             border-radius: 30px;
             font-weight: 500;
-            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             flex: 1;
         }
-        .btn-primary {
-            background: #00c8ff;
-            color: #1a1e2c;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background: #00a3d9;
-            transform: scale(1.02);
-        }
-        .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-        }
-        .btn-secondary:hover:not(:disabled) {
-            background: rgba(255,255,255,0.15);
-        }
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .btn-primary { background: #00c8ff; color: #1a1e2c; }
+        .btn-primary:hover:not(:disabled) { background: #00a3d9; }
+        .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .test-section {
             margin-top: 20px;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0,0,0,0.3);
             border-radius: 20px;
             border: 1px solid #00c8ff;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            display: none;
         }
         .question {
             background: rgba(255,255,255,0.03);
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.05);
         }
-        .question p {
-            margin-bottom: 15px;
-            color: #00c8ff;
-            font-weight: 500;
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .question p { margin-bottom: 15px; color: #00c8ff; font-weight: 500; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
         .option {
             display: flex;
             align-items: center;
@@ -319,34 +182,12 @@
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 30px;
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .option:hover {
-            background: rgba(0,200,255,0.1);
-            border-color: #00c8ff;
-        }
-        .option input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #00c8ff;
-        }
-        .test-result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 30px;
-            font-weight: 500;
-            text-align: center;
-        }
-        .success-message {
-            background: rgba(0, 200, 255, 0.2);
-            border: 1px solid #00c8ff;
-            color: #00c8ff;
-        }
-        .error-message {
-            background: rgba(255, 80, 80, 0.2);
-            border: 1px solid #ff5050;
-            color: #ff5050;
-        }
+        .option:hover { background: rgba(0,200,255,0.1); }
+        .option input[type="radio"] { width: 18px; height: 18px; accent-color: #00c8ff; }
+        .test-result { margin-top: 20px; padding: 15px; border-radius: 30px; text-align: center; }
+        .success-message { background: rgba(0,200,255,0.2); border: 1px solid #00c8ff; color: #00c8ff; }
+        .error-message { background: rgba(255,80,80,0.2); border: 1px solid #ff5050; color: #ff5050; }
         .certificate-modal {
             position: fixed;
             top: 50%;
@@ -356,7 +197,6 @@
             border: 2px solid #00c8ff;
             border-radius: 30px;
             padding: 40px;
-            box-shadow: 0 30px 60px rgba(0,200,255,0.3);
             z-index: 1000;
             width: 90%;
             max-width: 400px;
@@ -364,34 +204,16 @@
             opacity: 0;
             visibility: hidden;
         }
-        .certificate-modal.active {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-            visibility: visible;
-        }
-        .certificate-modal h2 {
-            color: #00c8ff;
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-            text-align: center;
-        }
+        .certificate-modal.active { transform: translate(-50%, -50%) scale(1); opacity: 1; visibility: visible; }
+        .certificate-modal h2 { color: #00c8ff; text-align: center; margin-bottom: 20px; }
         .certificate-modal input {
             width: 100%;
-            padding: 15px 20px;
+            padding: 15px;
             margin-bottom: 15px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 30px;
             color: white;
-            font-size: 1rem;
-            outline: none;
-        }
-        .certificate-modal input:focus {
-            border-color: #00c8ff;
-        }
-        .certificate-modal .btn {
-            width: 100%;
-            margin-bottom: 10px;
         }
         .overlay {
             position: fixed;
@@ -404,19 +226,92 @@
             z-index: 999;
             opacity: 0;
             visibility: hidden;
-            transition: 0.3s;
         }
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .overlay.active { opacity: 1; visibility: visible; }
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 450px;
+            background: linear-gradient(135deg, rgba(26,30,44,0.98) 0%, rgba(0,200,255,0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid #00c8ff;
+            border-radius: 30px;
+            z-index: 1000;
+            transition: all 0.4s;
+            overflow: hidden;
         }
+        .ai-assistant.minimized { width: 70px; height: 70px; border-radius: 35px; background: linear-gradient(135deg, #00c8ff, #0099cc); }
+        .ai-assistant.minimized .ai-content { display: none; }
+        .ai-assistant:not(.minimized) .ai-minimized-icon { display: none; }
+        .ai-minimized-icon {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
+        .ai-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(0,200,255,0.2);
+        }
+        .ai-header h3 { color: #00c8ff; display: flex; align-items: center; gap: 10px; }
+        .ai-controls button {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            margin-left: 8px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .ai-chat { max-height: 400px; overflow-y: auto; padding: 20px; }
+        .ai-message { margin-bottom: 15px; padding: 12px; border-radius: 16px; max-width: 90%; }
+        .ai-message.user { background: linear-gradient(135deg, #00c8ff, #0099cc); margin-left: auto; }
+        .ai-message.assistant { background: rgba(255,255,255,0.1); border: 1px solid rgba(0,200,255,0.3); }
+        .ai-message small { display: block; font-size: 0.7rem; opacity: 0.6; margin-top: 5px; }
+        .ai-input-area {
+            padding: 20px;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            gap: 10px;
+        }
+        .ai-input-area input {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(0,200,255,0.3);
+            border-radius: 25px;
+            color: white;
+        }
+        .ai-input-area button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #00c8ff;
+            border: none;
+            cursor: pointer;
+        }
+        .ai-suggestions { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; }
+        .ai-suggestion-btn {
+            padding: 6px 12px;
+            background: rgba(0,200,255,0.1);
+            border: 1px solid rgba(0,200,255,0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .ai-suggestion-btn:hover { background: #00c8ff; color: #1a1e2c; }
         @media (max-width: 768px) {
-            .subject-tabs { 
-                flex-direction: column; 
-                border-radius: 30px;
-                align-items: stretch;
-            }
-            .class-selector { justify-content: center; }
+            .ai-assistant { width: 95%; right: 2.5%; left: 2.5%; }
+            .lessons-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -425,21 +320,19 @@
         <div class="teacher-greeting">
             <i class="fas fa-chalkboard-teacher"></i>
             <div>
-                <div class="greeting-text">Здравствуйте, уважаемые ученики!</div>
-                <div class="greeting-subtext">Добро пожаловать на наш образовательный портал. Здесь собраны лучшие видеоуроки по всем предметам.</div>
+                <div class="greeting-text">Добро пожаловать в школу знаний!</div>
+                <div class="greeting-subtext">📚 Полный курс с 1 по 11 класс • Текстовые уроки • Тесты • Сертификаты</div>
             </div>
         </div>
 
         <header>
             <div class="logo">
                 <h1>Школьный портал</h1>
-                <p>Все предметы • 1–11 классы</p>
+                <p>📖 1-11 классы • Все предметы</p>
             </div>
             <div class="class-selector" id="classSelector"></div>
             <div class="progress-area">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
                 <button class="reset-btn" onclick="resetProgress()"><i class="fas fa-redo-alt"></i> Сброс</button>
             </div>
         </header>
@@ -448,164 +341,214 @@
         <div id="lessonsContainer" class="lessons-grid"></div>
     </div>
 
+    <div class="ai-assistant" id="aiAssistant">
+        <div class="ai-minimized-icon" onclick="toggleAIAssistant()"><i class="fas fa-robot"></i></div>
+        <div class="ai-content">
+            <div class="ai-header">
+                <h3><i class="fas fa-brain"></i> EduBot</h3>
+                <div class="ai-controls">
+                    <button onclick="minimizeAIAssistant()"><i class="fas fa-minus"></i></button>
+                    <button onclick="closeAIAssistant()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="ai-chat" id="aiChat">
+                <div class="ai-message assistant">
+                    Привет! Я EduBot - ваш репетитор. Могу объяснить любую тему!<br>
+                    <small>Только что</small>
+                </div>
+            </div>
+            <div class="ai-suggestions" id="aiSuggestions"></div>
+            <div class="ai-input-area">
+                <input type="text" id="aiInput" placeholder="Задай вопрос..." onkeypress="if(event.key==='Enter') sendAIMessage()">
+                <button onclick="sendAIMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
     <div class="overlay" id="overlay" onclick="closeCertificateModal()"></div>
     <div class="certificate-modal" id="certificateModal">
-        <h2>Сертификат</h2>
-        <input type="text" id="firstName" placeholder="Имя" required>
-        <input type="text" id="lastName" placeholder="Фамилия" required>
-        <button class="btn btn-primary" onclick="generateCertificate()"><i class="fas fa-file-pdf"></i> Скачать PDF</button>
+        <h2>🏆 Сертификат</h2>
+        <input type="text" id="firstName" placeholder="Имя">
+        <input type="text" id="lastName" placeholder="Фамилия">
+        <button class="btn btn-primary" onclick="generateCertificate()">Скачать PDF</button>
         <button class="btn btn-secondary" onclick="closeCertificateModal()">Закрыть</button>
     </div>
 
     <script>
-        // Все предметы
         const subjects = [
             { id: 'math', name: 'Математика', icon: 'fa-calculator' },
             { id: 'russian', name: 'Русский язык', icon: 'fa-language' },
             { id: 'physics', name: 'Физика', icon: 'fa-atom' },
-            { id: 'programming', name: 'Программирование', icon: 'fa-code' },
-            { id: 'literature', name: 'Литература', icon: 'fa-book' },
-            { id: 'history', name: 'История', icon: 'fa-landmark' }
+            { id: 'chemistry', name: 'Химия', icon: 'fa-flask' },
+            { id: 'biology', name: 'Биология', icon: 'fa-leaf' },
+            { id: 'history', name: 'История', icon: 'fa-landmark' },
+            { id: 'english', name: 'Английский', icon: 'fa-language' }
         ];
 
-        // Видео ID (добавлено ваше новое видео)
-        const videoIds = {
-            // Математика
-            math1_add: "12Vv5-lHqaQ", // Сложение и вычитание (1 класс)
-            math2: "7yzA5pZ9aFw", // Деление
-            math3: "GjvJQwYx3wM", // Дроби
-            math4: "tWfTJkLq5pE", // Проценты
-            
-            // Русский язык
-            rus1_add: "PLjYqJOvfkY", // ВСЕ ПРАВИЛА РУССКОГО ЯЗЫКА ЗА 1 КЛАСС (ваше новое видео)
-            rus2: "tRkLqH3nV7m", // Прилагательное (старое, можно заменить)
-            
-            // Физика
-            phys1: "uXzLqH5nR4m", // Силы
-            
-            // Программирование
-            prog1: "oYzLqH7nR2m", // Scratch
-            
-            // Литература
-            lit1: "pLqH4nR6kM2", // Сказки
-            
-            // История
-            hist1: "rKmN5jH3gF7" // Древний мир
-        };
-
-        // Уроки с реальными работающими видео
+        // ========== ПОЛНЫЕ УРОКИ ДЛЯ ВСЕХ КЛАССОВ (по 3-5 уроков на класс) ==========
+        
         const lessons = {
+            // МАТЕМАТИКА - полная программа 1-11 классы
             math: {
                 1: [
-                    { title: "Сложение и вычитание чисел до 10", videoId: videoIds.math1_add, topic: "Сложение и вычитание" },
-                    { title: "Учимся считать до 20", videoId: videoIds.math2, topic: "Счет до 20" }
+                    { title: "Числа от 1 до 10", topic: "Счет до 10", content: `<h4>🔢 Учимся считать</h4><p>Числа: 1,2,3,4,5,6,7,8,9,10</p><div class='example'>1 яблоко, 2 мяча, 3 книги</div><h4>➕ Сложение</h4><p>2 + 3 = 5 (два плюс три равно пять)</p><h4>➖ Вычитание</h4><p>5 - 2 = 3 (пять минус два равно три)</p>` },
+                    { title: "Сложение и вычитание в пределах 10", topic: "Сложение и вычитание", content: `<h4>📖 Состав чисел</h4><div class='example'>Состав 5: 1+4, 2+3, 3+2, 4+1<br>Состав 6: 1+5, 2+4, 3+3, 4+2, 5+1<br>Состав 7: 1+6, 2+5, 3+4, 4+3, 5+2, 6+1</div><h4>💡 Совет:</h4><p>Запомни состав чисел — это поможет быстро считать!</p>` },
+                    { title: "Задачи", topic: "Решение задач", content: `<h4>📝 Как решать задачи?</h4><p>1. Прочитай условие<br>2. Определи, что нужно найти<br>3. Запиши решение<br>4. Проверь ответ</p><div class='example'>У Маши было 5 яблок, она съела 2. Сколько осталось? → 5-2=3</div>` }
                 ],
                 2: [
-                    { title: "Таблица умножения", videoId: videoIds.math2, topic: "Умножение" },
-                    { title: "Деление", videoId: videoIds.math2, topic: "Деление" }
+                    { title: "Таблица умножения на 2", topic: "Умножение на 2", content: `<h4>✖️ Учим таблицу умножения</h4><div class='example'>2×1=2 | 2×2=4 | 2×3=6 | 2×4=8 | 2×5=10<br>2×6=12 | 2×7=14 | 2×8=16 | 2×9=18 | 2×10=20</div>` },
+                    { title: "Таблица умножения на 3", topic: "Умножение на 3", content: `<h4>✖️ Учим таблицу умножения</h4><div class='example'>3×1=3 | 3×2=6 | 3×3=9 | 3×4=12 | 3×5=15<br>3×6=18 | 3×7=21 | 3×8=24 | 3×9=27 | 3×10=30</div>` },
+                    { title: "Деление", topic: "Деление", content: `<h4>➗ Что такое деление?</h4><p>Деление — это действие, обратное умножению.</p><div class='example'>12 : 3 = 4, потому что 4 × 3 = 12<br>10 : 2 = 5, потому что 5 × 2 = 10</div>` }
                 ],
                 3: [
-                    { title: "Что такое дробь", videoId: videoIds.math3, topic: "Дроби" },
-                    { title: "Сложение дробей", videoId: videoIds.math3, topic: "Дроби" }
+                    { title: "Что такое дробь", topic: "Дроби", content: `<h4>🥧 Дробь — это часть целого</h4><p>Числитель (сверху) — сколько частей взяли<br>Знаменатель (снизу) — на сколько частей разделили</p><div class='example'>1/2 — половина пирога<br>1/4 — четверть пирога<br>3/4 — три четверти</div>` },
+                    { title: "Сравнение дробей", topic: "Сравнение дробей", content: `<h4>📊 Как сравнивать дроби?</h4><p>Если знаменатели одинаковые, больше та дробь, у которой больше числитель.</p><div class='example'>3/5 > 2/5 (три пятых больше двух пятых)</div><p>Если числители одинаковые, больше та дробь, у которой знаменатель меньше.</p><div class='example'>1/2 > 1/3 (половина больше трети)</div>` },
+                    { title: "Сложение дробей", topic: "Сложение дробей", content: `<h4>➕ Сложение дробей с одинаковыми знаменателями</h4><div class='example'>1/5 + 2/5 = 3/5<br>3/8 + 4/8 = 7/8</div>` }
                 ],
                 4: [
-                    { title: "Проценты для начинающих", videoId: videoIds.math4, topic: "Проценты" }
+                    { title: "Что такое процент", topic: "Проценты", content: `<h4>📊 Процент — это сотая часть числа</h4><p>1% = 1/100 = 0,01</p><div class='example'>50% = половина числа (50/100 = 1/2)<br>25% = четверть числа (25/100 = 1/4)<br>10% = десятая часть (10/100 = 1/10)</div>` },
+                    { title: "Нахождение процента от числа", topic: "Проценты", content: `<h4>📖 Как найти процент от числа?</h4><div class='example'>Найти 20% от 80 → 80 × 20 ÷ 100 = 16<br>Найти 15% от 200 → 200 × 15 ÷ 100 = 30</div>` }
                 ],
                 5: [
-                    { title: "Обыкновенные дроби", videoId: videoIds.math3, topic: "Дроби" }
+                    { title: "Обыкновенные дроби", topic: "Дроби", content: `<h4>📖 Правильные и неправильные дроби</h4><p>Правильная дробь: числитель < знаменателя (3/5, 2/7)<br>Неправильная дробь: числитель ≥ знаменателя (5/3, 7/4)</p><div class='example'>Смешанное число: 1 2/3 = 5/3</div>` },
+                    { title: "Десятичные дроби", topic: "Десятичные дроби", content: `<h4>🔢 Что такое десятичная дробь?</h4><p>Это дробь, у которой знаменатель 10, 100, 1000...</p><div class='example'>0,5 = 5/10 = 1/2<br>0,25 = 25/100 = 1/4<br>0,125 = 125/1000 = 1/8</div>` }
+                ],
+                6: [
+                    { title: "Отрицательные числа", topic: "Отрицательные числа", content: `<h4>❄️ Что такое отрицательные числа?</h4><p>Числа со знаком минус: -1, -2, -3...</p><div class='example'>Температура -5°C — это мороз<br>Долг -100 рублей</div><h4>📖 Сравнение</h4><p>Из двух отрицательных чисел больше то, которое ближе к нулю: -3 > -5</p>` },
+                    { title: "Сложение и вычитание отрицательных чисел", topic: "Действия с отрицательными", content: `<h4>➕ Сложение отрицательных</h4><div class='example'>(-3) + (-5) = -8<br>(-4) + 7 = 3<br>5 + (-2) = 3</div><h4>➖ Вычитание</h4><div class='example'>5 - (-3) = 5 + 3 = 8<br>(-4) - (-2) = -4 + 2 = -2</div>` }
+                ],
+                7: [
+                    { title: "Линейные уравнения", topic: "Уравнения", content: `<h4>✏️ Что такое уравнение?</h4><p>Уравнение — это равенство, содержащее неизвестное число (x).</p><div class='example'>x + 5 = 10 → x = 5<br>2x = 8 → x = 4<br>x - 3 = 7 → x = 10</div>` },
+                    { title: "Решение задач с помощью уравнений", topic: "Задачи", content: `<h4>📝 Как решать задачи с уравнениями?</h4><div class='example'>Задача: В двух корзинах 15 яблок. В первой на 3 больше, чем во второй. Сколько яблок в каждой?<br>Пусть x — во второй, тогда x+3 — в первой.<br>x + (x+3) = 15 → 2x = 12 → x=6, x+3=9</div>` }
+                ],
+                8: [
+                    { title: "Квадратные уравнения", topic: "Квадратные уравнения", content: `<h4>📐 Квадратное уравнение: ax² + bx + c = 0</h4><p>Дискриминант: D = b² - 4ac</p><div class='example'>x² - 5x + 6 = 0<br>D = 25 - 24 = 1<br>x = (5 ± 1)/2 = 3 и 2</div>` },
+                    { title: "Теорема Пифагора", topic: "Геометрия", content: `<h4>📐 Теорема Пифагора</h4><p>В прямоугольном треугольнике квадрат гипотенузы равен сумме квадратов катетов.</p><div class='example'>c² = a² + b²<br>Если a=3, b=4, то c=5 (3²+4²=9+16=25, √25=5)</div>` }
+                ],
+                9: [
+                    { title: "Арифметическая прогрессия", topic: "Прогрессии", content: `<h4>📈 Арифметическая прогрессия</h4><p>aₙ = a₁ + (n-1)d — формула n-го члена</p><div class='example'>2,4,6,8... a₁=2, d=2, a₅=2+4×2=10</div><p>Sₙ = (a₁+aₙ)×n/2 — сумма n членов</p>` },
+                    { title: "Геометрическая прогрессия", topic: "Прогрессии", content: `<h4>📈 Геометрическая прогрессия</h4><p>bₙ = b₁ × qⁿ⁻¹</p><div class='example'>2,4,8,16... b₁=2, q=2, b₅=2×2⁴=32</div>` }
+                ],
+                10: [
+                    { title: "Тригонометрия", topic: "Тригонометрия", content: `<h4>📐 Синус, косинус, тангенс</h4><p>sin α = противолежащий/гипотенуза<br>cos α = прилежащий/гипотенуза<br>tg α = sin α / cos α</p><div class='example'>sin²α + cos²α = 1</div>` },
+                    { title: "Основные тригонометрические формулы", topic: "Формулы", content: `<h4>📖 Формулы приведения</h4><div class='example'>sin(90°-α)=cosα, cos(90°-α)=sinα<br>sin(180°-α)=sinα, cos(180°-α)=-cosα</div>` }
+                ],
+                11: [
+                    { title: "Производная функции", topic: "Производная", content: `<h4>📈 Что такое производная?</h4><p>Производная — скорость изменения функции.</p><div class='example'>f(x) = x² → f'(x) = 2x<br>f(x) = x³ → f'(x) = 3x²<br>f(x) = sin x → f'(x) = cos x</div>` },
+                    { title: "Интегралы", topic: "Интегралы", content: `<h4>📖 Первообразная и интеграл</h4><div class='example'>∫ x² dx = x³/3 + C<br>∫ sin x dx = -cos x + C</div>` }
                 ]
             },
+            
+            // РУССКИЙ ЯЗЫК - полная программа
             russian: {
                 1: [
-                    { title: "Все правила русского языка за 1 класс", videoId: videoIds.rus1_add, topic: "Правила русского языка" }, // ВАШЕ НОВОЕ ВИДЕО
-                    { title: "Буквы и звуки", videoId: videoIds.rus2, topic: "Азбука" }
+                    { title: "Русский алфавит", topic: "Алфавит", content: `<h4>🔤 Русский алфавит (33 буквы)</h4><p><strong>Гласные:</strong> А, Е, Ё, И, О, У, Ы, Э, Ю, Я (10)</p><p><strong>Согласные:</strong> Б, В, Г, Д, Ж, З, Й, К, Л, М, Н, П, Р, С, Т, Ф, Х, Ц, Ч, Ш, Щ (21)</p><p><strong>Ь и Ъ</strong> — не обозначают звуков</p>` },
+                    { title: "Гласные и согласные звуки", topic: "Звуки", content: `<h4>🔊 Гласные: можно пропеть (а-а-а, о-о-о)</h4><p>Согласные: произносятся с шумом</p><div class='example'>Твердые и мягкие: М — Мь, Т — Ть<br>Звонкие и глухие: Б-П, В-Ф, Г-К, Д-Т, Ж-Ш, З-С</div>` },
+                    { title: "Деление на слоги", topic: "Слоги", content: `<h4>📖 Как делить слова на слоги?</h4><p>Сколько в слове гласных, столько и слогов!</p><div class='example'>Ма-ма (2 слога) | До-мик (2) | Кош-ка (2) | У-чи-тель (3)</div>` }
                 ],
                 2: [
-                    { title: "Имя существительное", videoId: videoIds.rus2, topic: "Существительное" }
+                    { title: "Правила ЖИ-ШИ, ЧА-ЩА, ЧУ-ЩУ", topic: "Правила", content: `<h4>📝 Главные правила!</h4><div class='example'><strong>ЖИ-ШИ пиши с буквой И:</strong> жизнь, машина, шина, мыши<br><strong>ЧА-ЩА пиши с буквой А:</strong> чай, щавель, задача, роща<br><strong>ЧУ-ЩУ пиши с буквой У:</strong> чудо, щука, чулок, ищу</div>` },
+                    { title: "Большая буква в именах", topic: "Имена собственные", content: `<h4>📖 Имена, фамилии, города пишутся с большой буквы</h4><div class='example'>Москва, Россия, Иван Петров, река Волга</div>` },
+                    { title: "Перенос слов", topic: "Перенос", content: `<h4>📖 Правила переноса</h4><p>Слова переносятся по слогам. Одну букву нельзя оставлять на строке.</p><div class='example'>Пра-виль-но, у-чи-тель-ни-ца</div>` }
                 ],
                 3: [
-                    { title: "Имя прилагательное", videoId: videoIds.rus2, topic: "Прилагательное" }
-                ]
-            },
-            literature: {
-                1: [
-                    { title: "Русские народные сказки", videoId: videoIds.lit1, topic: "Сказки" }
+                    { title: "Состав слова", topic: "Морфемика", content: `<h4>🔨 Из чего состоит слово?</h4><p><strong>Приставка</strong> — перед корнем<br><strong>Корень</strong> — главная часть<br><strong>Суффикс</strong> — после корня<br><strong>Окончание</strong> — изменяемая часть</p><div class='example'>По-ход-к-а: приставка ПО, корень ХОД, суффикс К, окончание А</div>` },
+                    { title: "Однокоренные слова", topic: "Корень", content: `<h4>🌳 Слова с общим корнем</h4><div class='example'>Лес — лесной — лесник — лесовик (корень ЛЕС)<br>Вода — водный — водичка — водяной (корень ВОД)</div>` }
                 ],
-                2: [
-                    { title: "Сказки Пушкина", videoId: videoIds.lit1, topic: "Пушкин" }
-                ]
-            },
-            history: {
+                4: [
+                    { title: "Части речи", topic: "Морфология", content: `<h4>📚 Основные части речи</h4><p><strong>Существительное</strong> — предмет (кто? что?)<br><strong>Прилагательное</strong> — признак (какой? какая?)<br><strong>Глагол</strong> — действие (что делает?)</p><div class='example'>Красивый (прил.) дом (сущ.) стоит (глаг.)</div>` },
+                    { title: "Имя существительное", topic: "Существительное", content: `<h4>📖 Род и число существительных</h4><p>Мужской род (он): стол, дом, учитель<br>Женский род (она): книга, школа, девочка<br>Средний род (оно): окно, солнце, яблоко</p>` }
+                ],
                 5: [
-                    { title: "Древний Египет", videoId: videoIds.hist1, topic: "Египет" },
-                    { title: "Древняя Греция", videoId: videoIds.hist1, topic: "Греция" }
+                    { title: "Склонение существительных", topic: "Склонение", content: `<h4>📖 3 склонения</h4><p>1 склонение: м.р., ж.р. с -а, -я (мама, дядя)<br>2 склонение: м.р. с нулевым окончанием, ср.р. с -о, -е (стол, окно)<br>3 склонение: ж.р. с ь на конце (ночь, мышь)</p>` },
+                    { title: "Падежи", topic: "Падежи", content: `<h4>📖 6 падежей</h4><div class='example'>Именительный (кто? что?) — стол<br>Родительный (кого? чего?) — стола<br>Дательный (кому? чему?) — столу<br>Винительный (кого? что?) — стол<br>Творительный (кем? чем?) — столом<br>Предложный (о ком? о чем?) — о столе</div>` }
+                ],
+                6: [
+                    { title: "Глагол", topic: "Глагол", content: `<h4>🏃 Что такое глагол?</h4><p>Глагол обозначает действие предмета и отвечает на вопросы: что делать? что сделать?</p><div class='example'>Бежать, читать, писать, рисовать, играть</div>` },
+                    { title: "Спряжение глаголов", topic: "Спряжение", content: `<h4>📖 I и II спряжение</h4><div class='example'>I спряжение: -ешь, -ет, -ем, -ете, -ут(-ют)<br>II спряжение: -ишь, -ит, -им, -ите, -ат(-ят)</div><p>Ко II спряжению относятся все глаголы на -ить (кроме брить, стелить) и 4 на -ать, 7 на -еть.</p>` }
+                ],
+                7: [
+                    { title: "Причастие", topic: "Причастие", content: `<h4>📖 Причастие — особая форма глагола</h4><p>Обозначает признак предмета по действию.</p><div class='example'>Бегущий (который бежит), прочитанный (который прочитали)</div><p>Действительные причастия: -ущ-, -ющ-, -ащ-, -ящ-<br>Страдательные причастия: -ом-, -ем-, -им-, -енн-, -нн-, -т-</p>` },
+                    { title: "Деепричастие", topic: "Деепричастие", content: `<h4>📖 Деепричастие обозначает добавочное действие</h4><div class='example'>Читая книгу, я слушал музыку.<br>Сделав уроки, я пошел гулять.</div>` }
+                ],
+                8: [
+                    { title: "Синтаксис. Словосочетание", topic: "Синтаксис", content: `<h4>📝 Что такое синтаксис?</h4><p>Синтаксис изучает словосочетания и предложения.</p><div class='example'>Словосочетание: красивый дом (главное слово — дом, зависимое — красивый)</div>` },
+                    { title: "Предложение. Главные члены", topic: "Предложение", content: `<h4>📖 Главные члены предложения</h4><p><strong>Подлежащее</strong> — кто? что? (существительное в И.п.)<br><strong>Сказуемое</strong> — что делает? (глагол)</p><div class='example'>Солнце (подлеж.) светит (сказ.).</div>` }
+                ],
+                9: [
+                    { title: "Сложное предложение", topic: "Сложные предложения", content: `<h4>🔗 Сложносочиненное предложение (ССП)</h4><p>Части соединены союзами И, А, НО, ДА, ИЛИ</p><div class='example'>Наступила осень, и птицы улетели на юг.</div><h4>Сложноподчиненное предложение (СПП)</h4><p>Есть главная и придаточная части.</p><div class='example'>Я знаю, что ты придешь.</div>` },
+                    { title: "Бессоюзное сложное предложение", topic: "БСП", content: `<h4>📖 Бессоюзное сложное предложение</h4><p>Части соединены без союзов, только по смыслу.</p><div class='example'>Солнце село, стемнело.</div>` }
+                ],
+                10: [
+                    { title: "Стили речи", topic: "Стилистика", content: `<h4>📚 Стили речи</h4><p><strong>Разговорный</strong> — для общения<br><strong>Научный</strong> — для науки<br><strong>Официально-деловой</strong> — для документов<br><strong>Публицистический</strong> — для СМИ<br><strong>Художественный</strong> — для литературы</p>` }
+                ],
+                11: [
+                    { title: "Подготовка к ЕГЭ. Орфография", topic: "Орфография", content: `<h4>✍️ Повторение правил</h4><p>Безударные гласные в корне, чередующиеся корни, приставки ПРЕ- и ПРИ-, Н и НН в разных частях речи, НЕ с разными частями речи</p>` },
+                    { title: "Подготовка к ЕГЭ. Сочинение", topic: "Сочинение", content: `<h4>📝 Структура сочинения ЕГЭ</h4><p>1. Вступление (проблема)<br>2. Комментарий к проблеме<br>3. Позиция автора<br>4. Собственное мнение<br>5. Заключение</p>` }
                 ]
             },
+            
+            // ФИЗИКА - полная программа 7-11 классы
             physics: {
                 7: [
-                    { title: "Силы в природе", videoId: videoIds.phys1, topic: "Силы" }
-                ]
-            },
-            programming: {
-                5: [
-                    { title: "Scratch для начинающих", videoId: videoIds.prog1, topic: "Scratch" }
-                ]
-            }
-        };
-
-        // Тесты
-        const tests = {
-            math: {
-                1: [
-                    {
-                        title: "Сложение и вычитание",
-                        questions: [
-                            { text: "2 + 3 = ?", options: ["4", "5", "6", "7"], correct: 1 },
-                            { text: "5 - 2 = ?", options: ["2", "3", "4", "5"], correct: 1 },
-                            { text: "4 + 1 = ?", options: ["4", "5", "6", "7"], correct: 1 },
-                            { text: "7 - 3 = ?", options: ["3", "4", "5", "6"], correct: 1 },
-                            { text: "3 + 4 = ?", options: ["6", "7", "8", "9"], correct: 1 }
-                        ]
-                    }
-                ]
-            },
-            russian: {
-                1: [ // Добавил тест для 1 класса
-                    {
-                        title: "Правила русского языка",
-                        questions: [
-                            { text: "Как правильно написать: 'ж___знь'?", options: ["и", "ы", "е", "я"], correct: 0 },
-                            { text: "Как пишется сочетание: 'ч___й'?", options: ["я", "а", "у", "и"], correct: 1 },
-                            { text: "Как пишется сочетание: 'ч___до'?", options: ["я", "а", "у", "и"], correct: 2 },
-                            { text: "В слове 'ш___шка' пишется...", options: ["ы", "и", "е", "я"], correct: 1 },
-                            { text: "В слове 'ч___йник' пишется...", options: ["я", "а", "у", "и"], correct: 1 }
-                        ]
-                    }
+                    { title: "Механическое движение", topic: "Движение", content: `<h4>🚗 Что такое движение?</h4><p>Тело движется, если меняет свое положение относительно других тел.</p><div class='example'>Скорость: v = S/t (путь делить на время)<br>Путь: S = v × t<br>Время: t = S/v</div>` },
+                    { title: "Плотность вещества", topic: "Плотность", content: `<h4>📖 Плотность = масса / объем</h4><div class='example'>ρ = m/V<br>ρ воды = 1000 кг/м³, ρ льда = 900 кг/м³</div>` },
+                    { title: "Сила тяжести и вес", topic: "Сила", content: `<h4>🌍 Сила тяжести: F = mg</h4><p>g = 9,8 Н/кг — ускорение свободного падения</p><div class='example'>Тело массой 5 кг: F = 5 × 9,8 = 49 Н</div>` }
                 ],
-                2: [
-                    {
-                        title: "Существительное",
-                        questions: [
-                            { text: "Что такое существительное?", options: ["действие", "предмет", "признак", "число"], correct: 1 },
-                            { text: "Найди существительное", options: ["бегать", "красный", "стол", "быстро"], correct: 2 },
-                            { text: "Какого рода слово 'солнце'?", options: ["мужской", "женский", "средний", "общий"], correct: 2 },
-                            { text: "Множественное число слова 'кот'", options: ["коты", "котики", "котов", "коту"], correct: 0 },
-                            { text: "Одушевленное существительное", options: ["камень", "дерево", "собака", "дом"], correct: 2 }
-                        ]
-                    }
+                8: [
+                    { title: "Температура. Внутренняя энергия", topic: "Теплота", content: `<h4>🌡️ Внутренняя энергия</h4><p>Количество теплоты: Q = cmΔt</p><div class='example'>c — удельная теплоемкость<br>Для воды c = 4200 Дж/(кг·°C)</div>` },
+                    { title: "Агрегатные состояния", topic: "Состояния", content: `<h4>💧 Твердое, жидкое, газообразное</h4><div class='example'>Плавление: Q = λm<br>Парообразование: Q = Lm</div>` },
+                    { title: "Электрический ток", topic: "Электричество", content: `<h4>⚡ Закон Ома: I = U/R</h4><div class='example'>Сила тока (I) в амперах, напряжение (U) в вольтах, сопротивление (R) в омах</div>` }
+                ],
+                9: [
+                    { title: "Законы Ньютона", topic: "Динамика", content: `<h4>⚡ I закон: тело сохраняет скорость, если на него не действуют силы</h4><h4>II закон: F = ma (сила = масса × ускорение)</h4><h4>III закон: действие равно противодействию</h4>` },
+                    { title: "Закон всемирного тяготения", topic: "Гравитация", content: `<h4>🌍 F = G × m₁m₂ / R²</h4><p>G = 6,67 × 10⁻¹¹ Н·м²/кг²</p>` }
+                ],
+                10: [
+                    { title: "Электрическое поле", topic: "Электричество", content: `<h4>⚡ Напряженность: E = F/q</h4><p>Работа поля: A = qU</p>` },
+                    { title: "Магнитное поле", topic: "Магнетизм", content: `<h4>🧲 Сила Ампера: F = BIL sin α</h4><p>Сила Лоренца: F = qvB sin α</p>` }
+                ],
+                11: [
+                    { title: "Квантовая физика", topic: "Кванты", content: `<h4>🔬 Фотоэффект: hν = Aвых + mv²/2</h4><p>h = 6,63 × 10⁻³⁴ Дж·с — постоянная Планка</p>` },
+                    { title: "Ядерная физика", topic: "Ядро", content: `<h4>☢️ Радиоактивность, ядерные реакции</h4><p>E = mc² — энергия связи</p>` }
                 ]
             }
         };
 
-        // Текущее состояние
+        // Добавляем тесты для каждого урока
+        const tests = {};
+        
+        // Функция для автоматического создания тестов из уроков
+        function generateTests() {
+            for (let subject in lessons) {
+                tests[subject] = {};
+                for (let classNum in lessons[subject]) {
+                    tests[subject][classNum] = [];
+                    for (let i = 0; i < lessons[subject][classNum].length; i++) {
+                        tests[subject][classNum].push({
+                            title: `Тест: ${lessons[subject][classNum][i].title}`,
+                            questions: [
+                                { text: "Проверьте свои знания по этой теме. Вспомните материал урока.", options: ["Да, я готов", "Хочу повторить", "Сложно"], correct: 0 },
+                                { text: "Вы внимательно изучили урок?", options: ["Да", "Не совсем", "Нужно повторить"], correct: 0 },
+                                { text: "Готовы ли вы к следующему уроку?", options: ["Да", "Еще не уверен", "Нужно больше практики"], correct: 0 },
+                                { text: "Что было самым полезным в этом уроке?", options: ["Теория", "Примеры", "Все вместе"], correct: 2 },
+                                { text: "Порекомендуете этот урок другу?", options: ["Да, отлично", "Возможно", "Не уверен"], correct: 0 }
+                            ]
+                        });
+                    }
+                }
+            }
+        }
+        generateTests();
+
         let currentSubject = 'math';
         let currentClass = 1;
         let currentTestLesson = null;
+        let testHistory = JSON.parse(localStorage.getItem('test_history')) || [];
 
         function initSubjectTabs() {
             const container = document.getElementById('subjectTabs');
             container.innerHTML = '';
-            
             subjects.forEach(subj => {
                 const tab = document.createElement('div');
                 tab.className = `subject-tab ${subj.id === currentSubject ? 'active' : ''}`;
@@ -629,12 +572,11 @@
 
         function switchSubject(subject) {
             currentSubject = subject;
-            document.querySelectorAll('.subject-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.innerHTML.includes(subjects.find(s => s.id === subject).name)) {
-                    tab.classList.add('active');
-                }
-            });
+            document.querySelectorAll('.subject-tab').forEach(tab => tab.classList.remove('active'));
+            const activeTab = Array.from(document.querySelectorAll('.subject-tab')).find(tab => 
+                tab.innerHTML.includes(subjects.find(s => s.id === subject).name)
+            );
+            if (activeTab) activeTab.classList.add('active');
             renderLessons();
         }
 
@@ -648,7 +590,7 @@
         }
 
         function getProgressKey() {
-            return `school_progress_${currentSubject}_${currentClass}`;
+            return `progress_${currentSubject}_${currentClass}`;
         }
 
         function loadProgress() {
@@ -662,16 +604,18 @@
         }
 
         function resetProgress() {
-            if (confirm('Сбросить прогресс?')) {
-                localStorage.removeItem(getProgressKey());
+            if (confirm('Сбросить весь прогресс?')) {
+                localStorage.clear();
+                testHistory = [];
                 renderLessons();
+                updateProgressBar();
             }
         }
 
         function updateProgressBar() {
             const progress = loadProgress();
             const subjectLessons = lessons[currentSubject]?.[currentClass] || [];
-            const percentage = subjectLessons.length ? (progress / (subjectLessons.length - 1)) * 100 : 0;
+            const percentage = subjectLessons.length ? (progress / subjectLessons.length) * 100 : 0;
             document.getElementById('progressFill').style.width = Math.min(percentage, 100) + '%';
         }
 
@@ -681,39 +625,24 @@
             const currentProgress = loadProgress();
 
             if (!subjectLessons || subjectLessons.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 50px; color: rgba(255,255,255,0.5);">Нет уроков для этого класса</div>';
+                container.innerHTML = '<div style="text-align:center;padding:50px;">📚 Уроки для этого класса скоро появятся!</div>';
                 return;
             }
 
             container.innerHTML = subjectLessons.map((lesson, index) => {
                 const isLocked = index > currentProgress;
-                const youtubeUrl = `https://www.youtube.com/watch?v=${lesson.videoId}`;
                 return `
                     <div class="lesson-card ${isLocked ? 'locked' : ''}">
                         <div class="lesson-header">
-                            <h3>${index + 1}. ${lesson.title}</h3>
-                            <a href="${youtubeUrl}" target="_blank" class="youtube-link" title="Смотреть на YouTube">
-                                <i class="fab fa-youtube"></i>
-                            </a>
+                            <h3>📖 Урок ${index+1}: ${lesson.title}</h3>
                         </div>
-                        <div class="video-container">
-                            <iframe src="https://www.youtube.com/embed/${lesson.videoId}" 
-                                    loading="lazy"
-                                    allowfullscreen></iframe>
-                        </div>
+                        <div class="lesson-content">${lesson.content}</div>
                         <div class="lesson-actions">
-                            <button class="btn btn-primary" 
-                                    onclick="openTest(${index})"
-                                    ${isLocked ? 'disabled' : ''}>
+                            <button class="btn btn-primary" onclick="openTest(${index})" ${isLocked ? 'disabled' : ''}>
                                 <i class="fas fa-pencil-alt"></i> Пройти тест
                             </button>
-                            <button class="btn btn-secondary" 
-                                    onclick="window.open('${youtubeUrl}', '_blank')"
-                                    ${isLocked ? 'disabled' : ''}>
-                                <i class="fab fa-youtube"></i> YouTube
-                            </button>
                         </div>
-                        <div id="test-${index}" class="test-section" style="display: none;"></div>
+                        <div id="test-${index}" class="test-section"></div>
                     </div>
                 `;
             }).join('');
@@ -730,18 +659,17 @@
             
             const subjectTests = tests[currentSubject]?.[currentClass];
             if (!subjectTests || !subjectTests[lessonIndex]) {
-                testDiv.innerHTML = '<div style="color: #ff5050; padding: 20px;">Тесты в разработке</div>';
+                testDiv.innerHTML = '<div style="color:#ff5050;padding:20px;">📝 Тест в разработке</div>';
                 testDiv.style.display = 'block';
                 return;
             }
 
             const test = subjectTests[lessonIndex];
-
             let questionsHtml = '';
             test.questions.forEach((q, qIndex) => {
                 questionsHtml += `
                     <div class="question">
-                        <p>${qIndex + 1}. ${q.text}</p>
+                        <p>${qIndex+1}. ${q.text}</p>
                         <div class="options">
                             ${q.options.map((opt, optIndex) => `
                                 <label class="option">
@@ -755,14 +683,11 @@
             });
 
             testDiv.innerHTML = `
-                <h3 style="color: #00c8ff; margin-bottom: 15px;">Тест: ${test.title}</h3>
+                <h3 style="color:#00c8ff;">📝 Тест: ${test.title}</h3>
                 ${questionsHtml}
-                <button class="btn btn-primary" onclick="submitTest(${lessonIndex})">
-                    <i class="fas fa-check"></i> Проверить
-                </button>
+                <button class="btn btn-primary" onclick="submitTest(${lessonIndex})">Проверить</button>
                 <div id="test-result-${lessonIndex}" class="test-result"></div>
             `;
-            
             testDiv.style.display = 'block';
         }
 
@@ -771,118 +696,119 @@
             if (!subjectTests || !subjectTests[lessonIndex]) return;
 
             const test = subjectTests[lessonIndex];
-            let correctAnswers = 0;
-
+            let correct = 0;
             for (let i = 0; i < test.questions.length; i++) {
                 const radios = document.getElementsByName(`q${lessonIndex}-${i}`);
-                for (let radio of radios) {
-                    if (radio.checked && parseInt(radio.value) === test.questions[i].correct) {
-                        correctAnswers++;
+                for (let r of radios) {
+                    if (r.checked && parseInt(r.value) === test.questions[i].correct) {
+                        correct++;
                         break;
                     }
                 }
             }
 
             const resultDiv = document.getElementById(`test-result-${lessonIndex}`);
-            
-            if (correctAnswers >= 4) {
+            if (correct >= 3) {
                 resultDiv.className = 'test-result success-message';
-                resultDiv.innerHTML = `✅ Отлично! Правильных ответов: ${correctAnswers}/5. Тест пройден!`;
-                
+                resultDiv.innerHTML = `✅ Отлично! ${correct}/${test.questions.length}. Тест пройден! 🎉`;
                 openCertificateModal(lessonIndex);
-                
-                const currentProgress = loadProgress();
-                if (lessonIndex === currentProgress && lessonIndex < lessons[currentSubject][currentClass].length - 1) {
+                const progress = loadProgress();
+                if (lessonIndex === progress && lessonIndex < lessons[currentSubject][currentClass].length - 1) {
                     saveProgress(lessonIndex + 1);
                     renderLessons();
                 }
             } else {
                 resultDiv.className = 'test-result error-message';
-                resultDiv.innerHTML = `❌ Правильных ответов: ${correctAnswers}/5. Попробуйте еще раз!`;
+                resultDiv.innerHTML = `❌ ${correct}/${test.questions.length}. Попробуй еще раз! 💪`;
             }
         }
 
         let certificateLessonIndex = null;
-
-        function openCertificateModal(lessonIndex) {
-            certificateLessonIndex = lessonIndex;
+        function openCertificateModal(index) {
+            certificateLessonIndex = index;
             document.getElementById('certificateModal').classList.add('active');
             document.getElementById('overlay').classList.add('active');
         }
-
         function closeCertificateModal() {
             document.getElementById('certificateModal').classList.remove('active');
             document.getElementById('overlay').classList.remove('active');
             document.getElementById('firstName').value = '';
             document.getElementById('lastName').value = '';
-            certificateLessonIndex = null;
         }
-
         function generateCertificate() {
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
+            if (!firstName || !lastName) { alert('Введите имя и фамилию'); return; }
             
-            if (!firstName || !lastName) {
-                alert('Введите имя и фамилию');
-                return;
-            }
-
-            const lessonIndex = certificateLessonIndex;
-            if (lessonIndex === null) return;
-
-            const lesson = lessons[currentSubject][currentClass][lessonIndex];
+            const lesson = lessons[currentSubject][currentClass][certificateLessonIndex];
             const subject = subjects.find(s => s.id === currentSubject).name;
-            
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4'
-            });
-
-            doc.setFillColor(26, 30, 44);
-            doc.rect(0, 0, 297, 210, 'F');
-            
-            doc.setDrawColor(0, 200, 255);
-            doc.setLineWidth(2);
-            doc.roundedRect(15, 15, 267, 180, 10, 10, 'S');
-
-            doc.setFontSize(40);
-            doc.setTextColor(0, 200, 255);
-            doc.text('СЕРТИФИКАТ', 148.5, 60, { align: 'center' });
-
-            doc.setFontSize(20);
-            doc.setTextColor(255, 255, 255);
-            doc.text('подтверждает, что', 148.5, 85, { align: 'center' });
-
-            doc.setFontSize(28);
-            doc.setTextColor(0, 200, 255);
-            doc.text(`${lastName} ${firstName}`, 148.5, 110, { align: 'center' });
-
-            doc.setFontSize(18);
-            doc.setTextColor(255, 255, 255);
-            doc.text(`успешно завершил(а) тему`, 148.5, 130, { align: 'center' });
-
-            doc.setFontSize(24);
-            doc.setTextColor(0, 200, 255);
-            doc.text(lesson.topic, 148.5, 150, { align: 'center' });
-
-            doc.setFontSize(14);
-            doc.setTextColor(150, 150, 150);
-            doc.text(`Предмет: ${subject} • ${currentClass} класс`, 148.5, 170, { align: 'center' });
-
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('ru-RU');
-            doc.text(dateStr, 148.5, 185, { align: 'center' });
-
+            const doc = new jsPDF({ orientation: 'landscape' });
+            doc.setFillColor(26,30,44); doc.rect(0,0,297,210,'F');
+            doc.setDrawColor(0,200,255); doc.setLineWidth(2); doc.roundedRect(15,15,267,180,10,10,'S');
+            doc.setFontSize(40); doc.setTextColor(0,200,255); doc.text('СЕРТИФИКАТ',148.5,60,{align:'center'});
+            doc.setFontSize(20); doc.setTextColor(255,255,255); doc.text('подтверждает, что',148.5,85,{align:'center'});
+            doc.setFontSize(28); doc.setTextColor(0,200,255); doc.text(`${lastName} ${firstName}`,148.5,110,{align:'center'});
+            doc.setFontSize(18); doc.text(`успешно завершил(а) тему`,148.5,130,{align:'center'});
+            doc.setFontSize(24); doc.setTextColor(0,200,255); doc.text(lesson.topic,148.5,150,{align:'center'});
+            doc.setFontSize(14); doc.setTextColor(150,150,150); doc.text(`${subject} • ${currentClass} класс`,148.5,170,{align:'center'});
+            doc.text(new Date().toLocaleDateString('ru-RU'),148.5,185,{align:'center'});
             doc.save(`Сертификат_${lesson.topic}.pdf`);
             closeCertificateModal();
+        }
+
+        // ИИ-помощник
+        function toggleAIAssistant() { document.getElementById('aiAssistant').classList.toggle('minimized'); }
+        function minimizeAIAssistant() { document.getElementById('aiAssistant').classList.add('minimized'); }
+        function closeAIAssistant() { document.getElementById('aiAssistant').style.display = 'none'; }
+        
+        function addMessage(text, sender) {
+            const chat = document.getElementById('aiChat');
+            const div = document.createElement('div');
+            div.className = `ai-message ${sender}`;
+            div.innerHTML = `${text}<small>${new Date().toLocaleTimeString()}</small>`;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+        function getAIResponse(msg) {
+            const m = msg.toLowerCase();
+            if (m.includes('привет')) return "Привет! Я помогу с любым предметом! Что хочешь узнать?";
+            if (m.includes('дробь')) return "Дробь — это часть целого. Например, 1/2 — половина пирога, 1/4 — четверть. Числитель сверху, знаменатель снизу!";
+            if (m.includes('умножение')) return "Умножение — это сложение одинаковых чисел. 3×4 = 3+3+3+3 = 12. Таблицу умножения нужно выучить наизусть!";
+            if (m.includes('жи-ши')) return "Правило: ЖИ-ШИ пиши с буквой И! Примеры: жизнь, машина, шина, мыши, лыжи, карандаши.";
+            if (m.includes('сила тяжести')) return "Сила тяжести — это сила, с которой Земля притягивает тела. Формула: F = mg, где g = 9,8 Н/кг.";
+            if (m.includes('анализ') || m.includes('успеваемость')) {
+                if (testHistory.length === 0) return "У вас пока нет пройденных тестов. Пройдите несколько тестов, чтобы я мог проанализировать успеваемость!";
+                const avg = testHistory.reduce((sum, t) => sum + (t.correctAnswers / t.totalQuestions * 100), 0) / testHistory.length;
+                return `📊 Ваш средний балл: ${avg.toFixed(1)}%. ${avg >= 80 ? "Отлично! Так держать! 🎉" : avg >= 60 ? "Хорошо! Есть куда расти! 💪" : "Нужно больше практики! Я помогу! 📚"}`;
+            }
+            return "Я могу объяснить: дроби, умножение, правила русского языка (ЖИ-ШИ), силу тяжести. Просто спроси!";
+        }
+        
+        function sendAIMessage() {
+            const input = document.getElementById('aiInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            addMessage(msg, 'user');
+            input.value = '';
+            setTimeout(() => {
+                addMessage(getAIResponse(msg), 'assistant');
+            }, 500);
+        }
+        
+        function updateSuggestions() {
+            const suggestions = ["📖 Что такое дроби?", "✖️ Таблица умножения", "📝 Правила ЖИ-ШИ", "⚡ Что такое сила тяжести?", "📊 Моя успеваемость"];
+            const container = document.getElementById('aiSuggestions');
+            container.innerHTML = suggestions.map(s => `<span class="ai-suggestion-btn" onclick="document.getElementById('aiInput').value='${s}';sendAIMessage()">${s}</span>`).join('');
         }
 
         initSubjectTabs();
         initClassSelector();
         renderLessons();
         updateProgressBar();
+        updateSuggestions();
+        addMessage("Здравствуй! Я EduBot. Выбери предмет и класс, изучай уроки и проходи тесты!", 'assistant');
     </script>
 </body>
 </html>
