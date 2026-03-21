@@ -3,1038 +3,965 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MuzaffarGram</title>
-    
-    <!-- Шрифты и иконки -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    
+    <title>MUZAFFAR Music — моя музыка</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        
+
+        :root {
+            --bg-primary: #0a0b0e;
+            --bg-secondary: #14151b;
+            --bg-card: #1e1f2a;
+            --accent: #7c3aed;
+            --accent-secondary: #10b981;
+            --accent-glow: #8b5cf6;
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --border: #2c2e3a;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f0f2f5;
-            color: #1a1a1a;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        /* Экран авторизации */
-        .auth-screen {
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #667eea;
         }
-        
-        .auth-card {
-            background: white;
-            border-radius: 16px;
-            padding: 40px 30px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-        
-        .auth-logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .auth-logo h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .auth-logo p {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.2s;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-        }
-        
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #5a67d8;
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #667eea;
-            color: #667eea;
-        }
-        
-        .btn-outline:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .btn-small {
-            padding: 8px 16px;
-            width: auto;
-        }
-        
-        .header {
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 12px 0;
+
+        /* Шапка с профилем */
+        header {
             position: sticky;
             top: 0;
+            background: rgba(10, 11, 14, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
             z-index: 100;
         }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
+
         .logo {
-            font-size: 20px;
-            font-weight: 700;
-            color: #667eea;
-            cursor: pointer;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        
-        .user-info {
+
+        .profile-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-btn {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 40px;
+            padding: 8px 16px 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .profile-btn:hover {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--bg-card), #2a2c3a);
+        }
+
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-name {
+            font-weight: 600;
+        }
+
+        .saved-count {
+            background: var(--accent);
+            color: white;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Табы */
+        .tabs {
+            padding: 20px 32px 0;
+            display: flex;
+            gap: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.2s;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Поиск (только в режиме поиска) */
+        .search-section {
+            padding: 20px 32px;
+            display: none;
+        }
+
+        .search-section.active {
+            display: block;
+        }
+
+        .search-container {
+            display: flex;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .search-container input {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 40px 0 0 40px;
+            padding: 14px 24px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-container input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-container button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            border: 2px solid var(--accent);
+            border-left: none;
+            border-radius: 0 40px 40px 0;
+            padding: 14px 32px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Быстрые жанры */
+        .quick-genres {
+            padding: 0 32px 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .genre-btn {
+            background: var(--bg-card);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+        }
+
+        .genre-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Сетка треков */
+        .tracks-grid {
+            padding: 0 32px 100px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .track-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .track-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+
+        .track-card.playing {
+            border-color: var(--accent);
+            background: linear-gradient(145deg, var(--bg-card), #2a2c3a);
+        }
+
+        .track-card.saved {
+            border-color: var(--accent-secondary);
+        }
+
+        .cover {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: white;
+            opacity: 0;
+            transition: 0.2s;
+            text-shadow: 0 2px 10px black;
+        }
+
+        .track-card:hover .play-icon {
+            opacity: 1;
+        }
+
+        .save-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
+            z-index: 10;
+        }
+
+        .save-btn:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+        }
+
+        .save-btn.saved {
+            background: var(--accent-secondary);
+            color: white;
+        }
+
+        .track-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 30px;
+        }
+
+        .track-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Плеер */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(20, 21, 27, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 2px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            z-index: 1000;
+        }
+
+        .now-playing {
             display: flex;
             align-items: center;
             gap: 15px;
+            min-width: 250px;
         }
-        
-        .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+
+        .now-playing img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
             object-fit: cover;
         }
-        
-        .username {
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin: 20px 0;
-            background: white;
-            border-radius: 10px;
-            padding: 5px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
+
+        .track-info h4 {
             font-size: 14px;
+            margin-bottom: 4px;
         }
-        
-        .tab.active {
-            background: #667eea;
-            color: white;
+
+        .track-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
         }
-        
-        /* Посты */
-        .posts-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .post {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-        }
-        
-        .post-header {
+
+        .controls {
             display: flex;
             align-items: center;
-            padding: 16px;
-            gap: 12px;
+            gap: 20px;
         }
-        
-        .post-avatar {
+
+        .controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        .post-user {
-            font-weight: 600;
-        }
-        
-        .post-date {
-            font-size: 12px;
-            color: #999;
-        }
-        
-        .post-image {
-            width: 100%;
-            max-height: 500px;
-            object-fit: cover;
-        }
-        
-        .post-actions {
-            display: flex;
-            gap: 20px;
-            padding: 12px 16px;
-        }
-        
-        .post-action {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            color: #666;
-        }
-        
-        .post-action.liked {
-            color: #e53e3e;
-        }
-        
-        .post-caption {
-            padding: 0 16px 16px;
-            font-size: 14px;
-        }
-        
-        .post-caption strong {
-            margin-right: 8px;
-            color: #333;
-        }
-        
-        /* Комментарии */
-        .comments-section {
-            padding: 16px;
-            border-top: 1px solid #f0f0f0;
-            background: #fafafa;
-        }
-        
-        .comment {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        
-        .comment-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        .comment-user {
-            font-weight: 600;
-            margin-right: 8px;
-            font-size: 13px;
-        }
-        
-        .comment-text {
-            font-size: 13px;
-        }
-        
-        .comment-date {
-            font-size: 10px;
-            color: #999;
-            margin-top: 2px;
-        }
-        
-        .profile-header {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 30px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-        }
-        
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        .profile-stats {
-            display: flex;
-            gap: 30px;
-            margin: 15px 0;
-        }
-        
-        .stat {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 18px;
-            font-weight: 700;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #999;
-        }
-        
-        .profile-bio {
-            color: #666;
-            font-size: 14px;
-            margin: 15px 0;
-            padding: 15px 0;
-            border-top: 1px solid #f0f0f0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        /* Модалка комментариев */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            padding: 20px;
+            transition: 0.2s;
         }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
+
+        .controls button:hover {
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--accent);
         }
-        
-        .modal-header {
+
+        .play-pause {
+            background: var(--accent) !important;
+            width: 50px !important;
+            height: 50px !important;
+            font-size: 1.5rem !important;
+        }
+
+        .play-pause:hover {
+            transform: scale(1.05);
+        }
+
+        .progress {
+            flex: 1;
+            max-width: 400px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 10px;
         }
-        
-        .modal-close {
-            font-size: 24px;
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 4px;
             cursor: pointer;
-            color: #999;
         }
-        
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
+
+        .progress-current {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            width: 0%;
         }
-        
-        .alert-success {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-        
-        .alert-error {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-        
-        .new-post-form {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .file-label {
+
+        .volume {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 30px;
-            border: 2px dashed #ddd;
-            border-radius: 12px;
+            gap: 10px;
+            min-width: 150px;
+        }
+
+        .volume-bar {
+            width: 80px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 4px;
             cursor: pointer;
-            margin-bottom: 15px;
-            color: #666;
         }
-        
-        .image-preview {
-            width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            border-radius: 8px;
-            margin-bottom: 15px;
+
+        .volume-level {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            width: 70%;
         }
-        
-        @media (max-width: 768px) {
-            .profile-header {
+
+        /* Загрузка */
+        .loading {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 900px) {
+            header {
                 flex-direction: column;
-                text-align: center;
+                gap: 15px;
             }
             
-            .profile-stats {
+            .player-bar {
+                flex-direction: column;
+                padding: 15px;
+            }
+            
+            .volume {
+                display: none;
+            }
+            
+            .tabs {
                 justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- ЭКРАН АВТОРИЗАЦИИ -->
-    <div id="auth-screen" class="auth-screen">
-        <div class="auth-card">
-            <div class="auth-logo">
-                <h1>MuzaffarGram</h1>
-                <p>Вход в аккаунт</p>
+
+<header>
+    <div class="logo">
+        <i class="fas fa-headphones-alt"></i>
+        MUZAFFAR
+    </div>
+    
+    <div class="profile-menu">
+        <div class="saved-count" id="savedCount">
+            <i class="fas fa-bookmark"></i>
+            <span>0</span>
+        </div>
+        <div class="profile-btn" onclick="switchTab('profile')">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
             </div>
-            
-            <div id="auth-message" class="alert hidden"></div>
-            
-            <!-- Форма входа -->
-            <div id="login-form">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="login-email" class="form-control" placeholder="Введите email">
-                </div>
-                <div class="form-group">
-                    <label>Пароль</label>
-                    <input type="password" id="login-password" class="form-control" placeholder="Введите пароль">
-                </div>
-                <button id="login-btn" class="btn btn-primary">
-                    Войти
-                </button>
-                <p style="margin-top: 20px; text-align: center;">
-                    Нет аккаунта? 
-                    <span class="link" id="show-register" style="color: #667eea; cursor: pointer;">Зарегистрироваться</span>
-                </p>
-            </div>
-            
-            <!-- Форма регистрации -->
-            <div id="register-form" style="display: none;">
-                <div class="form-group">
-                    <label>Имя</label>
-                    <input type="text" id="register-fullname" class="form-control" placeholder="Как вас зовут?">
-                </div>
-                <div class="form-group">
-                    <label>Имя пользователя</label>
-                    <input type="text" id="register-username" class="form-control" placeholder="@username">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="register-email" class="form-control" placeholder="Введите email">
-                </div>
-                <div class="form-group">
-                    <label>Пароль</label>
-                    <input type="password" id="register-password" class="form-control" placeholder="Минимум 6 символов">
-                </div>
-                <button id="register-btn" class="btn btn-primary">
-                    Зарегистрироваться
-                </button>
-                <p style="margin-top: 20px; text-align: center;">
-                    Уже есть аккаунт? 
-                    <span class="link" id="show-login" style="color: #667eea; cursor: pointer;">Войти</span>
-                </p>
-            </div>
+            <span class="profile-name">Мой профиль</span>
         </div>
     </div>
-    
-    <!-- ГЛАВНЫЙ ЭКРАН -->
-    <div id="main-screen" class="hidden">
-        <!-- Хедер -->
-        <header class="header">
-            <div class="container header-content">
-                <div class="logo" onclick="goToFeed()">MuzaffarGram</div>
-                <div class="user-info">
-                    <span class="username" id="username-display"></span>
-                    <img id="user-avatar-header" class="avatar" src="" alt="Avatar">
-                    <button id="logout-btn" class="btn btn-small btn-outline">Выйти</button>
-                </div>
-            </div>
-        </header>
-        
-        <main class="container">
-            <!-- Табы -->
-            <div class="tabs">
-                <div class="tab active" data-tab="feed">Лента</div>
-                <div class="tab" data-tab="profile">Профиль</div>
-                <div class="tab" data-tab="new-post">+ Пост</div>
-            </div>
-            
-            <!-- ЛЕНТА -->
-            <div id="feed-tab" class="tab-content">
-                <div id="posts-container" class="posts-container">
-                    <!-- Посты загружаются сюда -->
-                </div>
-            </div>
-            
-            <!-- ПРОФИЛЬ -->
-            <div id="profile-tab" class="tab-content hidden">
-                <div class="profile-header">
-                    <img id="profile-avatar" class="profile-avatar" src="" alt="Avatar">
-                    <div style="flex: 1;">
-                        <h2 id="profile-fullname" style="margin-bottom: 5px;"></h2>
-                        <p id="profile-username" style="color: #666; margin-bottom: 15px;"></p>
-                        
-                        <div class="profile-stats">
-                            <div class="stat">
-                                <div class="stat-value" id="profile-posts">0</div>
-                                <div class="stat-label">постов</div>
-                            </div>
-                        </div>
-                        
-                        <p class="profile-bio" id="profile-bio"></p>
-                        
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <input type="text" id="edit-bio" class="form-control" placeholder="Новый статус" style="flex: 1;">
-                            <button id="update-bio-btn" class="btn btn-primary" style="width: auto;">Обновить</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <h3 style="margin: 20px 0 15px;">Мои посты</h3>
-                <div id="profile-posts-container" class="posts-container"></div>
-            </div>
-            
-            <!-- НОВЫЙ ПОСТ -->
-            <div id="new-post-tab" class="tab-content hidden">
-                <div class="new-post-form">
-                    <h3 style="margin-bottom: 20px;">Создать пост</h3>
-                    
-                    <input type="file" id="post-image-input" class="file-input" accept="image/*">
-                    <label for="post-image-input" class="file-label" id="post-label">
-                        <span class="material-icons">add_photo_alternate</span>
-                        <p>Нажмите, чтобы выбрать фото</p>
-                    </label>
-                    
-                    <img id="post-image-preview" class="image-preview hidden">
-                    
-                    <div class="form-group">
-                        <label>Подпись</label>
-                        <textarea id="post-caption" class="form-control" rows="3" placeholder="Напишите что-нибудь..."></textarea>
-                    </div>
-                    
-                    <button id="upload-post-btn" class="btn btn-primary">Опубликовать</button>
-                </div>
-            </div>
-        </main>
+</header>
+
+<!-- Табы -->
+<div class="tabs">
+    <div class="tab active" onclick="switchTab('search')" id="tabSearch">
+        <i class="fas fa-search"></i> Поиск музыки
     </div>
-    
-    <!-- МОДАЛКА КОММЕНТАРИЕВ -->
-    <div id="comments-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Комментарии</h3>
-                <span class="modal-close" onclick="closeComments()">&times;</span>
-            </div>
-            <div id="comments-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;"></div>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="new-comment-text" class="form-control" placeholder="Комментарий...">
-                <button id="add-comment-btn" class="btn btn-primary" style="width: auto;">Отправить</button>
-            </div>
+    <div class="tab" onclick="switchTab('saved')" id="tabSaved">
+        <i class="fas fa-bookmark"></i> Моя музыка
+    </div>
+</div>
+
+<!-- Секция поиска -->
+<div id="searchSection" class="search-section active">
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Найди музыку..." value="pop music">
+        <button id="searchBtn">
+            <i class="fas fa-search"></i> Найти
+        </button>
+    </div>
+</div>
+
+<!-- Быстрые жанры (только в поиске) -->
+<div id="genresSection" class="quick-genres">
+    <span class="genre-btn" onclick="loadGenre('pop', this)">Pop</span>
+    <span class="genre-btn" onclick="loadGenre('rock', this)">Rock</span>
+    <span class="genre-btn" onclick="loadGenre('hip hop', this)">Hip Hop</span>
+    <span class="genre-btn" onclick="loadGenre('electronic', this)">Electronic</span>
+    <span class="genre-btn" onclick="loadGenre('jazz', this)">Jazz</span>
+    <span class="genre-btn" onclick="loadGenre('classical', this)">Classical</span>
+    <span class="genre-btn" onclick="loadGenre('lofi', this)">Lo-Fi</span>
+</div>
+
+<!-- Сетка треков -->
+<div class="tracks-grid" id="tracksGrid">
+    <div class="loading">
+        <div class="spinner"></div>
+        Загрузка...
+    </div>
+</div>
+
+<!-- Плеер -->
+<div class="player-bar">
+    <div class="now-playing">
+        <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=100&h=100&fit=crop" id="nowPlayingImg">
+        <div class="track-info">
+            <h4 id="trackName">Выбери трек</h4>
+            <p id="artistName">Нажми на любую песню</p>
         </div>
     </div>
-    
-    <script>
-        // ==============================================
-        // FIREBASE - ТВОИ ДАННЫЕ
-        // ==============================================
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyDebw9ztkpGDZ8zugfWB1bG3mdHMzztUS0",
-            authDomain: "book-63c93.firebaseapp.com",
-            projectId: "book-63c93",
-            storageBucket: "book-63c93.firebasestorage.app",
-            messagingSenderId: "1051750888512",
-            appId: "1:1051750888512:web:09f24b98c240514b66dba5"
-        };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-        const auth = firebase.auth();
+    <div class="controls">
+        <button onclick="prevTrack()"><i class="fas fa-step-backward"></i></button>
+        <button class="play-pause" onclick="playPause()" id="playPauseBtn"><i class="fas fa-play"></i></button>
+        <button onclick="nextTrack()"><i class="fas fa-step-forward"></i></button>
+    </div>
 
-        // ==============================================
-        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-        // ==============================================
-        
-        let currentUser = null;
-        let currentUserData = null;
-        let currentPostId = null;
+    <div class="progress">
+        <span id="currentTime">0:00</span>
+        <div class="progress-bar" onclick="seek(event)">
+            <div class="progress-current" id="progressCurrent"></div>
+        </div>
+        <span id="totalTime">0:00</span>
+    </div>
 
-        // ==============================================
-        // ФУНКЦИИ
-        // ==============================================
-        
-        window.goToFeed = function() {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelector('[data-tab="feed"]').classList.add('active');
-            document.getElementById('feed-tab').classList.remove('hidden');
-        };
+    <div class="volume">
+        <i class="fas fa-volume-up"></i>
+        <div class="volume-bar" onclick="changeVolume(event)">
+            <div class="volume-level" id="volumeLevel"></div>
+        </div>
+    </div>
+</div>
 
-        // ==============================================
-        // АВТОРИЗАЦИЯ
-        // ==============================================
-        
-        document.getElementById('show-register').addEventListener('click', () => {
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('register-form').style.display = 'block';
-        });
-        
-        document.getElementById('show-login').addEventListener('click', () => {
-            document.getElementById('login-form').style.display = 'block';
-            document.getElementById('register-form').style.display = 'none';
-        });
-        
-        document.getElementById('login-btn').addEventListener('click', async () => {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const msg = document.getElementById('auth-message');
-            
-            if (!email || !password) {
-                showMessage(msg, "Введите email и пароль", false);
-                return;
-            }
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
-                showMessage(msg, "Неверный email или пароль", false);
-            }
-        });
-        
-        document.getElementById('register-btn').addEventListener('click', async () => {
-            const fullName = document.getElementById('register-fullname').value.trim();
-            const username = document.getElementById('register-username').value.trim();
-            const email = document.getElementById('register-email').value.trim();
-            const password = document.getElementById('register-password').value;
-            const msg = document.getElementById('auth-message');
-            
-            if (!fullName || !username || !email || !password) {
-                showMessage(msg, "Заполните все поля", false);
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage(msg, "Пароль должен быть минимум 6 символов", false);
-                return;
-            }
-            
-            try {
-                const result = await auth.createUserWithEmailAndPassword(email, password);
-                const userData = {
-                    uid: result.user.uid,
-                    fullName: fullName,
-                    username: username,
-                    email: email,
-                    bio: "Привет! Я в MuzaffarGram",
-                    avatar: "https://i.ibb.co/kVZdSwzy/24ba19a8-aafe-4165-b731-5abb06575e7b.png",
-                    posts: 0,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                await db.collection('users').doc(result.user.uid).set(userData);
-            } catch (error) {
-                showMessage(msg, "Ошибка регистрации", false);
-            }
-        });
-        
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            await auth.signOut();
-            showAuthScreen();
-        });
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        // ==============================================
-        // ЗАГРУЗКА ДАННЫХ
-        // ==============================================
+<script>
+    // API ключ
+    const API_KEY = 'AIzaSyBQ_jnhCrhJFpTFMNMitoxGggIYv96bfBI';
+    const API_URL = 'https://www.googleapis.com/youtube/v3';
+
+    // Элементы
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const tracksGrid = document.getElementById('tracksGrid');
+    const savedCount = document.getElementById('savedCount').querySelector('span');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const trackName = document.getElementById('trackName');
+    const artistName = document.getElementById('artistName');
+    const nowPlayingImg = document.getElementById('nowPlayingImg');
+    const currentTime = document.getElementById('currentTime');
+    const totalTime = document.getElementById('totalTime');
+    const progressCurrent = document.getElementById('progressCurrent');
+    const volumeLevel = document.getElementById('volumeLevel');
+
+    // Переменные
+    let player;
+    let searchTracks = [];
+    let savedTracks = JSON.parse(localStorage.getItem('savedTracks')) || [];
+    let currentTracks = []; // Текущий отображаемый список
+    let currentIndex = 0;
+    let isPlaying = false;
+    let currentMode = 'search'; // 'search' или 'saved'
+    let progressInterval;
+
+    // Скрытый плеер
+    const playerContainer = document.createElement('div');
+    playerContainer.id = 'youtube-player';
+    playerContainer.style.display = 'none';
+    document.body.appendChild(playerContainer);
+
+    // Загрузка YouTube API
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+
+    window.onYouTubeIframeAPIReady = () => {
+        console.log('YouTube API готов');
+        updateSavedCount();
+        loadGenre('pop', document.querySelector('.genre-btn'));
+    };
+
+    // Переключение табов
+    window.switchTab = (mode) => {
+        currentMode = mode;
         
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user.uid;
-                const doc = await db.collection('users').doc(currentUser).get();
-                currentUserData = doc.data();
-                
-                if (currentUserData) {
-                    document.getElementById('username-display').textContent = '@' + currentUserData.username;
-                    document.getElementById('user-avatar-header').src = currentUserData.avatar;
-                    
-                    await loadPosts();
-                    await loadProfile();
-                    showMainScreen();
-                }
+        document.getElementById('tabSearch').classList.toggle('active', mode === 'search');
+        document.getElementById('tabSaved').classList.toggle('active', mode === 'saved');
+        document.getElementById('searchSection').classList.toggle('active', mode === 'search');
+        document.getElementById('genresSection').style.display = mode === 'search' ? 'flex' : 'none';
+        
+        if (mode === 'saved') {
+            showSavedTracks();
+        } else {
+            if (searchTracks.length > 0) {
+                currentTracks = searchTracks;
+                renderTracks(searchTracks);
             } else {
-                showAuthScreen();
-            }
-        });
-        
-        async function loadPosts() {
-            const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
-            const container = document.getElementById('posts-container');
-            container.innerHTML = '';
-            
-            if (snapshot.empty) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Пока нет постов</div>';
-                return;
-            }
-            
-            for (const doc of snapshot.docs) {
-                const post = { id: doc.id, ...doc.data() };
-                const likeDoc = await db.collection('posts').doc(post.id).collection('likes').doc(currentUser).get();
-                const isLiked = likeDoc.exists;
-                
-                const commentsSnapshot = await db.collection('posts').doc(post.id).collection('comments').orderBy('createdAt', 'desc').limit(3).get();
-                const comments = [];
-                commentsSnapshot.forEach(c => comments.push({ id: c.id, ...c.data() }));
-                
-                container.appendChild(createPostElement(post, isLiked, comments));
+                loadGenre('pop', document.querySelector('.genre-btn'));
             }
         }
-        
-        function createPostElement(post, isLiked, comments) {
-            const div = document.createElement('div');
-            div.className = 'post';
-            
-            let commentsHtml = '';
-            if (comments.length > 0) {
-                commentsHtml = '<div class="comments-section">';
-                comments.forEach(c => {
-                    commentsHtml += `
-                        <div class="comment">
-                            <img src="${c.userAvatar}" class="comment-avatar">
-                            <div>
-                                <span class="comment-user">${c.userName}</span>
-                                <span class="comment-text">${c.text}</span>
-                                <div class="comment-date">${formatDate(c.createdAt)}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                if (post.comments > 3) {
-                    commentsHtml += `<div style="color: #667eea; cursor: pointer; margin-top: 10px;" onclick="showComments('${post.id}')">Посмотреть все комментарии</div>`;
-                }
-                commentsHtml += '</div>';
-            }
-            
-            div.innerHTML = `
-                <div class="post-header">
-                    <img src="${post.userAvatar}" class="post-avatar">
-                    <div>
-                        <div class="post-user">${post.userName}</div>
-                        <div class="post-date">${formatDate(post.createdAt)}</div>
-                    </div>
+    };
+
+    // Показать сохраненные треки
+    function showSavedTracks() {
+        if (savedTracks.length === 0) {
+            tracksGrid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-bookmark"></i>
+                    <h3>У тебя пока нет сохраненных треков</h3>
+                    <p>Найди музыку в поиске и сохраняй ❤️</p>
+                    <button onclick="switchTab('search')">
+                        <i class="fas fa-search"></i> Найти музыку
+                    </button>
                 </div>
-                <img src="${post.imageUrl}" class="post-image">
-                <div class="post-actions">
-                    <div class="post-action ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
-                        <span class="material-icons">${isLiked ? 'favorite' : 'favorite_border'}</span>
-                        <span>${post.likes || 0}</span>
-                    </div>
-                    <div class="post-action" onclick="showComments('${post.id}')">
-                        <span class="material-icons">comment</span>
-                        <span>${post.comments || 0}</span>
-                    </div>
-                </div>
-                <div class="post-caption">
-                    <strong>${post.userName}</strong> ${post.caption}
-                </div>
-                ${commentsHtml}
             `;
-            return div;
+            currentTracks = [];
+        } else {
+            currentTracks = savedTracks;
+            renderTracks(savedTracks);
+        }
+    }
+
+    // Обновить счетчик сохраненных
+    function updateSavedCount() {
+        savedCount.textContent = savedTracks.length;
+    }
+
+    // Сохранить/удалить трек
+    window.toggleSave = (trackId, event) => {
+        event.stopPropagation();
+        
+        const track = currentTracks.find(t => t.id === trackId);
+        if (!track) return;
+        
+        const index = savedTracks.findIndex(t => t.id === trackId);
+        
+        if (index === -1) {
+            // Сохраняем
+            savedTracks.push(track);
+            showNotification('✅ Добавлено в мою музыку');
+        } else {
+            // Удаляем
+            savedTracks.splice(index, 1);
+            showNotification('❌ Удалено из моей музыки');
+            
+            // Если мы в режиме сохраненных, обновляем список
+            if (currentMode === 'saved') {
+                showSavedTracks();
+            }
         }
         
-        async function loadProfile() {
-            document.getElementById('profile-fullname').textContent = currentUserData.fullName;
-            document.getElementById('profile-username').textContent = '@' + currentUserData.username;
-            document.getElementById('profile-avatar').src = currentUserData.avatar;
-            document.getElementById('profile-bio').textContent = currentUserData.bio;
-            document.getElementById('profile-posts').textContent = currentUserData.posts || 0;
-            
-            const snapshot = await db.collection('posts').where('userId', '==', currentUser).get();
-            const container = document.getElementById('profile-posts-container');
-            container.innerHTML = '';
-            
-            if (snapshot.empty) {
-                container.innerHTML = '<div style="text-align: center; color: #999;">Нет постов</div>';
-            } else {
-                snapshot.forEach(doc => {
-                    const post = doc.data();
-                    container.innerHTML += `
-                        <div class="post">
-                            <img src="${post.imageUrl}" style="width: 100%; max-height: 300px; object-fit: cover;">
-                            <div style="padding: 10px;">❤️ ${post.likes || 0}</div>
-                        </div>
-                    `;
-                });
-            }
+        localStorage.setItem('savedTracks', JSON.stringify(savedTracks));
+        updateSavedCount();
+        
+        // Обновляем отображение кнопок сохранения
+        if (currentMode === 'search') {
+            renderTracks(currentTracks);
         }
+    };
 
-        // ==============================================
-        // КОММЕНТАРИИ (ИСПРАВЛЕНО!)
-        // ==============================================
-        
-        window.showComments = async function(postId) {
-            currentPostId = postId;
-            
-            const snapshot = await db.collection('posts').doc(postId).collection('comments').orderBy('createdAt', 'desc').get();
-            const container = document.getElementById('comments-container');
-            container.innerHTML = '';
-            
-            if (snapshot.empty) {
-                container.innerHTML = '<div style="text-align: center; color: #999;">Нет комментариев</div>';
-            } else {
-                snapshot.forEach(doc => {
-                    const comment = doc.data();
-                    container.innerHTML += `
-                        <div class="comment">
-                            <img src="${comment.userAvatar}" class="comment-avatar">
-                            <div>
-                                <span class="comment-user">${comment.userName}</span>
-                                <span class="comment-text">${comment.text}</span>
-                                <div class="comment-date">${formatDate(comment.createdAt)}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            document.getElementById('comments-modal').classList.remove('hidden');
-        };
-        
-        document.getElementById('add-comment-btn').addEventListener('click', async () => {
-            const text = document.getElementById('new-comment-text').value;
-            if (!text || !currentPostId) return;
-            
-            await db.collection('posts').doc(currentPostId).collection('comments').add({
-                userId: currentUser,
-                userName: currentUserData.username,
-                userAvatar: currentUserData.avatar,
-                text: text,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            await db.collection('posts').doc(currentPostId).update({
-                comments: firebase.firestore.FieldValue.increment(1)
-            });
-            
-            document.getElementById('new-comment-text').value = '';
-            document.getElementById('comments-modal').classList.add('hidden');
-            loadPosts();
-        });
-        
-        window.closeComments = function() {
-            document.getElementById('comments-modal').classList.add('hidden');
-            currentPostId = null;
-        };
+    // Поиск
+    searchBtn.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        if (query) searchMusic(query);
+    });
 
-        // ==============================================
-        // ЛАЙКИ
-        // ==============================================
-        
-        window.toggleLike = async (postId) => {
-            const likeRef = db.collection('posts').doc(postId).collection('likes').doc(currentUser);
-            const postRef = db.collection('posts').doc(postId);
-            
-            if ((await likeRef.get()).exists) {
-                await likeRef.delete();
-                await postRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
-            } else {
-                await likeRef.set({ userId: currentUser, createdAt: new Date() });
-                await postRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-            }
-            loadPosts();
-        };
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = searchInput.value.trim();
+            if (query) searchMusic(query);
+        }
+    });
 
-        // ==============================================
-        // ЗАГРУЗКА ФОТО
-        // ==============================================
+    // Загрузка по жанру
+    window.loadGenre = (genre, btn) => {
+        document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        searchInput.value = genre + ' music';
+        searchMusic(genre + ' music');
+    };
+
+    // Поиск музыки
+    async function searchMusic(query) {
+        tracksGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Загрузка...</div>';
         
-        document.getElementById('post-image-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('post-image-preview').src = e.target.result;
-                    document.getElementById('post-image-preview').classList.remove('hidden');
-                    document.getElementById('post-label').style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        
-        document.getElementById('upload-post-btn').addEventListener('click', async () => {
-            const file = document.getElementById('post-image-input').files[0];
-            const caption = document.getElementById('post-caption').value;
-            
-            if (!file) {
-                alert('Выберите фото');
+        try {
+            const searchUrl = `${API_URL}/search?part=snippet&type=video&videoCategoryId=10&maxResults=30&q=${encodeURIComponent(query)}&key=${API_KEY}`;
+            const searchResp = await fetch(searchUrl);
+            const searchData = await searchResp.json();
+
+            if (!searchData.items) {
+                tracksGrid.innerHTML = '<div class="loading">Ничего не найдено</div>';
                 return;
             }
-            
-            const storageRef = storage.ref(`posts/${currentUser}_${Date.now()}`);
-            await storageRef.put(file);
-            const imageUrl = await storageRef.getDownloadURL();
-            
-            await db.collection('posts').add({
-                userId: currentUser,
-                userName: currentUserData.username,
-                userAvatar: currentUserData.avatar,
-                imageUrl: imageUrl,
-                caption: caption,
-                likes: 0,
-                comments: 0,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            await db.collection('users').doc(currentUser).update({
-                posts: (currentUserData.posts || 0) + 1
-            });
-            
-            alert('Пост опубликован');
-            document.getElementById('post-image-input').value = '';
-            document.getElementById('post-caption').value = '';
-            document.getElementById('post-image-preview').classList.add('hidden');
-            document.getElementById('post-label').style.display = 'flex';
-            
-            loadPosts();
-            loadProfile();
-        });
 
-        // ==============================================
-        // ОБНОВЛЕНИЕ ПРОФИЛЯ
-        // ==============================================
+            const videoIds = searchData.items.map(item => item.id.videoId).join(',');
+            const detailsUrl = `${API_URL}/videos?part=contentDetails&id=${videoIds}&key=${API_KEY}`;
+            const detailsResp = await fetch(detailsUrl);
+            const detailsData = await detailsResp.json();
+
+            searchTracks = searchData.items.map(item => {
+                const details = detailsData.items?.find(d => d.id === item.id.videoId) || {};
+                return {
+                    id: item.id.videoId,
+                    title: item.snippet.title,
+                    artist: item.snippet.channelTitle,
+                    thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
+                    duration: details.contentDetails?.duration || 'PT3M0S'
+                };
+            });
+
+            currentTracks = searchTracks;
+            renderTracks(searchTracks);
+            
+        } catch (err) {
+            tracksGrid.innerHTML = '<div class="loading">Ошибка загрузки</div>';
+        }
+    }
+
+    // Отображение треков
+    function renderTracks(tracks) {
+        tracksGrid.innerHTML = tracks.map((track, index) => {
+            const isActive = index === currentIndex;
+            const isSaved = savedTracks.some(t => t.id === track.id);
+            
+            return `
+                <div class="track-card ${isActive ? 'playing' : ''} ${isSaved ? 'saved' : ''}" onclick="playTrack(${index})">
+                    <div class="cover">
+                        <img src="${track.thumbnail}" alt="${track.title}" loading="lazy">
+                        <div class="play-icon"><i class="fas fa-play-circle"></i></div>
+                    </div>
+                    <div class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave('${track.id}', event)">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                    <div class="track-title">${track.title.substring(0, 30)}</div>
+                    <div class="track-artist">${track.artist}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Воспроизведение трека
+    window.playTrack = (index) => {
+        currentIndex = index;
+        const track = currentTracks[index];
         
-        document.getElementById('update-bio-btn').addEventListener('click', async () => {
-            const bio = document.getElementById('edit-bio').value;
-            if (bio) {
-                await db.collection('users').doc(currentUser).update({ bio });
-                currentUserData.bio = bio;
-                document.getElementById('profile-bio').textContent = bio;
-                document.getElementById('edit-bio').value = '';
+        trackName.textContent = track.title.substring(0, 30);
+        artistName.textContent = track.artist;
+        nowPlayingImg.src = track.thumbnail;
+        
+        renderTracks(currentTracks);
+
+        if (player) {
+            player.loadVideoById(track.id);
+        } else {
+            player = new YT.Player('youtube-player', {
+                videoId: track.id,
+                playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    disablekb: 1
+                },
+                events: {
+                    onReady: () => player.playVideo(),
+                    onStateChange: handlePlayerState
+                }
+            });
+        }
+    };
+
+    // Обработка состояний плеера
+    function handlePlayerState(event) {
+        if (event.data === YT.PlayerState.PLAYING) {
+            isPlaying = true;
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            startProgress();
+            
+        } else if (event.data === YT.PlayerState.PAUSED) {
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        } else if (event.data === YT.PlayerState.ENDED) {
+            nextTrack();
+        }
+    }
+
+    // Прогресс
+    function startProgress() {
+        if (progressInterval) clearInterval(progressInterval);
+        
+        progressInterval = setInterval(() => {
+            if (player && player.getCurrentTime) {
+                const current = player.getCurrentTime();
+                const duration = player.getDuration();
+                
+                if (duration > 0) {
+                    const progress = (current / duration) * 100;
+                    progressCurrent.style.width = progress + '%';
+                    
+                    currentTime.textContent = formatTime(current);
+                    totalTime.textContent = formatTime(duration);
+                }
             }
-        });
+        }, 100);
+    }
 
-        // ==============================================
-        // ТАБЫ
-        // ==============================================
+    // Управление
+    window.playPause = () => {
+        if (!player) return;
         
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-                this.classList.add('active');
-                document.getElementById(this.dataset.tab + '-tab').classList.remove('hidden');
-            });
-        });
+        if (isPlaying) {
+            player.pauseVideo();
+        } else {
+            player.playVideo();
+        }
+    };
 
-        // ==============================================
-        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-        // ==============================================
+    window.nextTrack = () => {
+        if (currentTracks.length === 0) return;
+        let next = currentIndex + 1;
+        if (next >= currentTracks.length) next = 0;
+        playTrack(next);
+    };
+
+    window.prevTrack = () => {
+        if (currentTracks.length === 0) return;
+        let prev = currentIndex - 1;
+        if (prev < 0) prev = currentTracks.length - 1;
+        playTrack(prev);
+    };
+
+    window.seek = (event) => {
+        if (!player) return;
         
-        function formatDate(timestamp) {
-            if (!timestamp) return 'только что';
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            const now = new Date();
-            const diff = Math.floor((now - date) / 60000);
-            
-            if (diff < 1) return 'только что';
-            if (diff < 60) return diff + ' мин назад';
-            if (diff < 1440) return Math.floor(diff / 60) + ' ч назад';
-            return date.toLocaleDateString();
-        }
+        const bar = event.currentTarget;
+        const rect = bar.getBoundingClientRect();
+        const percent = (event.clientX - rect.left) / rect.width;
+        const duration = player.getDuration();
+        player.seekTo(percent * duration);
+    };
+
+    window.changeVolume = (event) => {
+        if (!player) return;
         
-        function showMessage(element, msg, success) {
-            element.textContent = msg;
-            element.className = `alert ${success ? 'alert-success' : 'alert-error'}`;
-            element.classList.remove('hidden');
-            setTimeout(() => element.classList.add('hidden'), 3000);
-        }
+        const bar = event.currentTarget;
+        const rect = bar.getBoundingClientRect();
+        const percent = (event.clientX - rect.left) / rect.width;
+        player.setVolume(percent * 100);
+        volumeLevel.style.width = (percent * 100) + '%';
+    };
+
+    // Уведомление
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            z-index: 2000;
+            animation: slideUp 0.3s ease;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
         
-        function showAuthScreen() {
-            document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('main-screen').classList.add('hidden');
+        setTimeout(() => {
+            notification.style.animation = 'slideDown 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 2000);
+    }
+
+    // Форматирование времени
+    function formatTime(seconds) {
+        if (!seconds) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Добавляем стили для анимации
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
-        
-        function showMainScreen() {
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('main-screen').classList.remove('hidden');
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(100px); opacity: 0; }
         }
-    </script>
+    `;
+    document.head.appendChild(style);
+</script>
+
 </body>
 </html>
