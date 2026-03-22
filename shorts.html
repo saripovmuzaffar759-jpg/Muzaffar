@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <title>MUZAFFAR Shorts — TikTok style</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            position: fixed;
+        }
+
+        /* Основной контейнер */
+        .shorts-container {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
+        }
+
+        /* Слайд */
+        .short-slide {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Видео плеер */
+        .video-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+            object-fit: cover;
+        }
+
+        /* Информация снизу слева */
+        .video-info {
+            position: absolute;
+            bottom: 20px;
+            left: 16px;
+            right: 80px;
+            z-index: 20;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 2px solid white;
+        }
+
+        .author-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .follow-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .description {
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .music {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #ddd;
+        }
+
+        /* Правая панель */
+        .right-actions {
+            position: absolute;
+            right: 12px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 20;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .action-item:active .action-icon {
+            transform: scale(0.9);
+        }
+
+        .action-item.liked .action-icon {
+            background: #ff4d4d;
+            animation: heartPop 0.3s ease;
+        }
+
+        .action-item.saved .action-icon {
+            background: #10b981;
+        }
+
+        .action-count {
+            font-size: 12px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px black;
+        }
+
+        /* Категории сверху */
+        .categories-strip {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            padding: 12px 16px;
+            z-index: 30;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .categories-strip::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-pill {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .category-pill.active {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border-color: transparent;
+        }
+
+        .category-pill:active {
+            transform: scale(0.95);
+        }
+
+        /* Индикатор прогресса */
+        .progress-bar-container {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+            z-index: 25;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ff6b6b;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* Анимации */
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .heart-animation {
+            position: fixed;
+            font-size: 80px;
+            color: #ff4d4d;
+            pointer-events: none;
+            z-index: 100;
+            animation: heartPop 0.4s ease forwards;
+            filter: drop-shadow(0 0 10px rgba(255,77,77,0.5));
+        }
+
+        /* Индикатор загрузки */
+        .loading-indicator {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 40;
+            font-size: 14px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Тосты */
+        .toast {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 14px;
+            color: white;
+            z-index: 100;
+            animation: slideUp 0.3s ease;
+            white-space: nowrap;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .action-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 22px;
+            }
+            
+            .author {
+                margin-bottom: 4px;
+            }
+            
+            .avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .description {
+                font-size: 13px;
+            }
+            
+            .category-pill {
+                padding: 6px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Категории сверху -->
+<div class="categories-strip" id="categoriesStrip"></div>
+
+<!-- Контейнер с видео -->
+<div class="shorts-container" id="shortsContainer"></div>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<script>
+    // ==================== КОНФИГУРАЦИЯ ====================
+    const API_KEY = 'AIzaSyBQ_jnhCrhJFpTFMNMitoxGggIYv96bfBI';
+    const API_URL = 'https://www.googleapis.com/youtube/v3';
+    
+    // Категории с разнообразными запросами
+    const CATEGORIES = {
+        foryou: { name: 'Для тебя', query: 'shorts viral trending popular', icon: 'fa-fire' },
+        music: { name: 'Музыка', query: 'shorts music guitar piano drum beatbox concert', icon: 'fa-music' },
+        sports: { name: 'Спорт', query: 'shorts sports football basketball soccer extreme skills', icon: 'fa-futbol' },
+        gaming: { name: 'Игры', query: 'shorts gaming minecraft valorant csgo funny moments', icon: 'fa-gamepad' },
+        comedy: { name: 'Юмор', query: 'shorts comedy funny meme fail prank sketch', icon: 'fa-laugh' },
+        animals: { name: 'Животные', query: 'shorts animals cute dog cat funny wildlife', icon: 'fa-paw' },
+        cars: { name: 'Авто', query: 'shorts cars drift racing supercar modified', icon: 'fa-car' },
+        food: { name: 'Еда', query: 'shorts food cooking recipe delicious asmr', icon: 'fa-utensils' },
+        travel: { name: 'Путешествия', query: 'shorts travel adventure beach mountain city', icon: 'fa-plane' },
+        nature: { name: 'Природа', query: 'shorts nature landscape sunset forest relaxing', icon: 'fa-tree' }
+    };
+    
+    // ==================== ПЕРЕМЕННЫЕ ====================
+    let shorts = [];
+    let currentIndex = 0;
+    let isLoading = false;
+    let nextPageToken = '';
+    let currentCategory = 'foryou';
+    let players = {};
+    let progressIntervals = {};
+    let observer = null;
+    
+    // Сохраненные данные
+    let likedVideos = JSON.parse(localStorage.getItem('shorts_liked')) || [];
+    let savedVideos = JSON.parse(localStorage.getItem('shorts_saved')) || [];
+    let followedChannels = JSON.parse(localStorage.getItem('shorts_followed')) || [];
+    
+    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+    document.addEventListener('DOMContentLoaded', () => {
+        renderCategories();
+        loadYouTubeAPI();
+    });
+    
+    function renderCategories() {
+        const strip = document.getElementById('categoriesStrip');
+        strip.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) => `
+            <div class="category-pill ${key === currentCategory ? 'active' : ''}" 
+                 data-category="${key}"
+                 onclick="switchCategory('${key}')">
+                <i class="fas ${cat.icon}"></i> ${cat.name}
+            </div>
+        `).join('');
+    }
+    
+    function loadYouTubeAPI() {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+    }
+    
+    window.onYouTubeIframeAPIReady = () => {
+        loadShorts();
+    };
+    
+    // ==================== СМЕНА КАТЕГОРИИ ====================
+    window.switchCategory = (category) => {
+        if (category === currentCategory) return;
+        
+        currentCategory = category;
+        nextPageToken = '';
+        shorts = [];
+        
+        // Очищаем контейнер
+        document.getElementById('shortsContainer').innerHTML = '';
+        
+        // Останавливаем все плееры
+        Object.keys(players).forEach(id => {
+            if (players[id] && players[id].destroy) players[id].destroy();
+        });
+        players = {};
+        
+        // Останавливаем все интервалы
+        Object.keys(progressIntervals).forEach(id => {
+            clearInterval(progressIntervals[id]);
+        });
+        progressIntervals = {};
+        
+        // Обновляем активный класс
+        document.querySelectorAll('.category-pill').forEach(pill => {
+            pill.classList.toggle('active', pill.dataset.category === category);
+        });
+        
+        // Загружаем новые видео
+        loadShorts();
+        showToast(`📺 ${CATEGORIES[category].name}`);
+    };
+    
+    // ==================== ЗАГРУЗКА ВИДЕО ====================
+    async function loadShorts() {
+        if (isLoading) return;
+        isLoading = true;
+        
+        showLoading(true);
+        
+        try {
+            const category = CATEGORIES[currentCategory];
+            const randomTerm = getRandomTerm(currentCategory);
+            const searchQuery = `${category.query} ${randomTerm}`;
+            
+            const url = `${API_URL}/search?part=snippet&type=video&videoDuration=short&maxResults=15&q=${encodeURIComponent(searchQuery)}&key=${API_KEY}&pageToken=${nextPageToken}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (!data.items || data.items.length === 0) {
+                showToast('Видео не найдены');
+                isLoading = false;
+                showLoading(false);
+                return;
+            }
+            
+            const videoIds = data.items.map(item => item.id.videoId).join(',');
+            const detailsUrl = `${API_URL}/videos?part=contentDetails,statistics&id=${videoIds}&key=${API_KEY}`;
+            const detailsResp = await fetch(detailsUrl);
+            const detailsData = await detailsResp.json();
+            
+            const newShorts = data.items.map(item => {
+                const details = detailsData.items?.find(d => d.id === item.id.videoId) || {};
+                const videoId = item.id.videoId;
+                
+                return {
+                    id: videoId,
+                    title: item.snippet.title,
+                    channel: item.snippet.channelTitle,
+                    channelId: item.snippet.channelId,
+                    thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+                    duration: details.contentDetails?.duration,
+                    views: details.statistics?.viewCount || Math.floor(Math.random() * 500000) + 10000,
+                    likes: Math.floor(Math.random() * 50000) + 1000,
+                    isLiked: likedVideos.includes(videoId),
+                    isSaved: savedVideos.includes(videoId),
+                    isFollowed: followedChannels.includes(item.snippet.channelId)
+                };
+            });
+            
+            shorts = [...shorts, ...newShorts];
+            nextPageToken = data.nextPageToken || '';
+            
+            renderShorts();
+            
+        } catch (err) {
+            console.error('Ошибка:', err);
+            showToast('Ошибка загрузки');
+        } finally {
+            isLoading = false;
+            showLoading(false);
+        }
+    }
+    
+    function getRandomTerm(category) {
+        const terms = {
+            foryou: ['viral', 'trending', 'new', 'best', 'top', 'popular'],
+            music: ['live', 'cover', 'original', 'remix', 'concert', 'studio'],
+            sports: ['highlights', 'skills', 'tricks', 'best moments', 'training'],
+            gaming: ['funny', 'best plays', 'montage', 'moments', 'highlights'],
+            comedy: ['funny', 'prank', 'fail', 'skit', 'comedy'],
+            animals: ['cute', 'funny', 'wild', 'pets', 'amazing'],
+            cars: ['supercar', 'drift', 'race', 'exotic', 'modified'],
+            food: ['delicious', 'recipe', 'street food', 'cooking', 'asmr'],
+            travel: ['amazing', 'beautiful', 'adventure', 'views', 'scenic'],
+            nature: ['beautiful', 'relaxing', 'scenic', 'wildlife', 'amazing']
+        };
+        const categoryTerms = terms[category] || terms.foryou;
+        return categoryTerms[Math.floor(Math.random() * categoryTerms.length)];
+    }
+    
+    // ==================== ОТОБРАЖЕНИЕ ВИДЕО ====================
+    function renderShorts() {
+        const container = document.getElementById('shortsContainer');
+        const existingCount = container.children.length;
+        
+        shorts.slice(existingCount).forEach((short, idx) => {
+            const slide = document.createElement('div');
+            slide.className = 'short-slide';
+            slide.setAttribute('data-id', short.id);
+            slide.setAttribute('data-index', shorts.indexOf(short));
+            
+            // Обложка для загрузки
+            const wrapper = document.createElement('div');
+            wrapper.className = 'video-wrapper';
+            wrapper.id = `player-${short.id}`;
+            
+            // Информация
+            const info = document.createElement('div');
+            info.className = 'video-info';
+            info.innerHTML = `
+                <div class="author">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <span class="author-name">${short.channel}</span>
+                        <span class="follow-btn" onclick="toggleFollow('${short.channelId}', '${short.channel.replace(/'/g, "\\'")}', event)">
+                            ${short.isFollowed ? '✓ Подписан' : '+ Подписаться'}
+                        </span>
+                    </div>
+                </div>
+                <div class="description">${short.title}</div>
+                <div class="music">
+                    <i class="fas fa-music"></i> ${short.channel} • оригинальный звук
+                </div>
+            `;
+            
+            // Правая панель
+            const actions = document.createElement('div');
+            actions.className = 'right-actions';
+            actions.innerHTML = `
+                <div class="action-item ${short.isLiked ? 'liked' : ''}" onclick="toggleLike('${short.id}', event)">
+                    <div class="action-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="action-count" id="like-count-${short.id}">${formatNumber(short.likes)}</div>
+                </div>
+                <div class="action-item ${short.isSaved ? 'saved' : ''}" onclick="toggleSave('${short.id}', event)">
+                    <div class="action-icon">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                    <div class="action-count">${short.isSaved ? 'Сохранено' : 'Сохранить'}</div>
+                </div>
+                <div class="action-item" onclick="shareVideo('${short.id}', '${short.title.replace(/'/g, "\\'")}', event)">
+                    <div class="action-icon">
+                        <i class="fas fa-share"></i>
+                    </div>
+                    <div class="action-count">Поделиться</div>
+                </div>
+            `;
+            
+            // Прогресс бар
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar-container';
+            progressBar.id = `progress-${short.id}`;
+            progressBar.innerHTML = '<div class="progress-fill"></div>';
+            
+            slide.appendChild(wrapper);
+            slide.appendChild(info);
+            slide.appendChild(actions);
+            slide.appendChild(progressBar);
+            container.appendChild(slide);
+            
+            // Создаем плеер
+            setTimeout(() => createPlayer(short.id), 100);
+        });
+        
+        setupIntersectionObserver();
+    }
+    
+    function createPlayer(videoId) {
+        const element = document.getElementById(`player-${videoId}`);
+        if (!element || players[videoId]) return;
+        
+        players[videoId] = new YT.Player(`player-${videoId}`, {
+            videoId: videoId,
+            playerVars: {
+                autoplay: 0,
+                controls: 0,
+                modestbranding: 1,
+                rel: 0,
+                disablekb: 1,
+                fs: 0,
+                playsinline: 1
+            },
+            events: {
+                onReady: (event) => {
+                    event.target.mute();
+                },
+                onStateChange: (event) => {
+                    if (event.data === YT.PlayerState.PLAYING) {
+                        startProgress(videoId);
+                    }
+                    if (event.data === YT.PlayerState.ENDED) {
+                        resetProgress(videoId);
+                    }
+                }
+            }
+        });
+    }
+    
+    // ==================== АВТОВОСПРОИЗВЕДЕНИЕ ====================
+    function setupIntersectionObserver() {
+        if (observer) observer.disconnect();
+        
+        observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const slide = entry.target;
+                const videoId = slide.getAttribute('data-id');
+                const index = parseInt(slide.getAttribute('data-index'));
+                
+                if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                    currentIndex = index;
+                    
+                    // Останавливаем все другие видео
+                    Object.keys(players).forEach(id => {
+                        if (players[id] && players[id].pauseVideo) {
+                            players[id].pauseVideo();
+                        }
+                        resetProgress(id);
+                    });
+                    
+                    // Воспроизводим текущее
+                    if (videoId && players[videoId]) {
+                        players[videoId].playVideo();
+                        players[videoId].unMute();
+                    }
+                } else {
+                    if (videoId && players[videoId] && players[videoId].pauseVideo) {
+                        players[videoId].pauseVideo();
+                    }
+                    resetProgress(videoId);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        document.querySelectorAll('.short-slide').forEach(slide => {
+            observer.observe(slide);
+        });
+    }
+    
+    function startProgress(videoId) {
+        if (progressIntervals[videoId]) clearInterval(progressIntervals[videoId]);
+        
+        const player = players[videoId];
+        if (!player) return;
+        
+        progressIntervals[videoId] = setInterval(() => {
+            if (player && player.getCurrentTime && player.getDuration) {
+                const current = player.getCurrentTime();
+                const duration = player.getDuration();
+                if (duration > 0) {
+                    const percent = (current / duration) * 100;
+                    const fill = document.querySelector(`#progress-${videoId} .progress-fill`);
+                    if (fill) fill.style.width = percent + '%';
+                }
+            }
+        }, 100);
+    }
+    
+    function resetProgress(videoId) {
+        if (progressIntervals[videoId]) {
+            clearInterval(progressIntervals[videoId]);
+            delete progressIntervals[videoId];
+        }
+        const fill = document.querySelector(`#progress-${videoId} .progress-fill`);
+        if (fill) fill.style.width = '0%';
+    }
+    
+    // ==================== ДЕЙСТВИЯ ====================
+    window.toggleLike = (videoId, event) => {
+        event.stopPropagation();
+        
+        const index = shorts.findIndex(s => s.id === videoId);
+        if (index === -1) return;
+        
+        const likeIndex = likedVideos.indexOf(videoId);
+        
+        if (likeIndex === -1) {
+            likedVideos.push(videoId);
+            shorts[index].likes++;
+            shorts[index].isLiked = true;
+            showHeartAnimation(event);
+            showToast('❤️ Лайк!');
+        } else {
+            likedVideos.splice(likeIndex, 1);
+            shorts[index].likes--;
+            shorts[index].isLiked = false;
+            showToast('💔 Убрали лайк');
+        }
+        
+        localStorage.setItem('shorts_liked', JSON.stringify(likedVideos));
+        
+        const likeCount = document.getElementById(`like-count-${videoId}`);
+        if (likeCount) likeCount.textContent = formatNumber(shorts[index].likes);
+        
+        const btn = event.currentTarget;
+        btn.classList.toggle('liked');
+    };
+    
+    window.toggleSave = (videoId, event) => {
+        event.stopPropagation();
+        
+        const index = shorts.findIndex(s => s.id === videoId);
+        if (index === -1) return;
+        
+        const saveIndex = savedVideos.indexOf(videoId);
+        
+        if (saveIndex === -1) {
+            savedVideos.push(videoId);
+            shorts[index].isSaved = true;
+            showToast('💾 Сохранено в избранное');
+        } else {
+            savedVideos.splice(saveIndex, 1);
+            shorts[index].isSaved = false;
+            showToast('🗑️ Удалено');
+        }
+        
+        localStorage.setItem('shorts_saved', JSON.stringify(savedVideos));
+        
+        const btn = event.currentTarget;
+        btn.classList.toggle('saved');
+        btn.querySelector('.action-count').textContent = shorts[index].isSaved ? 'Сохранено' : 'Сохранить';
+    };
+    
+    window.toggleFollow = (channelId, channelName, event) => {
+        event.stopPropagation();
+        
+        const index = followedChannels.indexOf(channelId);
+        
+        if (index === -1) {
+            followedChannels.push(channelId);
+            showToast(`✅ Подписались на ${channelName}`);
+        } else {
+            followedChannels.splice(index, 1);
+            showToast(`❌ Отписались от ${channelName}`);
+        }
+        
+        localStorage.setItem('shorts_followed', JSON.stringify(followedChannels));
+        
+        // Обновляем все видео этого канала
+        shorts.forEach(short => {
+            if (short.channelId === channelId) {
+                short.isFollowed = followedChannels.includes(channelId);
+            }
+        });
+        
+        // Обновляем кнопку
+        const btn = event.currentTarget;
+        btn.textContent = followedChannels.includes(channelId) ? '✓ Подписан' : '+ Подписаться';
+    };
+    
+    window.shareVideo = (videoId, title, event) => {
+        event.stopPropagation();
+        
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                text: 'Смотри это видео!',
+                url: `https://www.youtube.com/shorts/${videoId}`
+            });
+        } else {
+            navigator.clipboard.writeText(`https://www.youtube.com/shorts/${videoId}`);
+            showToast('🔗 Ссылка скопирована');
+        }
+    };
+    
+    // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+    function showHeartAnimation(event) {
+        const heart = document.createElement('div');
+        heart.className = 'heart-animation';
+        heart.innerHTML = '❤️';
+        heart.style.left = `${event.clientX - 40}px`;
+        heart.style.top = `${event.clientY - 40}px`;
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 400);
+    }
+    
+    let loadingToast = null;
+    function showLoading(show) {
+        if (show) {
+            if (loadingToast) return;
+            loadingToast = document.createElement('div');
+            loadingToast.className = 'loading-indicator';
+            loadingToast.innerHTML = '<div class="spinner"></div> Загрузка...';
+            document.body.appendChild(loadingToast);
+        } else {
+            if (loadingToast) {
+                loadingToast.remove();
+                loadingToast = null;
+            }
+        }
+    }
+    
+    let activeToast = null;
+    function showToast(message) {
+        if (activeToast) activeToast.remove();
+        activeToast = document.createElement('div');
+        activeToast.className = 'toast';
+        activeToast.textContent = message;
+        document.body.appendChild(activeToast);
+        setTimeout(() => {
+            if (activeToast) activeToast.remove();
+            activeToast = null;
+        }, 2000);
+    }
+    
+    function formatNumber(num) {
+        if (!num) return '0';
+        const n = parseInt(num);
+        if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+        if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+        return n.toString();
+    }
+    
+    // ==================== БЕСКОНЕЧНАЯ ЗАГРУЗКА ====================
+    const container = document.getElementById('shortsContainer');
+    container.addEventListener('scroll', () => {
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        if (scrollTop + clientHeight >= scrollHeight - 300 && !isLoading && nextPageToken) {
+            loadShorts();
+        }
+    });
+    
+    // Двойной тап для лайка
+    container.addEventListener('dblclick', (e) => {
+        const slide = e.target.closest('.short-slide');
+        if (slide) {
+            const videoId = slide.getAttribute('data-id');
+            if (videoId) {
+                const fakeEvent = { stopPropagation: () => {}, clientX: e.clientX, clientY: e.clientY };
+                toggleLike(videoId, fakeEvent);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
