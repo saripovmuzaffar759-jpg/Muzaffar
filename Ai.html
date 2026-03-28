@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -17,6 +16,7 @@
             --darker: #16213e;
             --light: #f0f0f0;
             --gray: #4a4a6a;
+            --error: #f44336;
             --sidebar-bg: #0f0f1f;
             --glow: 0 0 20px rgba(255, 107, 53, 0.5);
             --radius: 12px;
@@ -49,7 +49,6 @@
             height: 90vh;
         }
 
-        /* Боковая панель с историей */
         .sidebar {
             width: 280px;
             background: var(--sidebar-bg);
@@ -141,7 +140,6 @@
             background: rgba(244,67,54,0.2);
         }
 
-        /* Основная область чата */
         .main-chat {
             flex: 1;
             display: flex;
@@ -243,6 +241,7 @@
             font-family: 'Ubuntu Mono', monospace;
             word-wrap: break-word;
             line-height: 1.5;
+            white-space: pre-wrap;
         }
 
         .user-message .message-content {
@@ -312,7 +311,6 @@
             border-top: 1px solid #2a2a3a;
         }
 
-        /* Стили для скролла */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -323,11 +321,25 @@
             background: var(--primary);
             border-radius: 10px;
         }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 90vh;
+            }
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+            }
+            .message {
+                max-width: 95%;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Боковая панель -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <h3><i class="fas fa-history" style="margin-right: 8px;"></i>История</h3>
@@ -338,7 +350,6 @@
             <div class="chat-list" id="chatList"></div>
         </div>
 
-        <!-- Основная область -->
         <div class="main-chat">
             <div class="chat-header">
                 <h2 id="chatTitle">Новый чат</h2>
@@ -367,16 +378,13 @@
 
     <script>
         (function() {
-            // ========== КОНСТАНТЫ ==========
             const STORAGE_KEY = 'ai_chats';
-            const API_URL = 'https://text.pollinations.ai/';
+            const API_BASE_URL = 'https://text.pollinations.ai/';
 
-            // ========== СОСТОЯНИЕ ==========
-            let chats = [];                 // массив чатов
-            let currentChatId = null;        // id активного чата
-            let isLoading = false;           // флаг загрузки ответа
+            let chats = [];
+            let currentChatId = null;
+            let isLoading = false;
 
-            // ========== DOM ЭЛЕМЕНТЫ ==========
             const chatListEl = document.getElementById('chatList');
             const chatMessagesEl = document.getElementById('chatMessages');
             const chatTitleEl = document.getElementById('chatTitle');
@@ -385,13 +393,11 @@
             const newChatBtn = document.getElementById('newChatBtn');
             const modelSelect = document.getElementById('modelSelect');
 
-            // ========== ЗАГРУЗКА ИЗ STORAGE ==========
             function loadChats() {
                 const stored = localStorage.getItem(STORAGE_KEY);
                 if (stored) {
                     chats = JSON.parse(stored);
                 } else {
-                    // создаём чат по умолчанию
                     const defaultChat = {
                         id: generateId(),
                         title: 'Новый чат',
@@ -404,7 +410,6 @@
                     currentChatId = defaultChat.id;
                     saveChats();
                 }
-                // если currentChatId не установлен, берём первый
                 if (!currentChatId && chats.length > 0) {
                     currentChatId = chats[0].id;
                 }
@@ -420,7 +425,6 @@
                 return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
             }
 
-            // ========== РЕНДЕР СПИСКА ЧАТОВ ==========
             function renderChatList() {
                 if (chats.length === 0) {
                     chatListEl.innerHTML = '<div style="text-align:center; color:var(--gray); padding:20px;">Нет чатов</div>';
@@ -432,7 +436,7 @@
                     html += `
                         <div class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}">
                             <span class="chat-title">${escapeHtml(chat.title)}</span>
-                            <button class="delete-chat" onclick="event.stopPropagation(); window.deleteChat('${chat.id}')">
+                            <button class="delete-chat" data-chat-id="${chat.id}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -440,36 +444,43 @@
                 });
                 chatListEl.innerHTML = html;
 
-                // добавляем обработчики клика на элементы списка
                 document.querySelectorAll('.chat-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const chatId = item.dataset.chatId;
-                        switchChat(chatId);
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.closest('.delete-chat')) {
+                            const chatId = item.dataset.chatId;
+                            switchChat(chatId);
+                        }
                     });
+                    
+                    const deleteBtn = item.querySelector('.delete-chat');
+                    if (deleteBtn) {
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const chatId = deleteBtn.dataset.chatId;
+                            deleteChat(chatId);
+                        });
+                    }
                 });
             }
 
-            // Экранирование для безопасности
             function escapeHtml(unsafe) {
-                return unsafe.replace(/[&<>"]/g, function(m) {
+                if (!unsafe) return '';
+                return unsafe.replace(/[&<>]/g, function(m) {
                     if(m === '&') return '&amp;';
                     if(m === '<') return '&lt;';
                     if(m === '>') return '&gt;';
-                    if(m === '"') return '&quot;';
                     return m;
                 });
             }
 
-            // ========== ПЕРЕКЛЮЧЕНИЕ ЧАТА ==========
             function switchChat(chatId) {
                 const chat = chats.find(c => c.id === chatId);
                 if (!chat) return;
                 currentChatId = chatId;
-                renderChatList(); // обновляем активный класс
+                renderChatList();
                 renderCurrentChat();
             }
 
-            // ========== РЕНДЕР ТЕКУЩЕГО ЧАТА ==========
             function renderCurrentChat() {
                 const chat = chats.find(c => c.id === currentChatId);
                 if (!chat) {
@@ -493,7 +504,6 @@
                 chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
             }
 
-            // ========== НОВЫЙ ЧАТ ==========
             function createNewChat() {
                 const newChat = {
                     id: generateId(),
@@ -510,8 +520,7 @@
                 renderCurrentChat();
             }
 
-            // ========== УДАЛЕНИЕ ЧАТА ==========
-            window.deleteChat = function(chatId) {
+            function deleteChat(chatId) {
                 if (chats.length === 1) {
                     alert('Нельзя удалить последний чат. Создайте новый.');
                     return;
@@ -523,9 +532,8 @@
                 saveChats();
                 renderChatList();
                 renderCurrentChat();
-            };
+            }
 
-            // ========== ОТПРАВКА СООБЩЕНИЯ ==========
             async function sendMessage() {
                 const text = userInput.value.trim();
                 if (!text || isLoading) return;
@@ -533,53 +541,63 @@
                 const chat = chats.find(c => c.id === currentChatId);
                 if (!chat) return;
 
-                // добавляем сообщение пользователя
                 chat.messages.push({ role: 'user', content: text });
                 userInput.value = '';
                 renderCurrentChat();
 
-                // если это первое сообщение пользователя, обновляем заголовок чата
                 if (chat.messages.filter(m => m.role === 'user').length === 1) {
                     chat.title = text.slice(0, 30) + (text.length > 30 ? '…' : '');
+                    saveChats();
+                    renderChatList();
                 }
 
-                // показываем индикатор печатания
                 showTypingIndicator();
                 isLoading = true;
                 sendBtn.disabled = true;
 
                 try {
-                    // готовим историю для отправки (исключаем индикатор)
-                    const history = chat.messages.map(m => ({
-                        role: m.role,
-                        content: m.content
-                    }));
-
                     const model = modelSelect.value;
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            messages: history,
-                            model: model
-                        })
-                    });
-
-                    if (!response.ok) throw new Error('Ошибка сети');
+                    // Формируем контекст диалога для API Pollinations
+                    const context = chat.messages
+                        .filter(m => m.role !== 'system')
+                        .slice(-10) // Берем последние 10 сообщений для контекста
+                        .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
+                        .join('\n');
+                    
+                    // Pollinations API использует GET запрос с параметрами
+                    const prompt = `${context}\nAssistant:`;
+                    const encodedPrompt = encodeURIComponent(prompt);
+                    const url = `${API_BASE_URL}${encodedPrompt}?model=${model}`;
+                    
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
                     const answer = await response.text();
-
-                    // удаляем индикатор
+                    
                     removeTypingIndicator();
-
-                    // добавляем ответ ассистента
-                    chat.messages.push({ role: 'assistant', content: answer });
+                    
+                    if (answer && answer.trim()) {
+                        chat.messages.push({ role: 'assistant', content: answer.trim() });
+                    } else {
+                        chat.messages.push({ role: 'assistant', content: 'Извините, получен пустой ответ. Попробуйте ещё раз.' });
+                    }
+                    
                     saveChats();
                     renderCurrentChat();
 
                 } catch (error) {
-                    console.error(error);
+                    console.error('API Error:', error);
                     removeTypingIndicator();
-                    chat.messages.push({ role: 'assistant', content: 'Извините, что-то пошло не так. Попробуйте ещё раз.' });
+                    let errorMessage = 'Извините, произошла ошибка. ';
+                    if (error.message.includes('Failed to fetch')) {
+                        errorMessage += 'Проверьте подключение к интернету.';
+                    } else {
+                        errorMessage += error.message;
+                    }
+                    chat.messages.push({ role: 'assistant', content: errorMessage });
                     saveChats();
                     renderCurrentChat();
                 } finally {
@@ -595,21 +613,36 @@
                 typingDiv.id = 'typingIndicator';
                 typingDiv.innerHTML = `
                     <div class="avatar"><i class="fas fa-robot"></i></div>
-                    <div class="message-content">...</div>
+                    <div class="message-content">печатает<span class="dots">...</span></div>
                 `;
                 chatMessagesEl.appendChild(typingDiv);
                 chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+                
+                let dots = 0;
+                const dotsElement = typingDiv.querySelector('.dots');
+                const interval = setInterval(() => {
+                    if (!document.getElementById('typingIndicator')) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    dots = (dots + 1) % 4;
+                    dotsElement.textContent = '.'.repeat(dots);
+                }, 500);
+                typingDiv.dataset.interval = interval;
             }
 
             function removeTypingIndicator() {
                 const typing = document.getElementById('typingIndicator');
-                if (typing) typing.remove();
+                if (typing) {
+                    if (typing.dataset.interval) {
+                        clearInterval(parseInt(typing.dataset.interval));
+                    }
+                    typing.remove();
+                }
             }
 
-            // ========== ИНИЦИАЛИЗАЦИЯ ==========
             loadChats();
 
-            // Обработчики
             sendBtn.addEventListener('click', sendMessage);
             userInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
