@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Geometry Dash Deluxe — Выбор уровня | Крутые анимации</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', 'Segoe UI', monospace;
+            touch-action: manipulation;
+        }
+
+        .game-container {
+            background: #000000aa;
+            border-radius: 2rem;
+            padding: 1rem;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 1rem;
+            box-shadow: 0 0 0 3px #ffd966, 0 10px 25px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .info-panel {
+            margin-top: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            background: #1e1f2ccc;
+            backdrop-filter: blur(4px);
+            padding: 0.5rem 1.2rem;
+            border-radius: 3rem;
+            border: 1px solid #ffdd88;
+        }
+
+        .score-box {
+            background: #0b0e16;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #ffe3a3;
+            font-family: monospace;
+        }
+
+        .level-selector {
+            display: flex;
+            gap: 0.5rem;
+            background: #2a2438;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+        }
+
+        .level-btn {
+            background: #4a3a5a;
+            border: none;
+            font-size: 0.9rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .level-btn.active {
+            background: #ffaa44;
+            color: #1a1a2a;
+            box-shadow: 0 0 8px #ffaa66;
+        }
+
+        .level-btn:hover {
+            background: #ff8844;
+        }
+
+        .restart-btn {
+            background: #6b3e26;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            color: #ffddbb;
+            cursor: pointer;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            background: #000000aa;
+            padding: 0.2rem 1rem;
+            border-radius: 2rem;
+            color: #ffd58c;
+        }
+
+        @media (max-width: 650px) {
+            .info-panel { gap: 0.5rem; }
+            .level-btn { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
+            .score-box { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div class="info-panel">
+            <div class="score-box">⭐ СЧЁТ: <span id="scoreValue">0</span></div>
+            <div class="level-selector" id="levelSelector">
+                <button class="level-btn" data-level="0">🌿 ЛЕС</button>
+                <button class="level-btn" data-level="1">❄️ ЛЁД</button>
+                <button class="level-btn" data-level="2">🔥 ВУЛКАН</button>
+                <button class="level-btn" data-level="3">💀 НЕКРО</button>
+                <button class="level-btn" data-level="4">✨ КОСМОС</button>
+            </div>
+            <button class="restart-btn" id="restartButton">▶ НОВАЯ ИГРА</button>
+            <div class="status" id="gameStatusText">🎮 ПРОБЕЛ / КЛИК — ПРЫЖОК!</div>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #88aaff;">
+        🎯 ВЫБЕРИ УРОВЕНЬ | ПРЫЖОК С АНИМАЦИЕЙ | РАЗНЫЕ ПРЕПЯТСТВИЯ 🎯
+    </div>
+</div>
+
+<script>
+    (function(){
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const W = 800, H = 400;
+        const GROUND_Y = 340;
+        const PLAYER_SIZE = 38;
+        
+        // ФИЗИКА — УЛУЧШЕННАЯ, ЛЕГЧЕ ПРЫГАТЬ
+        const GRAVITY = 0.68;
+        const JUMP_POWER = -12.5;
+        
+        let player = {
+            x: 100,
+            y: GROUND_Y - PLAYER_SIZE,
+            vy: 0,
+            width: PLAYER_SIZE,
+            height: PLAYER_SIZE,
+            isOnGround: true
+        };
+        
+        let obstacles = [];
+        let gameRunning = true;
+        let score = 0;
+        let selectedLevel = 0;
+        
+        // КРУТЫЕ АНИМАЦИОННЫЕ ЭФФЕКТЫ
+        let jumpAnim = 0;        // анимация прыжка (сжатие/растяжение)
+        let landAnim = 0;        // анимация приземления
+        let trailParticles = [];
+        let hitParticles = [];
+        let screenShake = 0;
+        let levelUpParticles = [];
+        let jumpRequested = false;
+        
+        // ========== 5 УРОВНЕЙ С РАЗНЫМИ ПАРАМЕТРАМИ (ЛЕГЧЕ И ИНТЕРЕСНЕЕ) ==========
+        const LEVELS = [
+            {
+                name: "🌿 ЛЕСНОЙ",
+                bgTop: "#0a3a1a",
+                bgBottom: "#2a6a3a",
+                ground1: "#5d3a1a",
+                ground2: "#9a6a3a",
+                speed: 3.8,
+                spawnDelay: 72,
+                obstacleTypes: ["pillar", "spike", "ball"],
+                colorObstacle: "#aa6a3a",
+                colorAccent: "#ffcc66"
+            },
+            {
+                name: "❄️ ЛЕДЯНОЙ",
+                bgTop: "#2a5f8a",
+                bgBottom: "#6a9fca",
+                ground1: "#8ab3cf",
+                ground2: "#c8e8ff",
+                speed: 4.2,
+                spawnDelay: 65,
+                obstacleTypes: ["pillar", "saw", "ice_spike"],
+                colorObstacle: "#88ccff",
+                colorAccent: "#ffffff"
+            },
+            {
+                name: "🔥 ВУЛКАНИЧЕСКИЙ",
+                bgTop: "#5a1a0a",
+                bgBottom: "#aa4a2a",
+                ground1: "#6a2a0a",
+                ground2: "#ca6a3a",
+                speed: 4.6,
+                spawnDelay: 60,
+                obstacleTypes: ["pillar", "fire_ball", "saw"],
+                colorObstacle: "#dd5533",
+                colorAccent: "#ffaa44"
+            },
+            {
+                name: "💀 НЕКРОПОЛИС",
+                bgTop: "#2a0a3a",
+                bgBottom: "#5a2a6a",
+                ground1: "#4a2a5a",
+                ground2: "#7a4a8a",
+                speed: 5.0,
+                spawnDelay: 55,
+                obstacleTypes: ["pillar", "skull", "spike"],
+                colorObstacle: "#aa66cc",
+                colorAccent: "#cc88ff"
+            },
+            {
+                name: "✨ КОСМИЧЕСКИЙ",
+                bgTop: "#0a0a2a",
+                bgBottom: "#3a2a6a",
+                ground1: "#4a3a6a",
+                ground2: "#8a6aaa",
+                speed: 5.4,
+                spawnDelay: 50,
+                obstacleTypes: ["pillar", "cube", "laser"],
+                colorObstacle: "#ff66cc",
+                colorAccent: "#88ffff"
+            }
+        ];
+        
+        let currentLevel = LEVELS[0];
+        
+        function setLevel(levelIndex) {
+            selectedLevel = levelIndex;
+            currentLevel = LEVELS[selectedLevel];
+            document.querySelectorAll('.level-btn').forEach((btn, idx) => {
+                if (idx == selectedLevel) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            restartGame();
+        }
+        
+        // ========== РАЗНЫЕ ТИПЫ ПРЕПЯТСТВИЙ ==========
+        function createObstacle(type, x, y, w, h) {
+            return { type, x, y, w, h, passed: false, rotation: 0, pulse: 0, scale: 1 };
+        }
+        
+        function spawnObstacle() {
+            const types = currentLevel.obstacleTypes;
+            const type = types[Math.floor(Math.random() * types.length)];
+            const x = W;
+            let obs = null;
+            
+            switch(type) {
+                case "pillar":
+                    let h = Math.floor(Math.random() * 55) + 35;
+                    h = Math.min(h, GROUND_Y - 20);
+                    obs = createObstacle("pillar", x, GROUND_Y - h, 26, h);
+                    break;
+                case "spike":
+                    obs = createObstacle("spike", x, GROUND_Y - 28, 34, 28);
+                    break;
+                case "ball":
+                    let by = GROUND_Y - 45 - Math.random() * 50;
+                    obs = createObstacle("ball", x, by, 30, 30);
+                    break;
+                case "saw":
+                    let sy = GROUND_Y - 40 - Math.random() * 45;
+                    obs = createObstacle("saw", x, sy, 32, 32);
+                    break;
+                case "ice_spike":
+                    obs = createObstacle("ice_spike", x, GROUND_Y - 38, 40, 38);
+                    break;
+                case "fire_ball":
+                    let fy = GROUND_Y - 45 - Math.random() * 55;
+                    obs = createObstacle("fire_ball", x, fy, 32, 32);
+                    break;
+                case "skull":
+                    obs = createObstacle("skull", x, GROUND_Y - 42, 34, 42);
+                    break;
+                case "cube":
+                    let cy = GROUND_Y - 40 - Math.random() * 50;
+                    obs = createObstacle("cube", x, cy, 34, 34);
+                    break;
+                case "laser":
+                    let ly = GROUND_Y - 38 - Math.random() * 45;
+                    obs = createObstacle("laser", x, ly, 28, 28);
+                    break;
+                default:
+                    let dh = Math.floor(Math.random() * 50) + 35;
+                    obs = createObstacle("pillar", x, GROUND_Y - dh, 26, dh);
+            }
+            obstacles.push(obs);
+        }
+        
+        // Отрисовка препятствий
+        function drawObstacle(obs) {
+            ctx.save();
+            const col = currentLevel.colorObstacle;
+            const acc = currentLevel.colorAccent;
+            
+            switch(obs.type) {
+                case "pillar":
+                    ctx.fillStyle = col;
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.fillStyle = acc;
+                    for(let i = 0; i < 3; i++) ctx.fillRect(obs.x + 5, obs.y + 8 + i*12, obs.w-10, 4);
+                    break;
+                case "spike":
+                    ctx.fillStyle = "#dd6644";
+                    for(let i = 0; i < 5; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(obs.x + i*7, obs.y + obs.h);
+                        ctx.lineTo(obs.x + i*7 + 4, obs.y);
+                        ctx.lineTo(obs.x + i*7 + 7, obs.y + obs.h);
+                        ctx.fill();
+                    }
+                    break;
+                case "ball":
+                    obs.rotation = (obs.rotation || 0) + 0.12;
+                    ctx.translate(obs.x + obs.w/2, obs.y + obs.h/2);
+                    ctx.rotate(obs.rotation);
+                    ctx.fillStyle = "#ff8855";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, obs.w/2, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.fillStyle = "#442200";
+                    ctx.beginPath();
+                    ctx.arc(-4, -4, 3, 0, Math.PI*2);
+                    ctx.fill();
+                    break;
+                case "saw":
+                    obs.rotation = (obs.rotation || 0) + 0.18;
+                    ctx.translate(obs.x + obs.w/2, obs.y + obs.h/2);
+                    ctx.rotate(obs.rotation);
+                    ctx.fillStyle = "#ccaa66";
+                    for(let i = 0; i < 8; i++) {
+                        let a = (i * Math.PI * 2 / 8);
+                        let x1 = Math.cos(a) * 12;
+                        let y1 = Math.sin(a) * 12;
+                        let x2 = Math.cos(a + 0.5) * 18;
+                        let y2 = Math.sin(a + 0.5) * 18;
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.lineTo(Math.cos(a - 0.5) * 18, Math.sin(a - 0.5) * 18);
+                        ctx.fill();
+                    }
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 8, 0, Math.PI*2);
+                    ctx.fill();
+                    break;
+                case "ice_spike":
+                    ctx.fillStyle = "#aaffff";
+                    for(let i = 0; i < 5; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(obs.x + i*8, obs.y + obs.h);
+                        ctx.lineTo(obs.x + i*8 + 4, obs.y);
+                        ctx.lineTo(obs.x + i*8 + 8, obs.y + obs.h);
+                        ctx.fill();
+                    }
+                    break;
+                case "fire_ball":
+                    obs.pulse = (obs.pulse || 0) + 0.08;
+                    let s = 1 + Math.sin(obs.pulse) * 0.1;
+                    ctx.translate(obs.x + obs.w/2, obs.y + obs.h/2);
+                    ctx.scale(s, s);
+                    ctx.fillStyle = "#ff5533";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, obs.w/2, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.fillStyle = "#ffaa66";
+                    for(let i = 0; i < 3; i++) {
+                        let a = obs.pulse * 4 + i * Math.PI * 2 / 3;
+                        let x = Math.cos(a) * 9;
+                        let y = Math.sin(a) * 9;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4, 0, Math.PI*2);
+                        ctx.fill();
+                    }
+                    break;
+                case "skull":
+                    ctx.fillStyle = "#8866cc";
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.fillStyle = "#000000";
+                    ctx.fillRect(obs.x + 7, obs.y + 12, 6, 8);
+                    ctx.fillRect(obs.x + 21, obs.y + 12, 6, 8);
+                    break;
+                case "cube":
+                    obs.rotation = (obs.rotation || 0) + 0.1;
+                    ctx.translate(obs.x + obs.w/2, obs.y + obs.h/2);
+                    ctx.rotate(obs.rotation);
+                    ctx.fillStyle = "#ff77aa";
+                    ctx.fillRect(-obs.w/2, -obs.h/2, obs.w, obs.h);
+                    ctx.strokeStyle = "white";
+                    ctx.strokeRect(-obs.w/2, -obs.h/2, obs.w, obs.h);
+                    break;
+                case "laser":
+                    obs.pulse = (obs.pulse || 0) + 0.12;
+                    ctx.fillStyle = `rgba(0, 255, 100, ${0.6 + Math.sin(obs.pulse)*0.3})`;
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.fillStyle = "#88ffaa";
+                    ctx.fillRect(obs.x + 5, obs.y + 10, obs.w-10, 8);
+                    break;
+            }
+            ctx.restore();
+        }
+        
+        function checkCollision(obs) {
+            if (obs.type === "spike" || obs.type === "ice_spike") {
+                if (player.x + player.width > obs.x && player.x < obs.x + obs.w &&
+                    player.y + player.height > obs.y + obs.h - 15) return true;
+                return false;
+            }
+            return (player.x < obs.x + obs.w && player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.h && player.y + player.height > obs.y);
+        }
+        
+        function addParticles(x, y, count, color) {
+            for(let i = 0; i < count; i++) {
+                hitParticles.push({
+                    x: x + (Math.random() - 0.5) * 20,
+                    y: y + (Math.random() - 0.5) * 20,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5 - 2,
+                    life: 15,
+                    color: color
+                });
+            }
+        }
+        
+        function updateGame() {
+            if (!gameRunning) return;
+            
+            // ПРЫЖОК С АНИМАЦИЕЙ
+            if (jumpRequested && player.isOnGround) {
+                player.vy = JUMP_POWER;
+                player.isOnGround = false;
+                jumpAnim = 10;
+                addParticles(player.x + player.width/2, GROUND_Y, 8, "#ffcc88");
+                for(let i=0;i<6;i++) trailParticles.push({x: player.x+player.width/2, y: GROUND_Y, life: 10});
+                jumpRequested = false;
+            }
+            jumpRequested = false;
+            
+            // ФИЗИКА
+            player.vy += GRAVITY;
+            player.y += player.vy;
+            
+            if (player.y + player.height >= GROUND_Y) {
+                let wasAir = !player.isOnGround;
+                player.y = GROUND_Y - player.height;
+                player.vy = 0;
+                player.isOnGround = true;
+                if (wasAir) {
+                    landAnim = 8;
+                    addParticles(player.x + player.width/2, GROUND_Y, 6, "#ddaa66");
+                    screenShake = 3;
+                }
+            }
+            if (player.y < 0) { player.y = 0; if(player.vy<0) player.vy=0; }
+            
+            // ДВИЖЕНИЕ ПРЕПЯТСТВИЙ
+            let speed = currentLevel.speed + Math.min(1.5, Math.floor(score / 100) * 0.2);
+            for(let obs of obstacles) {
+                obs.x -= speed;
+                if (!obs.passed && obs.x + obs.w < player.x) {
+                    obs.passed = true;
+                    score++;
+                    document.getElementById('scoreValue').innerText = score;
+                    if(score % 10 === 0) addParticles(player.x+20, player.y+20, 10, "#ffaa66");
+                }
+            }
+            obstacles = obstacles.filter(obs => obs.x + obs.w > 0);
+            
+            // СПАВН
+            let delay = Math.max(40, currentLevel.spawnDelay - Math.floor(score / 60));
+            if (spawnCooldown <= 0) {
+                spawnCooldown = delay + Math.floor(Math.random() * 12);
+                spawnObstacle();
+            } else { spawnCooldown--; }
+            
+            // КОЛЛИЗИИ
+            for(let obs of obstacles) {
+                if (checkCollision(obs)) {
+                    gameRunning = false;
+                    addParticles(player.x+20, player.y+20, 20, "#ff4444");
+                    screenShake = 10;
+                    document.getElementById('gameStatusText').innerHTML = "💀 ПРОИГРЫШ! НАЖМИТЕ НОВАЯ ИГРА 💀";
+                    break;
+                }
+            }
+            
+            // ОБНОВЛЕНИЕ ЭФФЕКТОВ
+            if(jumpAnim > 0) jumpAnim--;
+            if(landAnim > 0) landAnim--;
+            if(screenShake > 0) screenShake--;
+            
+            for(let i=trailParticles.length-1; i>=0; i--) {
+                trailParticles[i].life--;
+                if(trailParticles[i].life <= 0) trailParticles.splice(i,1);
+            }
+            for(let i=hitParticles.length-1; i>=0; i--) {
+                hitParticles[i].x += hitParticles[i].vx;
+                hitParticles[i].y += hitParticles[i].vy;
+                hitParticles[i].life--;
+                if(hitParticles[i].life <= 0) hitParticles.splice(i,1);
+            }
+            for(let i=levelUpParticles.length-1; i>=0; i--) {
+                levelUpParticles[i].life--;
+                if(levelUpParticles[i].life <= 0) levelUpParticles.splice(i,1);
+            }
+        }
+        
+        let spawnCooldown = 20;
+        
+        function draw() {
+            ctx.save();
+            if(screenShake > 0) {
+                ctx.translate((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 3);
+            }
+            
+            // ФОН
+            const grad = ctx.createLinearGradient(0, 0, 0, H);
+            grad.addColorStop(0, currentLevel.bgTop);
+            grad.addColorStop(1, currentLevel.bgBottom);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+            
+            // ЗВЁЗДЫ/ДЕКОР
+            ctx.fillStyle = "#ffffff60";
+            for(let i=0;i<40;i++) {
+                if(i%2 === 0) ctx.fillRect(30 + i*37, 25 + Math.sin(Date.now()*0.002 + i)*10, 2, 2);
+            }
+            
+            // ЗЕМЛЯ
+            ctx.fillStyle = currentLevel.ground1;
+            ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y + 5);
+            ctx.fillStyle = currentLevel.ground2;
+            for(let i=0;i<18;i++) ctx.fillRect(i*48, GROUND_Y-4, 32, 5);
+            
+            // ПРЕПЯТСТВИЯ
+            for(let obs of obstacles) drawObstacle(obs);
+            
+            // ЧАСТИЦЫ
+            for(let p of hitParticles) {
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, 3, 3);
+            }
+            for(let p of trailParticles) {
+                ctx.fillStyle = `rgba(255,200,100,${p.life/10})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+                ctx.fill();
+            }
+            
+            // ========== КУБИК С ГЛАЗАМИ И АНИМАЦИЕЙ ПРЫЖКА ==========
+            let w = PLAYER_SIZE, h = PLAYER_SIZE;
+            let offX = 0, offY = 0;
+            if(jumpAnim > 0) {
+                w = PLAYER_SIZE + 7;
+                h = PLAYER_SIZE - 6;
+                offX = -3;
+                offY = 4;
+            } else if(landAnim > 0) {
+                w = PLAYER_SIZE + 5;
+                h = PLAYER_SIZE - 4;
+                offX = -2;
+                offY = 2;
+            }
+            
+            let cx = player.x + offX;
+            let cy = player.y + offY;
+            
+            // ТЕЛО КУБИКА
+            ctx.fillStyle = "#6effe8";
+            ctx.fillRect(cx, cy, w, h);
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(cx, cy, w, h);
+            
+            // ГЛАЗА
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.ellipse(cx + 9, cy + 13, 10, 11, 0, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(cx + w - 15, cy + 13, 10, 11, 0, 0, Math.PI*2);
+            ctx.fill();
+            
+            ctx.fillStyle = "#000000";
+            let pupilY = !player.isOnGround ? -2 : 0;
+            ctx.beginPath();
+            ctx.arc(cx + 11, cy + 14 + pupilY, 6, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx + w - 13, cy + 14 + pupilY, 6, 0, Math.PI*2);
+            ctx.fill();
+            
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(cx + 8, cy + 10, 2.2, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx + w - 16, cy + 10, 2.2, 0, Math.PI*2);
+            ctx.fill();
+            
+            // РОТ
+            ctx.beginPath();
+            ctx.strokeStyle = "#2c1a0a";
+            ctx.lineWidth = 2.5;
+            let my = cy + h - 10;
+            if(player.isOnGround) ctx.arc(cx + w/2, my-2, 8, 0.15, Math.PI - 0.15);
+            else ctx.arc(cx + w/2, my-1, 8, 0.05, Math.PI*1.7);
+            ctx.stroke();
+            
+            // БРОВИ
+            ctx.beginPath();
+            ctx.strokeStyle = "#1a1208";
+            ctx.lineWidth = 2.5;
+            ctx.moveTo(cx+4, cy+6);
+            ctx.lineTo(cx+12, cy+9);
+            ctx.moveTo(cx+w-12, cy+6);
+            ctx.lineTo(cx+w-4, cy+9);
+            ctx.stroke();
+            
+            // UI
+            ctx.font = "bold 20px monospace";
+            ctx.fillStyle = "#ffdd99";
+            ctx.fillText("⚡ " + score, 18, 48);
+            ctx.font = "bold 16px monospace";
+            ctx.fillStyle = "#ffcc88";
+            ctx.fillText(currentLevel.name, W-130, 45);
+            
+            let intensity = Math.min(1, (currentLevel.speed - 3.2) / 3.5);
+            ctx.fillStyle = "#2a2f42";
+            ctx.fillRect(W-105, 18, 90, 8);
+            ctx.fillStyle = `hsl(${45 - intensity*40}, 75%, 58%)`;
+            ctx.fillRect(W-105, 18, 90 * intensity, 8);
+            
+            if (!gameRunning) {
+                ctx.fillStyle = "rgba(0,0,0,0.85)";
+                ctx.fillRect(0, 0, W, H);
+                ctx.font = "bold 36px 'Courier New'";
+                ctx.fillStyle = "#ff8844";
+                ctx.fillText("GAME OVER", W/2-115, H/2-30);
+                ctx.font = "18px monospace";
+                ctx.fillStyle = "#ffcc88";
+                ctx.fillText("ВЫБЕРИ УРОВЕНЬ ИЛИ НАЖМИ НОВАЯ ИГРА", W/2-210, H/2+30);
+                ctx.font = "22px monospace";
+                ctx.fillStyle = "#ffffaa";
+                ctx.fillText("СЧЁТ: " + score, W/2-50, H/2+85);
+            }
+            
+            ctx.restore();
+        }
+        
+        function handleJump(e) {
+            if(!gameRunning) return;
+            if(player.isOnGround) jumpRequested = true;
+            if(e) e.preventDefault();
+        }
+        
+        function restartGame() {
+            gameRunning = true;
+            score = 0;
+            player.y = GROUND_Y - PLAYER_SIZE;
+            player.vy = 0;
+            player.isOnGround = true;
+            obstacles = [];
+            trailParticles = [];
+            hitParticles = [];
+            jumpAnim = 0;
+            landAnim = 0;
+            spawnCooldown = 20;
+            document.getElementById('scoreValue').innerText = "0";
+            document.getElementById('gameStatusText').innerHTML = "🎮 ИГРА АКТИВНА! ПРЫГАЙ!";
+        }
+        
+        function gameLoop() {
+            if(gameRunning) updateGame();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // СОБЫТИЯ
+        canvas.addEventListener('click', handleJump);
+        canvas.addEventListener('touchstart', handleJump, {passive: false});
+        window.addEventListener('keydown', (e) => {
+            if(e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+                e.preventDefault();
+                handleJump(e);
+            }
+            if(e.code === 'KeyR') restartGame();
+        });
+        
+        document.getElementById('restartButton').addEventListener('click', restartGame);
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.addEventListener('click', () => setLevel(parseInt(btn.dataset.level)));
+        });
+        
+        setLevel(0);
+        gameLoop();
+    })();
+</script>
+</body>
+</html>
