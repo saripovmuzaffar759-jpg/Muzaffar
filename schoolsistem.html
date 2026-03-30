@@ -1,0 +1,2086 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Школьная система управления | Учет учеников и платежей</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3a0ca3;
+      --secondary: #3f37c9;
+      --success: #4cc9f0;
+      --success-dark: #3aa8d0;
+      --danger: #f72585;
+      --danger-dark: #d1146a;
+      --warning: #f8961e;
+      --warning-dark: #e07c0c;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --gray-dark: #343a40;
+      --light-gray: #e9ecef;
+      --border-radius: 12px;
+      --border-radius-sm: 8px;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Темная тема */
+    [data-theme="dark"] {
+      --light: #1a1a2e;
+      --dark: #eee;
+      --gray: #aaa;
+      --gray-dark: #ccc;
+      --light-gray: #2a2a3a;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: var(--dark);
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+      transition: background 0.3s ease;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 25px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] header {
+      background: rgba(26, 26, 46, 0.95);
+    }
+
+    h1 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-weight: 700;
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      color: var(--gray);
+      font-size: 1.1rem;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 1000px) {
+      .main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .stats {
+        flex-wrap: wrap;
+      }
+      
+      .top-bar {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+      }
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .card {
+      background: rgba(26, 26, 46, 0.95);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      color: var(--primary);
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .card-title i {
+      margin-right: 12px;
+      font-size: 1.3rem;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), var(--success-dark));
+      color: white;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+      color: white;
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, var(--warning), var(--warning-dark));
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+    }
+
+    .btn-icon {
+      padding: 8px 12px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .form-control, .select-class {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid var(--light-gray);
+      border-radius: var(--border-radius-sm);
+      font-size: 1rem;
+      transition: var(--transition);
+      background: white;
+    }
+
+    [data-theme="dark"] .form-control,
+    [data-theme="dark"] .select-class {
+      background: var(--light-gray);
+      color: var(--dark);
+      border-color: var(--gray-dark);
+    }
+
+    .form-control:focus, .select-class:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .form-control.error {
+      border-color: var(--danger);
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 5px;
+    }
+
+    /* Таблица учеников */
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--border-radius-sm);
+    }
+
+    .students-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+
+    .students-table th {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      text-align: left;
+      padding: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+
+    .students-table th:hover {
+      background: var(--primary-dark);
+      opacity: 0.9;
+    }
+
+    .students-table th i {
+      margin-left: 5px;
+      font-size: 0.8rem;
+    }
+
+    .students-table td {
+      padding: 15px;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .students-table tr {
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .students-table tr:hover {
+      background: rgba(67, 97, 238, 0.05);
+      transform: scale(1.01);
+    }
+
+    .student-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Модальные окна */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: white;
+      border-radius: var(--border-radius);
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-20px);
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .modal {
+      background: var(--light);
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid var(--light-gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: inherit;
+      z-index: 1;
+    }
+
+    .modal-title {
+      font-size: 1.4rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: var(--gray);
+      cursor: pointer;
+      transition: var(--transition);
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: var(--danger);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 25px;
+    }
+
+    .modal-footer {
+      padding: 20px 25px;
+      border-top: 1px solid var(--light-gray);
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      position: sticky;
+      bottom: 0;
+      background: inherit;
+    }
+
+    /* Стили для платежей */
+    .payment-method-group {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .payment-method {
+      flex: 1;
+      text-align: center;
+      padding: 15px;
+      border: 2px solid var(--light-gray);
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      min-width: 120px;
+    }
+
+    .payment-method:hover {
+      border-color: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    .payment-method.active {
+      border-color: var(--primary);
+      background: rgba(67, 97, 238, 0.1);
+      box-shadow: 0 2px 8px rgba(67, 97, 238, 0.2);
+    }
+
+    .payment-method i {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .bank-details {
+      background: rgba(67, 97, 238, 0.05);
+      padding: 15px;
+      border-radius: var(--border-radius-sm);
+      margin-top: 10px;
+      display: none;
+    }
+
+    .bank-details.active {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Чек платежа */
+    .receipt {
+      background: white;
+      border: 2px dashed var(--gray);
+      border-radius: var(--border-radius-sm);
+      padding: 25px;
+      max-width: 400px;
+      margin: 0 auto;
+      font-family: 'Courier New', monospace;
+    }
+
+    [data-theme="dark"] .receipt {
+      background: var(--light-gray);
+    }
+
+    .receipt-header {
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--light-gray);
+      padding-bottom: 15px;
+    }
+
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .receipt-total {
+      font-weight: bold;
+      font-size: 1.2rem;
+      border-top: 2px solid var(--dark);
+      padding-top: 10px;
+      margin-top: 15px;
+    }
+
+    /* Информация об ученике */
+    .student-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .info-item {
+      background: var(--light-gray);
+      padding: 15px;
+      border-radius: var(--border-radius-sm);
+      transition: var(--transition);
+    }
+
+    .info-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .info-value.positive {
+      color: #28a745;
+    }
+
+    .info-value.negative {
+      color: var(--danger);
+    }
+
+    .info-value.warning {
+      color: var(--warning);
+    }
+
+    /* Прогресс оплаты */
+    .payment-progress {
+      margin: 20px 0;
+    }
+
+    .progress-bar {
+      height: 24px;
+      background: var(--light-gray);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #28a745, var(--success));
+      border-radius: 12px;
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+
+    /* Список платежей */
+    .payments-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .payment-item {
+      padding: 15px;
+      border: 1px solid var(--light-gray);
+      border-radius: var(--border-radius-sm);
+      margin-bottom: 10px;
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .payment-item:hover {
+      background: rgba(67, 97, 238, 0.05);
+      border-color: var(--primary-light);
+      transform: translateX(4px);
+    }
+
+    .payment-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .payment-amount {
+      font-weight: bold;
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+
+    .payment-date {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .payment-details {
+      color: var(--gray);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .payment-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: flex-end;
+    }
+
+    /* Сообщения */
+    .alert {
+      padding: 15px 20px;
+      border-radius: var(--border-radius-sm);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideIn 0.3s ease;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 400px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .alert-success {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      border-left: 4px solid #28a745;
+      color: #155724;
+    }
+
+    .alert-info {
+      background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+      border-left: 4px solid var(--primary);
+      color: #0c5460;
+    }
+
+    .alert-error {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      border-left: 4px solid var(--danger);
+      color: #721c24;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray);
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    /* Верхняя панель */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 25px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      min-width: 130px;
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .stat-item {
+      background: rgba(26, 26, 46, 0.95);
+    }
+
+    .stat-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-top: 5px;
+    }
+
+    /* Общая сумма для оплаты */
+    .total-amount-info {
+      background: linear-gradient(135deg, #4361ee, #3f37c9);
+      color: white;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      margin-bottom: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .total-amount-info:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .total-amount-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .total-amount-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    /* Фильтры */
+    .filters-bar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+
+    .search-box input {
+      padding-left: 35px;
+    }
+
+    /* Контекстное меню */
+    .context-menu {
+      position: fixed;
+      background: white;
+      border-radius: var(--border-radius-sm);
+      box-shadow: var(--shadow-lg);
+      padding: 8px 0;
+      z-index: 1000;
+      min-width: 180px;
+      display: none;
+    }
+
+    [data-theme="dark"] .context-menu {
+      background: var(--light);
+    }
+
+    .context-menu-item {
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .context-menu-item:hover {
+      background: var(--light-gray);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .card {
+        padding: 15px;
+      }
+      
+      .btn {
+        padding: 10px 16px;
+      }
+      
+      .modal {
+        width: 95%;
+      }
+      
+      .student-actions {
+        flex-direction: column;
+      }
+      
+      .student-actions .btn {
+        width: 100%;
+      }
+      
+      .stats {
+        justify-content: center;
+      }
+      
+      .stat-item {
+        min-width: 100px;
+        padding: 10px 15px;
+      }
+      
+      .stat-value {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Анимации */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease;
+    }
+
+    /* Скроллбар */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--light-gray);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div>
+          <h1><i class="fas fa-graduation-cap"></i> Школьная система управления</h1>
+          <p class="subtitle">Учет учеников и управление платежами</p>
+        </div>
+        <button class="btn btn-outline btn-small" id="themeToggleBtn">
+          <i class="fas fa-moon"></i> Тёмная тема
+        </button>
+      </div>
+    </header>
+
+    <div class="total-amount-info" id="totalAmountInfo">
+      <div class="total-amount-label">Общая сумма к оплате за учебный год</div>
+      <div class="total-amount-value" id="totalAmountValue">15 000 сомони</div>
+    </div>
+
+    <div class="top-bar">
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value" id="totalStudents">0</div>
+          <div class="stat-label">Учеников</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="totalPayments">0</div>
+          <div class="stat-label">Платежей</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="totalAmount">0</div>
+          <div class="stat-label">Оплачено (сом.)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="debtAmount">0</div>
+          <div class="stat-label">Общий долг (сом.)</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="addStudentBtn">
+        <i class="fas fa-user-plus"></i> Добавить ученика
+      </button>
+    </div>
+
+    <div class="main-content">
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-users"></i> Список учеников</h2>
+        
+        <div class="filters-bar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" class="form-control" id="searchInput" placeholder="Поиск по ФИО...">
+          </div>
+          <select class="select-class" id="classFilter" style="width: auto; min-width: 120px;">
+            <option value="">Все классы</option>
+          </select>
+          <select class="select-class" id="paymentStatusFilter" style="width: auto; min-width: 150px;">
+            <option value="">Все статусы</option>
+            <option value="paid">Полностью оплачено</option>
+            <option value="partial">Частично оплачено</option>
+            <option value="unpaid">Не оплачено</option>
+          </select>
+          <button class="btn btn-outline btn-small" id="exportBtn" title="Экспорт данных">
+            <i class="fas fa-download"></i> Экспорт
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th data-sort="name">ФИО <i class="fas fa-sort"></i></th>
+                <th data-sort="class">Класс <i class="fas fa-sort"></i></th>
+                <th data-sort="paid">Оплачено <i class="fas fa-sort"></i></th>
+                <th data-sort="remaining">Остаток <i class="fas fa-sort"></i></th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody">
+              <!-- Строки будут добавлены через JavaScript -->
+            </tbody>
+          </table>
+          <div id="noStudentsMessage" class="empty-state" style="display: none;">
+            <i class="fas fa-user-graduate"></i>
+            <h3>Нет учеников</h3>
+            <p>Добавьте первого ученика, нажав кнопку "Добавить ученика"</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-chart-line"></i> Информация об ученике</h2>
+        <div id="studentDetails">
+          <div class="empty-state">
+            <i class="fas fa-user-circle"></i>
+            <h3>Выберите ученика</h3>
+            <p>Нажмите на строку ученика или кнопку "Подробнее", чтобы увидеть его данные</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно добавления/редактирования ученика -->
+    <div class="modal-overlay" id="studentModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title" id="studentModalTitle"><i class="fas fa-user-plus"></i> Добавить ученика</h3>
+          <button class="modal-close" id="closeStudentModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editStudentId">
+          <div class="form-group">
+            <label class="form-label">ФИО ученика *</label>
+            <input type="text" class="form-control" id="studentFullName" placeholder="Иванов Иван Иванович">
+            <div class="error-message" id="nameError"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Дата рождения *</label>
+            <input type="date" class="form-control" id="studentBirthDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Класс *</label>
+            <select class="form-control" id="studentClassSelect"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Телефон родителя</label>
+            <input type="tel" class="form-control" id="studentPhone" placeholder="+992 XXX XX XX XX">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Адрес</label>
+            <input type="text" class="form-control" id="studentAddress" placeholder="Город, улица, дом">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" id="cancelStudentBtn">Отмена</button>
+          <button class="btn btn-success" id="saveStudentBtn">Сохранить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно платежей -->
+    <div class="modal-overlay" id="paymentModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-money-check-alt"></i> Добавить платеж</h3>
+          <button class="modal-close" id="closePaymentModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editPaymentId">
+          <div class="alert alert-info" id="paymentInfo">
+            <i class="fas fa-info-circle"></i>
+            <span>Добавление платежа для: <strong id="paymentStudentName">-</strong></span>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Сумма платежа (сомони) *</label>
+            <input type="number" class="form-control" id="paymentAmount" placeholder="Например: 1500" step="100" min="0">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Дата оплаты *</label>
+            <input type="date" class="form-control" id="paymentDate">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Способ оплаты</label>
+            <div class="payment-method-group">
+              <div class="payment-method" id="cashMethod">
+                <i class="fas fa-money-bill-wave"></i>
+                <div>Наличными</div>
+              </div>
+              <div class="payment-method" id="bankMethod">
+                <i class="fas fa-university"></i>
+                <div>Через банк</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bank-details" id="bankDetails">
+            <div class="form-group">
+              <label class="form-label">Номер телефона или карты *</label>
+              <input type="text" class="form-control" id="bankAccount" placeholder="Номер телефона или карты">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Название банка *</label>
+              <input type="text" class="form-control" id="bankName" placeholder="Например: Амонатбонк">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Примечание</label>
+            <textarea class="form-control" id="paymentNote" rows="2" placeholder="Дополнительная информация о платеже..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" id="cancelPaymentBtn">Отмена</button>
+          <button class="btn btn-success" id="savePaymentBtn">Сохранить платеж</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно чека -->
+    <div class="modal-overlay" id="receiptModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-receipt"></i> Чек об оплате</h3>
+          <button class="modal-close" id="closeReceiptModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="receipt" id="receiptContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="printReceiptBtn"><i class="fas fa-print"></i> Печать</button>
+          <button class="btn btn-danger" id="closeReceiptBtn">Закрыть</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Контекстное меню -->
+    <div class="context-menu" id="contextMenu">
+      <div class="context-menu-item" id="contextEdit">
+        <i class="fas fa-edit"></i> Редактировать
+      </div>
+      <div class="context-menu-item" id="contextDelete">
+        <i class="fas fa-trash"></i> Удалить
+      </div>
+      <div class="context-menu-item" id="contextPayment">
+        <i class="fas fa-money-bill"></i> Добавить платеж
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Инициализация данных
+    let students = [];
+    let payments = [];
+    let selectedStudentId = null;
+    let paymentMethod = 'cash';
+    let currentSort = { field: 'name', direction: 'asc' };
+    let currentContextStudentId = null;
+    let isEditingPayment = false;
+    const TOTAL_AMOUNT = 15000;
+
+    // Классы для выбора
+    const classes = [
+      "1А", "1Б", "2А", "2Б", "3А", "3Б", "4А", "4Б", 
+      "5А", "5Б", "6А", "6Б", "7А", "7Б", "8А", "8Б", 
+      "9А", "9Б", "10А", "10Б", "11А", "11Б"
+    ];
+
+    // Инициализация при загрузке
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      initClassSelects();
+      initEventListeners();
+      renderStudentsTable();
+      updateStats();
+      initTheme();
+    });
+
+    // Загрузка данных
+    function loadData() {
+      try {
+        const savedStudents = localStorage.getItem('schoolStudents_v2');
+        const savedPayments = localStorage.getItem('schoolPayments_v2');
+        
+        if (savedStudents) students = JSON.parse(savedStudents);
+        if (savedPayments) payments = JSON.parse(savedPayments);
+      } catch (e) {
+        console.error('Error loading data:', e);
+        showAlert('Ошибка загрузки данных', 'error');
+      }
+    }
+
+    // Сохранение данных
+    function saveData() {
+      try {
+        localStorage.setItem('schoolStudents_v2', JSON.stringify(students));
+        localStorage.setItem('schoolPayments_v2', JSON.stringify(payments));
+      } catch (e) {
+        console.error('Error saving data:', e);
+        showAlert('Ошибка сохранения данных', 'error');
+      }
+    }
+
+    // Инициализация выпадающих списков
+    function initClassSelects() {
+      const classFilter = document.getElementById('classFilter');
+      const studentClassSelect = document.getElementById('studentClassSelect');
+      
+      [classFilter, studentClassSelect].forEach(select => {
+        if (select) {
+          const currentValue = select.value;
+          select.innerHTML = '<option value="">Все классы</option>';
+          classes.forEach(className => {
+            const option = document.createElement('option');
+            option.value = className;
+            option.textContent = className;
+            select.appendChild(option);
+          });
+          if (currentValue && select !== classFilter) select.value = currentValue;
+        }
+      });
+    }
+
+    // Инициализация обработчиков
+    function initEventListeners() {
+      // Модальные окна
+      document.getElementById('addStudentBtn')?.addEventListener('click', () => openStudentModal());
+      document.getElementById('closeStudentModal')?.addEventListener('click', closeStudentModal);
+      document.getElementById('cancelStudentBtn')?.addEventListener('click', closeStudentModal);
+      document.getElementById('saveStudentBtn')?.addEventListener('click', saveStudent);
+      
+      document.getElementById('closePaymentModal')?.addEventListener('click', closePaymentModal);
+      document.getElementById('cancelPaymentBtn')?.addEventListener('click', closePaymentModal);
+      document.getElementById('savePaymentBtn')?.addEventListener('click', savePayment);
+      
+      document.getElementById('closeReceiptModal')?.addEventListener('click', closeReceiptModal);
+      document.getElementById('closeReceiptBtn')?.addEventListener('click', closeReceiptModal);
+      document.getElementById('printReceiptBtn')?.addEventListener('click', printReceipt);
+      
+      // Фильтры и поиск
+      document.getElementById('classFilter')?.addEventListener('change', () => renderStudentsTable());
+      document.getElementById('paymentStatusFilter')?.addEventListener('change', () => renderStudentsTable());
+      document.getElementById('searchInput')?.addEventListener('input', debounce(() => renderStudentsTable(), 300));
+      
+      // Сортировка
+      document.querySelectorAll('.students-table th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          const field = th.dataset.sort;
+          if (currentSort.field === field) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+          } else {
+            currentSort.field = field;
+            currentSort.direction = 'asc';
+          }
+          renderStudentsTable();
+        });
+      });
+      
+      // Способы оплаты
+      document.getElementById('cashMethod')?.addEventListener('click', () => selectPaymentMethod('cash'));
+      document.getElementById('bankMethod')?.addEventListener('click', () => selectPaymentMethod('bank'));
+      
+      // Экспорт
+      document.getElementById('exportBtn')?.addEventListener('click', exportData);
+      
+      // Тема
+      document.getElementById('themeToggleBtn')?.addEventListener('click', toggleTheme);
+      
+      // Общая сумма
+      document.getElementById('totalAmountInfo')?.addEventListener('click', () => {
+        const newAmount = prompt('Введите новую сумму к оплате за учебный год (сомони):', TOTAL_AMOUNT);
+        if (newAmount && !isNaN(newAmount) && parseFloat(newAmount) > 0) {
+          window.TOTAL_AMOUNT = parseFloat(newAmount);
+          document.getElementById('totalAmountValue').textContent = `${window.TOTAL_AMOUNT} сомони`;
+          renderStudentsTable();
+          updateStats();
+          if (selectedStudentId) showStudentDetails(selectedStudentId);
+          showAlert('Сумма к оплате обновлена', 'success');
+        }
+      });
+      
+      // Контекстное меню
+      document.addEventListener('click', () => {
+        document.getElementById('contextMenu').style.display = 'none';
+      });
+      
+      document.getElementById('contextEdit')?.addEventListener('click', () => {
+        if (currentContextStudentId) openStudentModal(currentContextStudentId);
+      });
+      
+      document.getElementById('contextDelete')?.addEventListener('click', () => {
+        if (currentContextStudentId) deleteStudent(currentContextStudentId);
+      });
+      
+      document.getElementById('contextPayment')?.addEventListener('click', () => {
+        if (currentContextStudentId) openPaymentModal(currentContextStudentId);
+      });
+    }
+
+    // Debounce функция
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Тема
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('themeToggleBtn').innerHTML = '<i class="fas fa-sun"></i> Светлая тема';
+      }
+    }
+    
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('themeToggleBtn').innerHTML = '<i class="fas fa-moon"></i> Тёмная тема';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('themeToggleBtn').innerHTML = '<i class="fas fa-sun"></i> Светлая тема';
+      }
+    }
+
+    // Открытие модального окна ученика
+    function openStudentModal(studentId = null) {
+      const modal = document.getElementById('studentModal');
+      const title = document.getElementById('studentModalTitle');
+      
+      if (studentId) {
+        const student = students.find(s => s.id === studentId);
+        if (student) {
+          title.innerHTML = '<i class="fas fa-edit"></i> Редактировать ученика';
+          document.getElementById('editStudentId').value = studentId;
+          document.getElementById('studentFullName').value = student.fullName;
+          document.getElementById('studentBirthDate').value = student.birthDate;
+          document.getElementById('studentClassSelect').value = student.class;
+          document.getElementById('studentPhone').value = student.phone || '';
+          document.getElementById('studentAddress').value = student.address || '';
+        }
+      } else {
+        title.innerHTML = '<i class="fas fa-user-plus"></i> Добавить ученика';
+        document.getElementById('editStudentId').value = '';
+        clearStudentForm();
+      }
+      
+      modal.classList.add('active');
+    }
+
+    function closeStudentModal() {
+      document.getElementById('studentModal').classList.remove('active');
+      clearStudentForm();
+    }
+
+    function clearStudentForm() {
+      document.getElementById('studentFullName').value = '';
+      document.getElementById('studentBirthDate').value = '';
+      document.getElementById('studentClassSelect').value = '1А';
+      document.getElementById('studentPhone').value = '';
+      document.getElementById('studentAddress').value = '';
+      document.getElementById('nameError').textContent = '';
+    }
+
+    // Сохранение ученика
+    function saveStudent() {
+      const fullName = document.getElementById('studentFullName').value.trim();
+      const birthDate = document.getElementById('studentBirthDate').value;
+      const studentClass = document.getElementById('studentClassSelect').value;
+      const phone = document.getElementById('studentPhone').value.trim();
+      const address = document.getElementById('studentAddress').value.trim();
+      const editId = document.getElementById('editStudentId').value;
+      
+      if (!fullName) {
+        document.getElementById('nameError').textContent = 'Пожалуйста, введите ФИО ученика';
+        return;
+      }
+      document.getElementById('nameError').textContent = '';
+      
+      if (!birthDate) {
+        showAlert('Пожалуйста, укажите дату рождения ученика', 'error');
+        return;
+      }
+      
+      if (editId) {
+        // Редактирование
+        const index = students.findIndex(s => s.id === editId);
+        if (index !== -1) {
+          students[index] = {
+            ...students[index],
+            fullName,
+            birthDate,
+            class: studentClass,
+            phone,
+            address,
+            updatedAt: new Date().toISOString()
+          };
+          showAlert(`Ученик ${fullName} успешно обновлен`, 'success');
+        }
+      } else {
+        // Добавление
+        const newStudent = {
+          id: generateId(),
+          fullName,
+          birthDate,
+          class: studentClass,
+          phone,
+          address,
+          createdAt: new Date().toISOString()
+        };
+        students.push(newStudent);
+        showAlert(`Ученик ${fullName} успешно добавлен`, 'success');
+      }
+      
+      saveData();
+      closeStudentModal();
+      renderStudentsTable();
+      updateStats();
+    }
+
+    // Отображение таблицы учеников
+    function renderStudentsTable() {
+      const tbody = document.getElementById('studentsTableBody');
+      const noStudentsMessage = document.getElementById('noStudentsMessage');
+      const classFilter = document.getElementById('classFilter').value;
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('paymentStatusFilter').value;
+      
+      let filteredStudents = [...students];
+      
+      // Фильтр по классу
+      if (classFilter) {
+        filteredStudents = filteredStudents.filter(s => s.class === classFilter);
+      }
+      
+      // Поиск по имени
+      if (searchTerm) {
+        filteredStudents = filteredStudents.filter(s => s.fullName.toLowerCase().includes(searchTerm));
+      }
+      
+      // Фильтр по статусу оплаты
+      if (statusFilter) {
+        filteredStudents = filteredStudents.filter(s => {
+          const studentPayments = payments.filter(p => p.studentId === s.id);
+          const totalPaid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
+          const remaining = TOTAL_AMOUNT - totalPaid;
+          
+          if (statusFilter === 'paid') return remaining <= 0;
+          if (statusFilter === 'partial') return remaining > 0 && remaining < TOTAL_AMOUNT;
+          if (statusFilter === 'unpaid') return totalPaid === 0;
+          return true;
+        });
+      }
+      
+      // Сортировка
+      filteredStudents.sort((a, b) => {
+        let aVal, bVal;
+        if (currentSort.field === 'name') {
+          aVal = a.fullName;
+          bVal = b.fullName;
+        } else if (currentSort.field === 'class') {
+          aVal = a.class;
+          bVal = b.class;
+        } else if (currentSort.field === 'paid' || currentSort.field === 'remaining') {
+          const aPayments = payments.filter(p => p.studentId === a.id);
+          const bPayments = payments.filter(p => p.studentId === b.id);
+          const aPaid = aPayments.reduce((sum, p) => sum + p.amount, 0);
+          const bPaid = bPayments.reduce((sum, p) => sum + p.amount, 0);
+          if (currentSort.field === 'paid') {
+            aVal = aPaid;
+            bVal = bPaid;
+          } else {
+            aVal = TOTAL_AMOUNT - aPaid;
+            bVal = TOTAL_AMOUNT - bPaid;
+          }
+        }
+        
+        if (typeof aVal === 'string') {
+          return currentSort.direction === 'asc' 
+            ? aVal.localeCompare(bVal)
+            : bVal.localeCompare(aVal);
+        } else {
+          return currentSort.direction === 'asc' 
+            ? aVal - bVal
+            : bVal - aVal;
+        }
+      });
+      
+      tbody.innerHTML = '';
+      
+      if (filteredStudents.length === 0) {
+        noStudentsMessage.style.display = 'block';
+        return;
+      }
+      
+      noStudentsMessage.style.display = 'none';
+      
+      filteredStudents.forEach(student => {
+        const studentPayments = payments.filter(p => p.studentId === student.id);
+        const totalPaid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
+        const remainingAmount = TOTAL_AMOUNT - totalPaid;
+        
+        let remainingClass = '';
+        if (remainingAmount === 0) remainingClass = 'positive';
+        else if (remainingAmount > 0 && remainingAmount < TOTAL_AMOUNT) remainingClass = 'warning';
+        else if (remainingAmount > 0) remainingClass = 'negative';
+        
+        const row = document.createElement('tr');
+        row.onclick = (e) => {
+          if (!e.target.closest('.student-actions')) {
+            showStudentDetails(student.id);
+          }
+        };
+        row.oncontextmenu = (e) => {
+          e.preventDefault();
+          currentContextStudentId = student.id;
+          const menu = document.getElementById('contextMenu');
+          menu.style.display = 'block';
+          menu.style.left = `${e.pageX}px`;
+          menu.style.top = `${e.pageY}px`;
+        };
+        
+        row.innerHTML = `
+          <td><strong>${escapeHtml(student.fullName)}</strong></td>
+          <td><span class="badge" style="background: var(--primary-light); color: white; padding: 4px 8px; border-radius: 6px;">${student.class}</span></td>
+          <td><strong>${totalPaid.toLocaleString()}</strong> сом.</td>
+          <td><strong class="${remainingClass}">${remainingAmount.toLocaleString()}</strong> сом.</td>
+          <td>
+            <div class="student-actions">
+              <button class="btn btn-primary btn-small btn-icon" onclick="event.stopPropagation(); showStudentDetails('${student.id}')" title="Подробнее">
+                <i class="fas fa-info-circle"></i>
+              </button>
+              <button class="btn btn-success btn-small btn-icon" onclick="event.stopPropagation(); openPaymentModal('${student.id}')" title="Добавить платеж">
+                <i class="fas fa-money-bill-wave"></i>
+              </button>
+              <button class="btn btn-warning btn-small btn-icon" onclick="event.stopPropagation(); openStudentModal('${student.id}')" title="Редактировать">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-danger btn-small btn-icon" onclick="event.stopPropagation(); deleteStudent('${student.id}')" title="Удалить">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Показать детали ученика
+    function showStudentDetails(studentId) {
+      const student = students.find(s => s.id === studentId);
+      const studentDetails = document.getElementById('studentDetails');
+      
+      if (!student) return;
+      
+      selectedStudentId = studentId;
+      const studentPayments = payments.filter(p => p.studentId === studentId);
+      const totalPaid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
+      const remainingAmount = TOTAL_AMOUNT - totalPaid;
+      const paymentPercentage = Math.round((totalPaid / TOTAL_AMOUNT) * 100);
+      
+      let remainingClass = '';
+      if (remainingAmount === 0) remainingClass = 'positive';
+      else if (remainingAmount > 0 && remainingAmount < TOTAL_AMOUNT) remainingClass = 'warning';
+      else if (remainingAmount > 0) remainingClass = 'negative';
+      
+      const birthDate = new Date(student.birthDate);
+      const formattedBirthDate = birthDate.toLocaleDateString('ru-RU');
+      
+      let paymentsHtml = '';
+      if (studentPayments.length > 0) {
+        studentPayments.sort((a, b) => new Date(b.date) - new Date(a.date));
+        studentPayments.forEach(payment => {
+          const paymentDate = new Date(payment.date);
+          const formattedDate = paymentDate.toLocaleDateString('ru-RU');
+          
+          paymentsHtml += `
+            <div class="payment-item" onclick="showReceipt('${payment.id}')">
+              <div class="payment-header">
+                <div class="payment-amount">${payment.amount.toLocaleString()} сом.</div>
+                <div class="payment-date">${formattedDate}</div>
+              </div>
+              <div class="payment-details">
+                <span><i class="fas fa-${payment.method === 'cash' ? 'money-bill-wave' : 'university'}"></i> ${payment.method === 'cash' ? 'Наличными' : `Через банк (${payment.bankName})`}</span>
+                ${payment.note ? `<span><i class="fas fa-sticky-note"></i> ${escapeHtml(payment.note)}</span>` : ''}
+              </div>
+              <div class="payment-actions">
+                <button class="btn btn-warning btn-small" onclick="event.stopPropagation(); editPayment('${payment.id}')">
+                  <i class="fas fa-edit"></i> Изменить
+                </button>
+                <button class="btn btn-danger btn-small" onclick="event.stopPropagation(); deletePayment('${payment.id}')">
+                  <i class="fas fa-trash"></i> Удалить
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        paymentsHtml = '<div class="empty-state"><i class="fas fa-money-bill"></i><p>Нет платежей</p></div>';
+      }
+      
+      studentDetails.innerHTML = `
+        <div class="student-info">
+          <div class="info-item">
+            <div class="info-label">ФИО</div>
+            <div class="info-value">${escapeHtml(student.fullName)}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Класс</div>
+            <div class="info-value">${student.class}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Дата рождения</div>
+            <div class="info-value">${formattedBirthDate}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Телефон</div>
+            <div class="info-value">${student.phone || 'Не указан'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Адрес</div>
+            <div class="info-value">${student.address || 'Не указан'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Оплачено</div>
+            <div class="info-value">${totalPaid.toLocaleString()} сом.</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Общая сумма</div>
+            <div class="info-value">${TOTAL_AMOUNT.toLocaleString()} сом.</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Остаток</div>
+            <div class="info-value ${remainingClass}">${remainingAmount.toLocaleString()} сом.</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Кол-во платежей</div>
+            <div class="info-value">${studentPayments.length}</div>
+          </div>
+        </div>
+        
+        <div class="payment-progress">
+          <div class="progress-info">
+            <span>Прогресс оплаты</span>
+            <span>${paymentPercentage}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${paymentPercentage}%">${paymentPercentage > 0 ? paymentPercentage + '%' : ''}</div>
+          </div>
+          <div class="progress-info">
+            <span>Оплачено: ${totalPaid.toLocaleString()} сом.</span>
+            <span>Осталось: ${remainingAmount.toLocaleString()} сом.</span>
+          </div>
+        </div>
+        
+        <h3 class="card-title"><i class="fas fa-history"></i> История платежей</h3>
+        <div class="payments-list">
+          ${paymentsHtml}
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+          <button class="btn btn-success" onclick="openPaymentModal('${student.id}')">
+            <i class="fas fa-plus-circle"></i> Добавить платеж
+          </button>
+        </div>
+      `;
+    }
+
+    // Открытие модального окна платежей
+    function openPaymentModal(studentId, paymentId = null) {
+      const student = students.find(s => s.id === studentId);
+      if (!student) return;
+      
+      selectedStudentId = studentId;
+      isEditingPayment = !!paymentId;
+      
+      if (paymentId) {
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment) {
+          document.getElementById('editPaymentId').value = paymentId;
+          document.getElementById('paymentAmount').value = payment.amount;
+          document.getElementById('paymentDate').value = payment.date;
+          document.getElementById('paymentNote').value = payment.note || '';
+          selectPaymentMethod(payment.method);
+          if (payment.method === 'bank') {
+            document.getElementById('bankAccount').value = payment.bankAccount || '';
+            document.getElementById('bankName').value = payment.bankName || '';
+          }
+          document.getElementById('paymentStudentName').textContent = student.fullName;
+          document.getElementById('paymentModal').classList.add('active');
+          return;
+        }
+      }
+      
+      // Новый платеж
+      document.getElementById('editPaymentId').value = '';
+      document.getElementById('paymentAmount').value = '';
+      document.getElementById('paymentNote').value = '';
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('paymentDate').value = today;
+      selectPaymentMethod('cash');
+      
+      const studentPayments = payments.filter(p => p.studentId === studentId);
+      const totalPaid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
+      const remainingAmount = TOTAL_AMOUNT - totalPaid;
+      
+      document.getElementById('paymentStudentName').textContent = student.fullName;
+      const paymentInfo = document.getElementById('paymentInfo');
+      paymentInfo.innerHTML = `
+        <i class="fas fa-info-circle"></i>
+        <span>${paymentId ? 'Редактирование платежа' : 'Добавление платежа'} для: <strong>${student.fullName}</strong><br>
+        <small>Остаток к оплате: <strong>${remainingAmount.toLocaleString()} сом.</strong> из ${TOTAL_AMOUNT.toLocaleString()} сом.</small></span>
+      `;
+      
+      document.getElementById('paymentModal').classList.add('active');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.remove('active');
+      isEditingPayment = false;
+    }
+
+    function selectPaymentMethod(method) {
+      paymentMethod = method;
+      document.getElementById('cashMethod').classList.toggle('active', method === 'cash');
+      document.getElementById('bankMethod').classList.toggle('active', method === 'bank');
+      document.getElementById('bankDetails').classList.toggle('active', method === 'bank');
+      
+      if (method === 'cash') {
+        document.getElementById('bankAccount').value = '';
+        document.getElementById('bankName').value = '';
+      }
+    }
+
+    // Сохранение платежа
+    function savePayment() {
+      const amount = parseFloat(document.getElementById('paymentAmount').value);
+      const date = document.getElementById('paymentDate').value;
+      const note = document.getElementById('paymentNote').value;
+      const editId = document.getElementById('editPaymentId').value;
+      
+      if (!amount || amount <= 0) {
+        showAlert('Пожалуйста, введите корректную сумму платежа', 'error');
+        return;
+      }
+      
+      if (!date) {
+        showAlert('Пожалуйста, укажите дату оплаты', 'error');
+        return;
+      }
+      
+      if (!selectedStudentId) {
+        showAlert('Ошибка: ученик не выбран', 'error');
+        return;
+      }
+      
+      const studentPayments = payments.filter(p => p.studentId === selectedStudentId);
+      const totalPaid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
+      const remainingAmount = TOTAL_AMOUNT - totalPaid;
+      
+      if (!editId && amount > remainingAmount) {
+        if (!confirm(`Сумма платежа (${amount.toLocaleString()} сом.) превышает остаток к оплате (${remainingAmount.toLocaleString()} сом.). Продолжить?`)) {
+          return;
+        }
+      }
+      
+      let bankAccount = '';
+      let bankName = '';
+      
+      if (paymentMethod === 'bank') {
+        bankAccount = document.getElementById('bankAccount').value.trim();
+        bankName = document.getElementById('bankName').value.trim();
+        
+        if (!bankAccount) {
+          showAlert('Пожалуйста, введите номер телефона или карты', 'error');
+          return;
+        }
+        
+        if (!bankName) {
+          showAlert('Пожалуйста, введите название банка', 'error');
+          return;
+        }
+      }
+      
+      if (editId) {
+        // Редактирование платежа
+        const index = payments.findIndex(p => p.id === editId);
+        if (index !== -1) {
+          payments[index] = {
+            ...payments[index],
+            amount,
+            date,
+            method: paymentMethod,
+            bankAccount,
+            bankName,
+            note,
+            updatedAt: new Date().toISOString()
+          };
+          showAlert(`Платеж на сумму ${amount.toLocaleString()} сомони успешно обновлен`, 'success');
+        }
+      } else {
+        // Новый платеж
+        const newPayment = {
+          id: generateId(),
+          studentId: selectedStudentId,
+          amount,
+          date,
+          method: paymentMethod,
+          bankAccount,
+          bankName,
+          note,
+          createdAt: new Date().toISOString()
+        };
+        payments.push(newPayment);
+        showAlert(`Платеж на сумму ${amount.toLocaleString()} сомони успешно добавлен`, 'success');
+        showReceipt(newPayment.id);
+      }
+      
+      saveData();
+      closePaymentModal();
+      showStudentDetails(selectedStudentId);
+      renderStudentsTable();
+      updateStats();
+    }
+
+    // Редактирование платежа
+    function editPayment(paymentId) {
+      const payment = payments.find(p => p.id === paymentId);
+      if (payment) {
+        openPaymentModal(payment.studentId, paymentId);
+      }
+    }
+
+    // Удаление платежа
+    function deletePayment(paymentId) {
+      if (!confirm('Вы уверены, что хотите удалить этот платеж?')) return;
+      
+      payments = payments.filter(p => p.id !== paymentId);
+      saveData();
+      if (selectedStudentId) showStudentDetails(selectedStudentId);
+      renderStudentsTable();
+      updateStats();
+      showAlert('Платеж успешно удален', 'success');
+    }
+
+    // Показать чек
+    function showReceipt(paymentId) {
+      const payment = payments.find(p => p.id === paymentId);
+      if (!payment) return;
+      
+      const student = students.find(s => s.id === payment.studentId);
+      const paymentDate = new Date(payment.date);
+      const formattedDate = paymentDate.toLocaleDateString('ru-RU');
+      const formattedTime = paymentDate.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'});
+      
+      const studentPayments = payments.filter(p => p.studentId === payment.studentId);
+      const totalPaid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
+      const remainingAmount = TOTAL_AMOUNT - totalPaid;
+      
+      let paymentDetails = '';
+      if (payment.method === 'cash') {
+        paymentDetails = 'Оплата наличными';
+      } else {
+        paymentDetails = `Банк: ${payment.bankName}<br>Счет: ${payment.bankAccount}`;
+      }
+      
+      const receiptContent = document.getElementById('receiptContent');
+      receiptContent.innerHTML = `
+        <div class="receipt-header">
+          <h3>🏫 Школьная система управления</h3>
+          <p>Чек об оплате №${payment.id.substring(0, 8).toUpperCase()}</p>
+        </div>
+        
+        <div class="receipt-item">
+          <div>📅 Дата:</div>
+          <div>${formattedDate}</div>
+        </div>
+        
+        <div class="receipt-item">
+          <div>⏰ Время:</div>
+          <div>${formattedTime}</div>
+        </div>
+        
+        <hr>
+        
+        <div class="receipt-item">
+          <div>👨‍🎓 Ученик:</div>
+          <div><strong>${student ? escapeHtml(student.fullName) : 'Неизвестно'}</strong></div>
+        </div>
+        
+        <div class="receipt-item">
+          <div>📚 Класс:</div>
+          <div>${student ? student.class : 'Неизвестно'}</div>
+        </div>
+        
+        <hr>
+        
+        <div class="receipt-item">
+          <div>💰 Сумма платежа:</div>
+          <div><strong>${payment.amount.toLocaleString()} сомони</strong></div>
+        </div>
+        
+        <div class="receipt-item">
+          <div>💳 Способ оплаты:</div>
+          <div>${payment.method === 'cash' ? 'Наличными' : 'Банковский перевод'}</div>
+        </div>
+        
+        <div style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+          ${paymentDetails}
+          ${payment.note ? `<div style="margin-top: 8px;"><i class="fas fa-sticky-note"></i> ${escapeHtml(payment.note)}</div>` : ''}
+        </div>
+        
+        <div class="receipt-item">
+          <div>📊 Всего оплачено:</div>
+          <div>${totalPaid.toLocaleString()} сомони</div>
+        </div>
+        
+        <div class="receipt-item">
+          <div>📉 Остаток к оплате:</div>
+          <div><strong>${remainingAmount.toLocaleString()} сомони</strong></div>
+        </div>
+        
+        <hr>
+        
+        <div class="receipt-item receipt-total">
+          <div>🎯 ИТОГО К ОПЛАТЕ:</div>
+          <div>${TOTAL_AMOUNT.toLocaleString()} сомони</div>
+        </div>
+        
+        <hr>
+        
+        <div style="text-align: center; margin-top: 20px; color: #6c757d; font-size: 0.85rem;">
+          <p>🙏 Спасибо за оплату!</p>
+          <p>Чек сгенерирован автоматически</p>
+        </div>
+      `;
+      
+      document.getElementById('receiptModal').classList.add('active');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receiptModal').classList.remove('active');
+    }
+
+    function printReceipt() {
+      const printContent = document.getElementById('receiptContent').innerHTML;
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Чек об оплате</title>
+            <style>
+              body { font-family: monospace; padding: 20px; }
+              .receipt { max-width: 400px; margin: 0 auto; }
+            </style>
+          </head>
+          <body>
+            <div class="receipt">${printContent}</div>
+            <script>window.print();<\/script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    // Удаление ученика
+    function deleteStudent(studentId) {
+      if (!confirm('Вы уверены, что хотите удалить этого ученика? Все его платежи также будут удалены.')) return;
+      
+      students = students.filter(s => s.id !== studentId);
+      payments = payments.filter(p => p.studentId !== studentId);
+      saveData();
+      renderStudentsTable();
+      updateStats();
+      
+      if (selectedStudentId === studentId) {
+        document.getElementById('studentDetails').innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-user-circle"></i>
+            <h3>Выберите ученика</h3>
+            <p>Нажмите на строку ученика или кнопку "Подробнее", чтобы увидеть его данные</p>
+          </div>
+        `;
+        selectedStudentId = null;
+      }
+      
+      showAlert('Ученик успешно удален', 'success');
+    }
+
+    // Обновление статистики
+    function updateStats() {
+      document.getElementById('totalStudents').textContent = students.length;
+      document.getElementById('totalPayments').textContent = payments.length;
+      
+      const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
+      document.getElementById('totalAmount').textContent = totalAmount.toLocaleString();
+      
+      const totalDebt = students.reduce((debt, student) => {
+        const studentPayments = payments.filter(p => p.studentId === student.id);
+        const paid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
+        return debt + (TOTAL_AMOUNT - paid);
+      }, 0);
+      document.getElementById('debtAmount').textContent = totalDebt.toLocaleString();
+    }
+
+    // Экспорт данных
+    function exportData() {
+      const exportType = prompt('Выберите формат экспорта:\n1 - JSON\n2 - CSV', '1');
+      if (exportType === '1') {
+        const data = { students, payments, totalAmount: TOTAL_AMOUNT };
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `school_data_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showAlert('Данные экспортированы в JSON', 'success');
+      } else if (exportType === '2') {
+        exportToCSV();
+      }
+    }
+
+    function exportToCSV() {
+      const headers = ['ID', 'ФИО', 'Класс', 'Дата рождения', 'Телефон', 'Адрес', 'Оплачено', 'Остаток'];
+      const rows = students.map(student => {
+        const studentPayments = payments.filter(p => p.studentId === student.id);
+        const paid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
+        const remaining = TOTAL_AMOUNT - paid;
+        return [
+          student.id,
+          student.fullName,
+          student.class,
+          student.birthDate,
+          student.phone || '',
+          student.address || '',
+          paid,
+          remaining
+        ];
+      });
+      
+      const csvContent = [headers, ...rows]
+        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+      
+      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `students_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showAlert('Данные экспортированы в CSV', 'success');
+    }
+
+    // Генерация ID
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2, 8);
+    }
+
+    // Показать уведомление
+    function showAlert(message, type = 'info') {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      const icons = { success: 'fa-check-circle', info: 'fa-info-circle', error: 'fa-exclamation-circle' };
+      alert.innerHTML = `
+        <i class="fas ${icons[type] || 'fa-info-circle'}"></i>
+        <span>${message}</span>
+      `;
+      
+      document.body.appendChild(alert);
+      
+      setTimeout(() => {
+        alert.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => alert.remove(), 300);
+      }, 4000);
+    }
+
+    // Экранирование HTML
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Добавляем стиль для анимации исчезновения
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
