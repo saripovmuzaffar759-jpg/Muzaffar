@@ -2,1013 +2,836 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Простой навигатор MUZAFFAR</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Muzaffar Link — умный сокращатель ссылок</title>
     <style>
-        :root {
-            --primary: #4CAF50;
-            --primary-dark: #388E3C;
-            --secondary: #8BC34A;
-            --dark: #121212;
-            --darker: #0A0A0A;
-            --light: #F5F5F5;
-            --text: #E0E0E0;
-            --text-dark: #212121;
-            --accent: #FFC107;
-            --error: #F44336;
-            --info: #2196F3;
-        }
-        
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--dark);
-            color: var(--text);
-            line-height: 1.6;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: radial-gradient(circle at 10% 30%, rgba(15, 25, 45, 1) 0%, rgba(10, 20, 35, 1) 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            padding: 2rem 1.5rem;
         }
-        
-        .header {
-            background-color: var(--darker);
-            padding: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            position: relative;
-            z-index: 1000;
-        }
-        
-        .header-content {
-            max-width: 1200px;
+
+        .main-wrapper {
+            max-width: 1300px;
             margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
-        
-        .logo {
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .hero {
+            background: linear-gradient(110deg, #ffffff 0%, #fef9f0 100%);
+            border-radius: 2rem;
+            padding: 2rem 2rem 1.8rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 140, 50, 0.2);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-area {
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 0.5rem;
         }
-        
+
         .logo-icon {
-            font-size: 2rem;
-            color: var(--primary);
-        }
-        
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--light);
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .tagline {
-            color: var(--secondary);
-            font-size: 0.9rem;
-            opacity: 0.9;
-            text-align: center;
-        }
-        
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        
-        .search-container {
-            width: 100%;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-        
-        .search-box {
-            display: flex;
-            gap: 0.5rem;
-            width: 100%;
-        }
-        
-        #search-box {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            border: 2px solid var(--primary);
-            font-size: 1rem;
-            background-color: var(--darker);
-            color: var(--text);
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        #search-box:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
-        }
-        
-        #search-box::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-            font-style: italic;
-        }
-        
-        #search-button {
-            padding: 0 1.25rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #FF8C42, #F05A28);
+            border-radius: 24px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        #search-button:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        #search-button:active {
-            transform: translateY(0);
-        }
-        
-        .route-container {
-            background-color: var(--darker);
-            border-radius: 0.75rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        
-        .route-title {
-            font-size: 1.1rem;
-            color: var(--primary);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .route-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-        
-        .route-input {
-            position: relative;
-        }
-        
-        .route-input input {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.9rem;
-            background-color: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            transition: all 0.3s ease;
-        }
-        
-        .route-input input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-        }
-        
-        .route-input i {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--secondary);
-        }
-        
-        .route-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .route-button {
-            padding: 0.75rem 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex: 1;
             justify-content: center;
-        }
-        
-        .route-button.primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            font-weight: 800;
+            font-size: 28px;
             color: white;
+            box-shadow: 0 12px 18px -8px rgba(240, 90, 40, 0.4);
         }
-        
-        .route-button.secondary {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text);
+
+        .logo-text h1 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #F05A28, #FF8C42);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
         }
-        
-        .route-button:hover {
+
+        .logo-text span {
+            font-size: 0.85rem;
+            color: #5a6e8a;
+            font-weight: 500;
+        }
+
+        .badge {
+            background: #FFEDE0;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #F05A28;
+        }
+
+        .tagline {
+            color: #2c3e4e;
+            font-size: 1rem;
+            margin-top: 0.75rem;
+            border-left: 4px solid #FF8C42;
+            padding-left: 1rem;
+            background: #fff7ef;
+            border-radius: 1rem;
+            width: fit-content;
+            padding: 0.6rem 1.2rem;
+        }
+
+        .form-panel {
+            padding: 1.8rem 2rem 2rem;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid #e9edf2;
+            border-radius: 1.2rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: #fbfdff;
+            font-weight: 500;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #FF8C42;
+            box-shadow: 0 0 0 4px rgba(255, 140, 66, 0.15);
+            background: white;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(105deg, #F05A28, #FF8C42);
+            border: none;
+            padding: 0.9rem 2rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            box-shadow: 0 5px 12px rgba(240, 90, 40, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 12px 20px rgba(240, 90, 40, 0.4);
         }
-        
-        .route-info {
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 0.5rem;
-            display: none;
+
+        .btn-secondary {
+            background: #2d3e50;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        
-        .route-info.active {
-            display: block;
-            animation: fadeIn 0.5s ease forwards;
+
+        .btn-secondary:hover {
+            background: #1e2f3f;
+            transform: translateY(-1px);
         }
-        
-        .route-details {
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-card {
+            background: #FFF8F0;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.5rem;
+            margin: 1.5rem 0 1rem;
+            border: 1px solid #ffe0b5;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        .route-distance, .route-time {
-            display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-        
-        .transport-options {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
             flex-wrap: wrap;
+            gap: 1rem;
         }
-        
-        .transport-option {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.5rem;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.8rem;
+
+        .result-link {
+            font-size: 1.15rem;
+            font-weight: 700;
+            font-family: 'SF Mono', monospace;
+            color: #E05A2A;
+            word-break: break-all;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            flex: 2;
         }
-        
-        .transport-option.active {
-            background-color: var(--primary);
+
+        .copy-result-btn {
+            background: #27ae60;
+            border: none;
+            padding: 0.6rem 1.3rem;
+            border-radius: 2rem;
+            font-weight: 600;
             color: white;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        
-        .transport-option:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.1);
+
+        .copy-result-btn:hover {
+            background: #219653;
+            transform: scale(0.97);
         }
-        
-        .map-container {
-            position: relative;
-            flex: 1;
-            width: 100%;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-            margin-bottom: 1rem;
-        }
-        
-        #map {
-            width: 100%;
-            height: 50vh;
-            min-height: 400px;
-        }
-        
-        .info-panel {
-            padding: 1rem;
-            background-color: var(--darker);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .info-panel:hover {
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        }
-        
-        .info-title {
-            font-size: 1.1rem;
-            color: var(--primary);
-            margin-bottom: 0.75rem;
+
+        .stats-row {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin: 1.8rem 0 2rem;
+            flex-wrap: wrap;
         }
-        
-        #place-info {
-            font-size: 1rem;
-            line-height: 1.7;
-            color: var(--text);
-            min-height: 3rem;
-        }
-        
-        .coordinates {
-            margin-top: 0.75rem;
-            font-size: 0.8rem;
-            color: var(--secondary);
-            font-family: 'Roboto Mono', monospace;
-        }
-        
-        .footer {
-            background-color: var(--darker);
-            color: var(--text);
+
+        .stat-block {
+            background: #f4f7fc;
+            flex: 1;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
             text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
-            margin-top: auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+            border-bottom: 3px solid #FF8C42;
         }
-        
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #F05A28;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4a627a;
+        }
+
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0 0.5rem 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .links-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(145deg, #1e2a3a, #2c3e50);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .search-box {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid #ddd;
+            width: 220px;
+            font-size: 0.85rem;
+            background: white;
+        }
+
+        .links-grid {
+            max-height: 460px;
+            overflow-y: auto;
+            padding-right: 6px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
             gap: 1rem;
-            margin-top: 0.75rem;
-            flex-wrap: wrap;
         }
-        
-        .footer-link {
-            color: var(--secondary);
-            text-decoration: none;
-            transition: color 0.2s;
+
+        .link-card {
+            background: white;
+            border-radius: 1.3rem;
+            padding: 1.2rem 1.3rem;
+            border: 1px solid #eef2f8;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .link-card:hover {
+            border-color: #FFC9A5;
+            transform: translateX(4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .link-name-badge {
+            background: #FFEADB;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #c44f26;
+            display: inline-block;
+        }
+
+        .link-date {
+            font-size: 0.7rem;
+            color: #7f8c8d;
+        }
+
+        .link-urls-container {
             display: flex;
-            align-items: center;
-            gap: 0.25rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1rem;
+            margin: 0.8rem 0;
             font-size: 0.8rem;
         }
-        
-        .footer-link:hover {
-            color: var(--accent);
+
+        .original-url-text {
+            color: #3b5c7a;
+            word-break: break-all;
+            flex: 1;
         }
-        
-        /* Стили для маркера */
-        .custom-marker {
-            background-color: var(--primary);
-            border: 3px solid white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
+
+        .short-url-text a {
+            color: #F05A28;
+            font-weight: 600;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .short-url-text a:hover {
+            text-decoration: underline;
+        }
+
+        .link-actions {
             display: flex;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+
+        .small-btn {
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .copy-sm {
+            background: #e9f0f9;
+            color: #2c5282;
+        }
+
+        .copy-sm:hover {
+            background: #d0e2f5;
+        }
+
+        .delete-sm {
+            background: #fee2e2;
+            color: #c53030;
+        }
+
+        .delete-sm:hover {
+            background: #fbc4c4;
+        }
+
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e2a32;
+            color: #f0ede8;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.85);
+            z-index: 1200;
+            display: none;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .error-message {
+            background: #fff0f0;
+            border-left: 5px solid #e53e3e;
+            padding: 0.8rem 1rem;
+            border-radius: 1rem;
+            margin: 0.5rem 0;
+            display: none;
+            font-size: 0.85rem;
+            color: #b91c1c;
+        }
+
+        .loading-spinner {
+            display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            gap: 12px;
+            padding: 1rem;
+            color: #F05A28;
+            font-weight: 500;
         }
-        
-        .custom-marker::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 12px solid var(--primary);
-            bottom: -12px;
+
+        .spinner-ring {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 4px solid #ffe6db;
+            border-top: 4px solid #F05A28;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
         }
-        
-        /* Стили для попапа */
-        .leaflet-popup-content {
-            font-family: 'Roboto', sans-serif;
-            margin: 0.5rem;
-            font-size: 0.9rem;
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state {
+            text-align: center;
+            background: #fafcff;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            color: #7f8c8d;
+            border: 1px dashed #ccc;
         }
-        
-        .leaflet-popup-content-wrapper {
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .logo-text {
-                font-size: 1.25rem;
-            }
-            
-            .logo-icon {
-                font-size: 1.5rem;
-            }
-            
-            .search-box {
-                flex-direction: column;
-            }
-            
-            #search-button {
-                padding: 0.5rem;
-                justify-content: center;
-            }
-            
-            #map {
-                height: 40vh;
-                min-height: 300px;
-            }
-            
-            .route-actions {
-                flex-direction: column;
-            }
-        }
-        
-        /* Анимации */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .pulse {
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
-        }
-        
-        /* Стили для locate control */
-        .leaflet-control-locate {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-            border-radius: 0.5rem !important;
-            overflow: hidden;
-        }
-        
-        /* Стили для маршрута */
-        .leaflet-routing-container {
-            background-color: var(--darker);
-            color: var(--text);
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            max-height: 200px;
-            overflow-y: auto;
-            font-size: 0.8rem;
-        }
-        
-        .leaflet-routing-alt {
-            background-color: var(--darker);
-            color: var(--text);
-        }
-        
-        .leaflet-routing-alt h2 {
-            color: var(--primary);
-            font-size: 1rem;
-        }
-        
-        .leaflet-routing-alt table {
-            color: var(--text);
-            font-size: 0.8rem;
-        }
-        
-        .leaflet-routing-alt-minimized {
-            display: none;
-        }
-        
-        .leaflet-routing-geocoders {
-            padding: 0.5rem;
-        }
-        
-        .leaflet-routing-geocoder input {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.8rem;
+
+        @media (max-width: 680px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .button-group { flex-direction: column; }
+            .result-card { flex-direction: column; align-items: stretch; }
+            .stats-row { flex-direction: column; }
+            .hero { padding: 1.5rem; }
+            .form-panel { padding: 1.2rem; }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <i class="fas fa-map-marked-alt logo-icon"></i>
-                <span class="logo-text">MUZAFFAR Навигатор</span>
-            </div>
-            <div class="tagline">Найди место и построй маршрут</div>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="search-box" placeholder="Найти место на карте..." autocomplete="off">
-                <button id="search-button">
-                    <i class="fas fa-search"></i>
-                    <span class="button-text">Найти</span>
-                </button>
-            </div>
-        </div>
-        
-        <div class="route-container">
-            <div class="route-title">
-                <i class="fas fa-route"></i>
-                <span>Маршрут</span>
-            </div>
-            <div class="route-inputs">
-                <div class="route-input">
-                    <i class="fas fa-location-arrow"></i>
-                    <input type="text" id="route-from" placeholder="Откуда (нажми на карту)" autocomplete="off" readonly>
-                </div>
-                <div class="route-input">
-                    <i class="fas fa-flag-checkered"></i>
-                    <input type="text" id="route-to" placeholder="Куда (нажми на карту)" autocomplete="off" readonly>
-                </div>
-            </div>
-            <div class="route-actions">
-                <button class="route-button primary" id="calculate-route">
-                    <i class="fas fa-route"></i>
-                    <span>Построить маршрут</span>
-                </button>
-                <button class="route-button secondary" id="clear-route">
-                    <i class="fas fa-times"></i>
-                    <span>Очистить</span>
-                </button>
-            </div>
-            <div class="route-info" id="route-info">
-                <div class="route-details">
-                    <div class="route-distance">
-                        <i class="fas fa-road"></i>
-                        <span id="route-distance">-</span>
-                    </div>
-                    <div class="route-time">
-                        <i class="fas fa-clock"></i>
-                        <span id="route-time">-</span>
+<div class="main-wrapper">
+    <div class="glass-card">
+        <div class="hero">
+            <div class="brand">
+                <div class="logo-area">
+                    <div class="logo-icon">M</div>
+                    <div class="logo-text">
+                        <h1>Muzaffar Link</h1>
+                        <span>чистый сокращатель • без трекинга</span>
                     </div>
                 </div>
-                <div class="transport-options">
-                    <div class="transport-option active" data-type="car">
-                        <i class="fas fa-car"></i>
-                        <span>Машина</span>
-                    </div>
-                    <div class="transport-option" data-type="foot">
-                        <i class="fas fa-walking"></i>
-                        <span>Пешком</span>
-                    </div>
+                <div class="badge">✨ именные ссылки | простота</div>
+            </div>
+            <div class="tagline">
+                🔗 Дайте ссылке запоминающееся имя — создавайте короткие Muzaffar-ссылки за секунду. Никакой статистики переходов, только удобство.
+            </div>
+        </div>
+
+        <div class="form-panel">
+            <div class="input-grid">
+                <input type="text" id="linkName" class="input-field" placeholder="📛 Имя ссылки (например: МойПроект, Портфолио)">
+                <input type="url" id="longUrl" class="input-field" placeholder="🔗 Вставьте длинный URL (https://...)">
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" id="createLinkBtn">✨ Создать Muzaffar ссылку</button>
+                <button class="btn-secondary" id="clearAllHistoryBtn">🗑 Очистить всё</button>
+            </div>
+            <div id="errorBox" class="error-message"></div>
+            <div id="loadingArea" class="loading-spinner"><div class="spinner-ring"></div><span>Создаём волшебную ссылку...</span></div>
+            
+            <div id="resultBox" style="display: none;">
+                <div class="result-card">
+                    <div class="result-link" id="shortResultLink"></div>
+                    <button class="copy-result-btn" id="copyResultBtn">📋 Копировать</button>
                 </div>
             </div>
-        </div>
 
-        <div class="map-container">
-            <div id="map"></div>
-        </div>
-
-        <div class="info-panel">
-            <div class="info-title">
-                <i class="fas fa-info-circle"></i>
-                <span>Информация о месте</span>
-            </div>
-            <div id="place-info">Нажми на карту или найди место, чтобы увидеть информацию</div>
-            <div class="coordinates" id="coordinates"></div>
-        </div>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2025 MUZAFFAR Карты.</p>
-            <div class="footer-links">
-                <a href="#" class="footer-link">
-                    <i class="fas fa-info-circle"></i>
-                    <span>О проекте</span>
-                </a>
-                <a href="#" class="footer-link">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Помощь</span>
-                </a>
+            <div class="stats-row">
+                <div class="stat-block"><div class="stat-number" id="totalCount">0</div><div class="stat-label">всего ссылок</div></div>
+                <div class="stat-block"><div class="stat-number" id="namedCount">0</div><div class="stat-label">именованных</div></div>
+                <div class="stat-block"><div class="stat-number">⚡ Muzaffar</div><div class="stat-label">ваш бренд</div></div>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-    <script>
-        // Инициализация карты
-        const map = L.map('map', {
-            center: [55.7558, 37.6173],
-            zoom: 12,
-            zoomControl: false
-        });
+    <div style="margin-top: 2rem; background: rgba(255,255,240,0.95); border-radius: 1.8rem; padding: 1.5rem;">
+        <div class="links-header">
+            <div class="links-title">📚 Мои именованные ссылки</div>
+            <input type="text" id="searchLinks" class="search-box" placeholder="🔍 Поиск по имени или ссылке...">
+        </div>
+        <div id="linksListContainer" class="links-grid"></div>
+    </div>
+</div>
 
-        // Добавляем контрол зума
-        L.control.zoom({
-            position: 'topright'
-        }).addTo(map);
+<div id="toastMsg" class="toast-notify">✅ Готово</div>
 
-        // Добавляем контрол определения местоположения
-        const locateControl = L.control.locate({
-            position: 'topright',
-            strings: {
-                title: "Мое местоположение",
-                popup: "Вы находитесь здесь"
-            },
-            locateOptions: {
-                maxZoom: 16,
-                enableHighAccuracy: true
-            }
-        }).addTo(map);
+<script>
+    // ======================== Muzaffar Link Shortener (без кликов / без счётчика) ========================
+    class MuzaffarShortener {
+        constructor() {
+            this.API_ENDPOINT = 'https://clck.ru/--';
+            this.STORAGE_KEY = 'muzaffar_link_app_v2';
+            this.links = [];       // каждый объект: { id, name, originalUrl, shortUrl, createdAt }
+            this.initElements();
+            this.loadData();
+            this.attachEvents();
+            this.renderAll();
+        }
 
-        // Слои карты
-        const tileLayers = {
-            "Стандартная": L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }),
-            "Темная": L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 19
-            })
-        };
+        initElements() {
+            this.nameInput = document.getElementById('linkName');
+            this.urlInput = document.getElementById('longUrl');
+            this.createBtn = document.getElementById('createLinkBtn');
+            this.clearBtn = document.getElementById('clearAllHistoryBtn');
+            this.errorDiv = document.getElementById('errorBox');
+            this.loadingDiv = document.getElementById('loadingArea');
+            this.resultBox = document.getElementById('resultBox');
+            this.shortResultLinkSpan = document.getElementById('shortResultLink');
+            this.copyResultBtn = document.getElementById('copyResultBtn');
+            this.totalCountSpan = document.getElementById('totalCount');
+            this.namedCountSpan = document.getElementById('namedCount');
+            this.linksContainer = document.getElementById('linksListContainer');
+            this.searchInput = document.getElementById('searchLinks');
+            this.toast = document.getElementById('toastMsg');
+        }
 
-        // Добавляем стандартный слой
-        tileLayers["Стандартная"].addTo(map);
+        attachEvents() {
+            this.createBtn.addEventListener('click', () => this.handleShorten());
+            this.clearBtn.addEventListener('click', () => this.clearAllHistory());
+            this.copyResultBtn.addEventListener('click', () => this.copyTextToClipboard(this.shortResultLinkSpan.innerText));
+            this.urlInput.addEventListener('input', () => this.validateForm());
+            this.nameInput.addEventListener('input', () => this.validateForm());
+            this.searchInput.addEventListener('input', () => this.renderLinksList());
+            
+            this.urlInput.addEventListener('keypress', (e) => { if(e.key === 'Enter' && !this.createBtn.disabled) this.handleShorten(); });
+            this.nameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter' && !this.createBtn.disabled) this.handleShorten(); });
+        }
 
-        // Добавляем контрол выбора слоев
-        L.control.layers(tileLayers, null, {
-            position: 'topright',
-            collapsed: false
-        }).addTo(map);
+        validateForm() {
+            const url = this.urlInput.value.trim();
+            const name = this.nameInput.value.trim();
+            this.createBtn.disabled = !(this.isValidHttpUrl(url) && name.length > 0);
+        }
 
-        // Создаем кастомный маркер
-        const customIcon = L.divIcon({
-            className: 'custom-marker',
-            iconSize: [24, 24],
-            iconAnchor: [12, 24],
-            popupAnchor: [0, -24]
-        });
-
-        // Переменные для хранения состояния
-        let fromMarker = null;
-        let toMarker = null;
-        let currentRoute = null;
-        let transportType = 'car';
-
-        // Функция для установки маркера и получения информации
-        async function setMarker(lat, lng, isFrom = false) {
+        isValidHttpUrl(str) {
             try {
-                // Определяем, какой маркер устанавливаем
-                let marker;
-                let inputField;
-                
-                if (isFrom) {
-                    // Удаляем старый маркер "откуда" если есть
-                    if (fromMarker) {
-                        map.removeLayer(fromMarker);
-                    }
-                    
-                    // Создаем новый маркер "откуда"
-                    fromMarker = L.marker([lat, lng], {
-                        icon: customIcon
-                    }).addTo(map);
-                    
-                    marker = fromMarker;
-                    inputField = document.getElementById('route-from');
-                } else {
-                    // Удаляем старый маркер "куда" если есть
-                    if (toMarker) {
-                        map.removeLayer(toMarker);
-                    }
-                    
-                    // Создаем новый маркер "куда"
-                    toMarker = L.marker([lat, lng], {
-                        icon: customIcon
-                    }).addTo(map);
-                    
-                    marker = toMarker;
-                    inputField = document.getElementById('route-to');
-                }
-                
-                // Анимация маркера
-                marker.on('add', () => {
-                    marker._icon.classList.add('pulse');
-                });
-                
-                // Получаем информацию об адресе
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=ru&zoom=18&addressdetails=1`);
-                
-                if (!response.ok) throw new Error('Ошибка сервера');
-                
-                const data = await response.json();
-                
-                // Форматируем адрес
-                let address = formatAddress(data);
-                
-                // Заполняем поле ввода
-                inputField.value = address;
-                
-                // Обновляем информацию
-                updateInfoPanel(`<strong>${address}</strong>`, `Широта: ${lat.toFixed(6)}<br>Долгота: ${lng.toFixed(6)}`);
-                
-                // Создаем попап
-                const popupContent = createPopupContent(address, lat, lng);
-                marker.bindPopup(popupContent).openPopup();
-                
-                // Центрируем карту
-                map.setView([lat, lng], 16);
-                
-            } catch (error) {
-                console.error('Ошибка:', error);
-                updateInfoPanel('<span style="color: var(--error)"><i class="fas fa-exclamation-triangle"></i> Ошибка получения информации о месте</span>',
-                              `Широта: ${lat.toFixed(6)}<br>Долгота: ${lng.toFixed(6)}`);
-                
-                // Все равно ставим маркер
-                let marker;
-                let inputField;
-                
-                if (isFrom) {
-                    if (!fromMarker) {
-                        fromMarker = L.marker([lat, lng], {
-                            icon: customIcon
-                        }).addTo(map);
-                    }
-                    marker = fromMarker;
-                    inputField = document.getElementById('route-from');
-                    inputField.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-                } else {
-                    if (!toMarker) {
-                        toMarker = L.marker([lat, lng], {
-                            icon: customIcon
-                        }).addTo(map);
-                    }
-                    marker = toMarker;
-                    inputField = document.getElementById('route-to');
-                    inputField.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-                }
-                
-                const popupContent = createPopupContent("Точные координаты", lat, lng);
-                marker.bindPopup(popupContent).openPopup();
+                const url = new URL(str);
+                return url.protocol === 'http:' || url.protocol === 'https:';
+            } catch { 
+                return false; 
             }
         }
 
-        // Форматирование адреса
-        function formatAddress(data) {
-            if (!data.address) return data.display_name || "Адрес не найден";
-            
-            const addr = data.address;
-            const parts = [];
-            
-            if (addr.road) parts.push(addr.road + (addr.house_number ? `, ${addr.house_number}` : ''));
-            if (addr.city) parts.push(addr.city);
-            else if (addr.town) parts.push(addr.town);
-            else if (addr.village) parts.push(addr.village);
-            
-            if (parts.length === 0) return data.display_name || "Адрес не найден";
-            
-            return parts.join(', ');
+        showError(msg) {
+            this.errorDiv.innerText = msg;
+            this.errorDiv.style.display = 'block';
+            setTimeout(() => { this.errorDiv.style.display = 'none'; }, 4000);
         }
 
-        // Создание содержимого попапа
-        function createPopupContent(address, lat, lng) {
-            return `
-                <div style="min-width: 180px;">
-                    <h4 style="margin: 0 0 8px 0; color: var(--primary); font-size: 0.9rem;">${address}</h4>
-                    <div style="margin-bottom: 8px; font-size: 0.8rem;">
-                        <div><strong>Широта:</strong> ${lat.toFixed(6)}</div>
-                        <div><strong>Долгота:</strong> ${lng.toFixed(6)}</div>
-                    </div>
-                </div>
-            `;
+        hideError() { this.errorDiv.style.display = 'none'; }
+
+        showLoading(show) {
+            this.loadingDiv.style.display = show ? 'flex' : 'none';
+            if(show) this.createBtn.disabled = true;
+            else this.validateForm();
         }
 
-        // Обновление информационной панели
-        function updateInfoPanel(info, coordinates = '') {
-            document.getElementById('place-info').innerHTML = info;
-            document.getElementById('coordinates').innerHTML = coordinates;
+        showToast(message, isError = false) {
+            this.toast.innerText = message;
+            this.toast.style.display = 'block';
+            this.toast.style.background = isError ? '#c53030cc' : '#1f3b3ccc';
+            setTimeout(() => { this.toast.style.display = 'none'; }, 2500);
         }
 
-        // Функция поиска мест
-        async function searchLocation() {
-            const query = document.getElementById('search-box').value.trim();
-            if (!query) {
-                showError('Пожалуйста, введите поисковый запрос');
+        hideResult() { 
+            this.resultBox.style.display = 'none'; 
+        }
+
+        async handleShorten() {
+            const originalUrl = this.urlInput.value.trim();
+            const customName = this.nameInput.value.trim();
+            
+            if(!this.isValidHttpUrl(originalUrl)) {
+                this.showError('❌ Введите корректный URL, начинающийся с http:// или https://');
+                return;
+            }
+            if(!customName) {
+                this.showError('❌ Придумайте имя для ссылки (например: "Мой сайт")');
                 return;
             }
             
-            // Показываем загрузку
-            updateInfoPanel(`<i class="fas fa-spinner fa-spin"></i> Поиск места...`, '');
-            
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&accept-language=ru&addressdetails=1`);
-                
-                if (!response.ok) throw new Error('Ошибка сервера');
-                
-                const data = await response.json();
-                
-                if (data.length === 0) {
-                    showError('Место не найдено. Попробуйте изменить запрос.');
-                    return;
-                }
-                
-                const place = data[0];
-                
-                // Спрашиваем пользователя, куда добавить найденное место
-                if (confirm(`Добавить "${formatAddress(place)}" как пункт назначения?`)) {
-                    await setMarker(parseFloat(place.lat), parseFloat(place.lon), false);
-                } else {
-                    await setMarker(parseFloat(place.lat), parseFloat(place.lon), true);
-                }
-                
-            } catch (error) {
-                console.error('Ошибка поиска:', error);
-                showError('Ошибка при выполнении поиска. Пожалуйста, попробуйте позже.');
-            }
-        }
-
-        // Функция показа ошибки
-        function showError(message) {
-            updateInfoPanel(`<span style="color: var(--error)"><i class="fas fa-exclamation-triangle"></i> ${message}</span>`, '');
-        }
-
-        // Функция построения маршрута
-        function calculateRoute() {
-            if (!fromMarker || !toMarker) {
-                showError('Пожалуйста, укажите обе точки на карте');
+            // проверка уникальности имени (регистронезависимо)
+            if(this.links.some(link => link.name.toLowerCase() === customName.toLowerCase())) {
+                this.showError(`⚠️ Ссылка с именем "${customName}" уже существует! Используйте другое имя.`);
                 return;
             }
-            
-            // Очищаем предыдущий маршрут
-            if (currentRoute) {
-                map.removeControl(currentRoute);
-            }
-            
-            // Определяем точки маршрута
-            const waypoints = [
-                fromMarker.getLatLng(),
-                toMarker.getLatLng()
-            ];
-            
-            // Настройки маршрутизатора в зависимости от типа транспорта
-            let router;
-            if (transportType === 'foot') {
-                router = L.Routing.osrmv1({
-                    serviceUrl: 'https://router.project-osrm.org/route/v1',
-                    profile: 'foot'
+
+            this.showLoading(true);
+            this.hideError();
+            this.hideResult();
+
+            try {
+                const response = await fetch(this.API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ url: originalUrl })
                 });
-            } else {
-                router = L.Routing.osrmv1({
-                    serviceUrl: 'https://router.project-osrm.org/route/v1',
-                    profile: 'driving'
-                });
+                if(!response.ok) throw new Error(`HTTP ${response.status}`);
+                const shortUrl = await response.text();
+                if(!shortUrl.startsWith('https://clck.ru/')) throw new Error('некорректный ответ clck.ru');
+
+                const newLink = {
+                    id: Date.now().toString() + '-' + Math.random().toString(36).substr(2, 8),
+                    name: customName.trim(),
+                    originalUrl: originalUrl,
+                    shortUrl: shortUrl,
+                    createdAt: new Date().toISOString()
+                };
+                this.links.unshift(newLink);
+                this.saveToLocal();
+                this.updateStatsAndRender();
+
+                // показать результат
+                this.shortResultLinkSpan.innerText = shortUrl;
+                this.resultBox.style.display = 'block';
+                this.showToast(`🎉 Ссылка "${customName}" создана!`);
+
+                // очистка полей
+                this.nameInput.value = '';
+                this.urlInput.value = '';
+                this.validateForm();
+
+            } catch(err) {
+                console.error(err);
+                this.showError('❌ Ошибка при сокращении. Попробуйте позже или проверьте ссылку.');
+            } finally {
+                this.showLoading(false);
             }
-            
-            currentRoute = L.Routing.control({
-                waypoints: waypoints,
-                router: router,
-                routeWhileDragging: false,
-                showAlternatives: false,
-                lineOptions: {
-                    styles: [{color: '#4CAF50', opacity: 0.8, weight: 6}]
-                },
-                show: false,
-                autoRoute: true,
-                fitSelectedRoutes: true,
-                addWaypoints: false
-            }).addTo(map);
-            
-            // Обработчик завершения построения маршрута
-            currentRoute.on('routesfound', function(e) {
-                const routes = e.routes;
-                const summary = routes[0].summary;
-                
-                // Обновляем информацию о маршруте
-                document.getElementById('route-distance').textContent = (summary.totalDistance / 1000).toFixed(1) + ' км';
-                document.getElementById('route-time').textContent = formatTime(summary.totalTime);
-                
-                // Показываем панель информации о маршруте
-                document.getElementById('route-info').classList.add('active');
+        }
+
+        copyTextToClipboard(text) {
+            if(!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                this.showToast(`📋 Скопировано: ${text.length > 55 ? text.slice(0,55)+'…' : text}`);
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                this.showToast('📋 Скопировано!');
             });
         }
 
-        // Форматирование времени
-        function formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            
-            if (hours > 0) {
-                return `${hours} ч ${minutes} мин`;
-            } else {
-                return `${minutes} мин`;
+        // удаление одной ссылки
+        deleteLinkById(id, linkName) {
+            if(confirm(`Удалить ссылку "${linkName}"?`)) {
+                this.links = this.links.filter(link => link.id !== id);
+                this.saveToLocal();
+                this.updateStatsAndRender();
+                this.showToast(`🗑 Ссылка "${linkName}" удалена`);
+                if(this.resultBox.style.display === 'block') this.hideResult();
             }
         }
 
-        // Очистка маршрута
-        function clearRoute() {
-            if (currentRoute) {
-                map.removeControl(currentRoute);
-                currentRoute = null;
+        clearAllHistory() {
+            if(this.links.length === 0) {
+                this.showToast('✨ История и так пуста');
+                return;
             }
-            
-            if (fromMarker) {
-                map.removeLayer(fromMarker);
-                fromMarker = null;
+            if(confirm('⚠️ ВНИМАНИЕ! Будут удалены ВСЕ именованные ссылки без возможности восстановления. Продолжить?')) {
+                this.links = [];
+                this.saveToLocal();
+                this.updateStatsAndRender();
+                this.hideResult();
+                this.showToast('🧹 Вся история Muzaffar Link очищена');
             }
-            
-            if (toMarker) {
-                map.removeLayer(toMarker);
-                toMarker = null;
-            }
-            
-            document.getElementById('route-info').classList.remove('active');
-            document.getElementById('route-from').value = '';
-            document.getElementById('route-to').value = '';
-            updateInfoPanel('Нажми на карту или найди место, чтобы увидеть информацию', '');
         }
 
-        // Обработчики событий
-        document.getElementById('search-button').addEventListener('click', searchLocation);
-        
-        document.getElementById('search-box').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchLocation();
+        updateStatsAndRender() {
+            const total = this.links.length;
+            const named = this.links.filter(l => l.name && l.name.length > 0).length;
+            this.totalCountSpan.innerText = total;
+            this.namedCountSpan.innerText = named;
+            this.renderLinksList();
+        }
+
+        renderLinksList() {
+            const searchTerm = this.searchInput?.value.toLowerCase().trim() || '';
+            let filtered = [...this.links];
+            if(searchTerm) {
+                filtered = filtered.filter(link => 
+                    link.name.toLowerCase().includes(searchTerm) || 
+                    link.originalUrl.toLowerCase().includes(searchTerm) ||
+                    link.shortUrl.toLowerCase().includes(searchTerm)
+                );
             }
-        });
 
-        // Обработчик клика по карте
-        let clickCount = 0;
-        map.on('click', function(e) {
-            clickCount++;
-            
-            // Первый клик - "откуда", второй - "куда", затем цикл повторяется
-            if (clickCount % 2 === 1) {
-                setMarker(e.latlng.lat, e.latlng.lng, true);
-            } else {
-                setMarker(e.latlng.lat, e.latlng.lng, false);
+            if(filtered.length === 0) {
+                this.linksContainer.innerHTML = `<div class="empty-state">
+                    <div style="font-size: 3rem;">📭</div>
+                    <div style="font-weight: 600;">Нет ссылок</div>
+                    <div style="font-size: 0.8rem; margin-top: 8px;">Создайте первую Muzaffar ссылку с именем</div>
+                </div>`;
+                return;
             }
-        });
 
-        // Кнопка построения маршрута
-        document.getElementById('calculate-route').addEventListener('click', calculateRoute);
-        
-        // Кнопка очистки маршрута
-        document.getElementById('clear-route').addEventListener('click', clearRoute);
+            this.linksContainer.innerHTML = filtered.map(link => {
+                const dateStr = new Date(link.createdAt).toLocaleString('ru-RU', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                const shortDisplay = link.shortUrl.length > 52 ? link.shortUrl.slice(0,49)+'…' : link.shortUrl;
+                return `
+                    <div class="link-card" data-id="${link.id}">
+                        <div style="display: flex; justify-content: space-between; flex-wrap:wrap; align-items:center; gap:8px;">
+                            <span class="link-name-badge">🏷️ ${this.escapeHtml(link.name)}</span>
+                            <span class="link-date">📅 ${dateStr}</span>
+                        </div>
+                        <div class="link-urls-container">
+                            <div class="original-url-text"><span style="font-weight:600;">🔗 Оригинал:</span><br> ${this.truncateSmart(link.originalUrl, 70)}</div>
+                            <div class="short-url-text"><span style="font-weight:600;">✨ Muzaffar:</span><br> 
+                                <a href="${link.shortUrl}" target="_blank" rel="noopener noreferrer" class="short-link-preview" data-short="${link.shortUrl}">${this.escapeHtml(shortDisplay)}</a>
+                            </div>
+                        </div>
+                        <div class="link-actions">
+                            <button class="small-btn copy-sm" data-copy-url="${link.shortUrl}" data-name="${this.escapeHtml(link.name)}">📋 Копировать</button>
+                            <button class="small-btn delete-sm" data-delete-id="${link.id}" data-delete-name="${this.escapeHtml(link.name)}">🗑 Удалить</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-        // Обработчики выбора типа транспорта
-        document.querySelectorAll('.transport-option').forEach(option => {
-            option.addEventListener('click', function() {
-                document.querySelectorAll('.transport-option').forEach(opt => {
-                    opt.classList.remove('active');
+            // обработчики для копирования
+            document.querySelectorAll('.copy-sm').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const url = btn.getAttribute('data-copy-url');
+                    const name = btn.getAttribute('data-name');
+                    if(url) this.copyTextToClipboard(url);
+                    this.showToast(`📎 Ссылка "${name}" скопирована`);
                 });
-                this.classList.add('active');
-                transportType = this.getAttribute('data-type');
-                
-                // Перестраиваем маршрут если он уже был построен
-                if (currentRoute) {
-                    calculateRoute();
+            });
+            
+            // обработчики для удаления
+            document.querySelectorAll('.delete-sm').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-delete-id');
+                    const name = btn.getAttribute('data-delete-name');
+                    if(id) this.deleteLinkById(id, name);
+                });
+            });
+            
+            // короткие ссылки открываются в новой вкладке (без счётчика)
+            // дополнительная защита: все ссылки уже имеют target="_blank", но на всякий случай
+            document.querySelectorAll('.short-link-preview').forEach(linkElem => {
+                linkElem.removeEventListener('click', this.preventDup);
+                linkElem.addEventListener('click', (e) => {
+                    // просто открываем, никакой аналитики
+                    const href = linkElem.getAttribute('href');
+                    if(href) window.open(href, '_blank');
+                });
+            });
+        }
+
+        truncateSmart(str, maxLen) {
+            if(!str) return '';
+            return str.length > maxLen ? str.slice(0, maxLen) + '…' : str;
+        }
+
+        escapeHtml(str) {
+            if(!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if(m === '&') return '&amp;';
+                if(m === '<') return '&lt;';
+                if(m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        saveToLocal() {
+            const data = {
+                links: this.links,
+                version: '2.0-no-clicks'
+            };
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+        }
+
+        loadData() {
+            const raw = localStorage.getItem(this.STORAGE_KEY);
+            if(raw) {
+                try {
+                    const saved = JSON.parse(raw);
+                    if(saved.links && Array.isArray(saved.links)) {
+                        this.links = saved.links.map(link => ({
+                            id: link.id,
+                            name: link.name,
+                            originalUrl: link.originalUrl,
+                            shortUrl: link.shortUrl,
+                            createdAt: link.createdAt || new Date().toISOString()
+                        }));
+                    } else {
+                        this.links = [];
+                    }
+                } catch(e) { 
+                    this.links = []; 
                 }
-            });
-        });
+            } else {
+                this.links = [];
+            }
+        }
 
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            // Можно добавить проверку геолокации при загрузке
-            // locateControl.start();
-        });
-    </script>
+        updateDisplayAfterLoad() {
+            this.updateStatsAndRender();
+        }
+    }
+
+    let muzaffarApp;
+    document.addEventListener('DOMContentLoaded', () => {
+        muzaffarApp = new MuzaffarShortener();
+        muzaffarApp.updateDisplayAfterLoad();
+        window.muzaffarApp = muzaffarApp;
+    });
+</script>
 </body>
 </html>
