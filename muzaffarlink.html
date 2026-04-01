@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Muzaffar Link Pro — умный сокращатель ссылок</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Анимированные частицы */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Главная карточка */
+        .main-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .main-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Хедер */
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            animation: pulse 2s infinite;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .logo-text p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .domain-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-family: monospace;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Демо-блок */
+        .demo-block {
+            background: linear-gradient(135deg, #f0f9ff, #e6f7ff);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px solid #48bb78;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-block::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(72, 187, 120, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .demo-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2c5282;
+        }
+
+        .demo-link-box {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .demo-link {
+            font-size: 22px;
+            font-weight: bold;
+            font-family: monospace;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: #f7fafc;
+        }
+
+        .demo-link:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .demo-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demo-btn:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4);
+        }
+
+        /* Форма */
+        .form-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .create-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Результат */
+        .result-card {
+            background: linear-gradient(135deg, #f0f9ff, #e6f7ff);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 25px 0;
+            display: none;
+            animation: slideIn 0.5s ease;
+            border: 1px solid #48bb78;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .result-header i {
+            font-size: 24px;
+            color: #48bb78;
+        }
+
+        .result-header span {
+            font-weight: 700;
+            font-size: 18px;
+            color: #22543d;
+        }
+
+        .result-link-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .result-link-wrapper input {
+            flex: 1;
+            font-family: monospace;
+            font-size: 14px;
+            background: white;
+            padding: 12px 15px;
+        }
+
+        .open-link-btn {
+            padding: 12px 24px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .open-link-btn:hover {
+            background: #3182ce;
+            transform: scale(0.98);
+        }
+
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* Список ссылок */
+        .links-section {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 32px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+        }
+
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .links-header h3 {
+            font-size: 1.5rem;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f7fafc;
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            gap: 10px;
+        }
+
+        .search-box i {
+            color: #a0aec0;
+        }
+
+        .search-box input {
+            border: none;
+            padding: 8px;
+            width: 200px;
+            background: transparent;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .links-grid {
+            display: grid;
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .links-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .links-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .links-grid::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+
+        .link-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .link-card:hover {
+            transform: translateX(5px);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .link-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .link-name {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .link-date {
+            font-size: 11px;
+            color: #a0aec0;
+        }
+
+        .link-original {
+            font-size: 12px;
+            color: #718096;
+            word-break: break-all;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .link-short {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 13px;
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .link-short span {
+            color: #48bb78;
+            font-weight: 600;
+        }
+
+        .link-short a {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .link-short a:hover {
+            text-decoration: underline;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn.open {
+            background: #e6fffa;
+            color: #38a89d;
+        }
+
+        .action-btn.open:hover {
+            background: #b2f5ea;
+        }
+
+        .action-btn.delete {
+            background: #fff5f5;
+            color: #e53e3e;
+        }
+
+        .action-btn.delete:hover {
+            background: #fed7d7;
+        }
+
+        .clear-all-btn {
+            margin-top: 20px;
+            padding: 12px;
+            background: #cbd5e0;
+            color: #4a5568;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .clear-all-btn:hover {
+            background: #a0aec0;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #a0aec0;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Уведомления */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2d3748;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            display: none;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            font-weight: 500;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .main-card {
+                padding: 25px;
+            }
+            .logo-text h1 {
+                font-size: 1.8rem;
+            }
+            .demo-link {
+                font-size: 16px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <!-- Главная карточка -->
+        <div class="main-card">
+            <div class="header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Muzaffar Link Pro</h1>
+                        <p>Создавайте и управляйте короткими ссылками</p>
+                    </div>
+                </div>
+                <div class="domain-badge">
+                    <i class="fas fa-globe"></i> muzaffar.link/<span id="previewName">ваше-имя</span>
+                </div>
+            </div>
+
+            <!-- Демо-блок с работающей ссылкой -->
+            <div class="demo-block">
+                <div class="demo-title">
+                    <i class="fas fa-star" style="color: #fbbf24;"></i> Популярная ссылка
+                </div>
+                <div class="demo-link-box">
+                    <div class="demo-link" id="vbLink">
+                        <i class="fas fa-link"></i> muzaffar.link/vb
+                    </div>
+                    <button class="demo-btn" id="openGoogleBtn">
+                        <i class="fab fa-google"></i> Открыть Google
+                    </button>
+                </div>
+                <div style="font-size: 13px; color: #48bb78;">
+                    <i class="fas fa-check-circle"></i> Нажмите на ссылку или кнопку — откроется Google!
+                </div>
+            </div>
+
+            <!-- Форма создания ссылки -->
+            <div class="form-title">
+                <i class="fas fa-magic" style="color: #667eea;"></i>
+                <span>Создать новую ссылку</span>
+            </div>
+
+            <div class="form-grid">
+                <div class="input-wrapper">
+                    <i class="fas fa-tag input-icon"></i>
+                    <input type="text" id="linkName" placeholder="Имя ссылки (латиница, цифры)">
+                </div>
+                <div class="input-wrapper">
+                    <i class="fas fa-link input-icon"></i>
+                    <input type="text" id="longUrl" placeholder="Куда ведёт? (https://...)">
+                </div>
+            </div>
+
+            <button class="create-btn" id="createBtn">
+                <i class="fas fa-plus-circle"></i> Создать Muzaffar ссылку
+            </button>
+
+            <!-- Результат создания -->
+            <div id="resultCard" class="result-card">
+                <div class="result-header">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Ссылка успешно создана!</span>
+                </div>
+                <div class="result-link-wrapper">
+                    <input type="text" id="resultUrl" readonly>
+                    <button class="open-link-btn" id="openResultBtn">
+                        <i class="fas fa-external-link-alt"></i> Открыть
+                    </button>
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">Всего ссылок</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="todayCount">0</div>
+                    <div class="stat-label">Создано сегодня</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalClicks">0</div>
+                    <div class="stat-label">Всего переходов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">⚡ Pro</div>
+                    <div class="stat-label">Muzaffar Link</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список ссылок -->
+        <div class="links-section">
+            <div class="links-header">
+                <h3>
+                    <i class="fas fa-bookmark" style="color: #667eea;"></i>
+                    Мои Muzaffar ссылки
+                </h3>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск по имени...">
+                </div>
+            </div>
+            <div id="linksContainer" class="links-grid"></div>
+            <button class="clear-all-btn" id="clearAllBtn">
+                <i class="fas fa-trash-alt"></i> Очистить все ссылки
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        class MuzaffarPro {
+            constructor() {
+                this.storageKey = 'muzaffar_pro_v2';
+                this.links = [];
+                this.init();
+                this.createParticles();
+            }
+
+            init() {
+                this.loadLinks();
+                this.initElements();
+                this.attachEvents();
+                this.renderLinks();
+                this.updateStats();
+                this.updatePreview();
+            }
+
+            createParticles() {
+                const container = document.getElementById('particles');
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    const size = Math.random() * 5 + 2;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 20 + 's';
+                    particle.style.animationDuration = Math.random() * 15 + 10 + 's';
+                    container.appendChild(particle);
+                }
+            }
+
+            initElements() {
+                this.nameInput = document.getElementById('linkName');
+                this.urlInput = document.getElementById('longUrl');
+                this.createBtn = document.getElementById('createBtn');
+                this.clearBtn = document.getElementById('clearAllBtn');
+                this.resultCard = document.getElementById('resultCard');
+                this.resultUrl = document.getElementById('resultUrl');
+                this.openResultBtn = document.getElementById('openResultBtn');
+                this.searchInput = document.getElementById('searchInput');
+                this.linksContainer = document.getElementById('linksContainer');
+                this.totalCountSpan = document.getElementById('totalCount');
+                this.todayCountSpan = document.getElementById('todayCount');
+                this.totalClicksSpan = document.getElementById('totalClicks');
+                this.previewName = document.getElementById('previewName');
+                this.toast = document.getElementById('toast');
+                this.vbLink = document.getElementById('vbLink');
+                this.openGoogleBtn = document.getElementById('openGoogleBtn');
+            }
+
+            attachEvents() {
+                this.createBtn.onclick = () => this.createLink();
+                this.clearBtn.onclick = () => this.clearAll();
+                this.openResultBtn.onclick = () => this.openLink(this.resultUrl.value);
+                this.searchInput.oninput = () => this.renderLinks();
+                this.nameInput.oninput = () => this.updatePreview();
+                
+                if (this.vbLink) {
+                    this.vbLink.onclick = () => this.openGoogle();
+                }
+                if (this.openGoogleBtn) {
+                    this.openGoogleBtn.onclick = () => this.openGoogle();
+                }
+            }
+
+            updatePreview() {
+                const name = this.nameInput.value.trim();
+                if (name && /^[a-zA-Z0-9\-_]+$/.test(name)) {
+                    this.previewName.textContent = name;
+                } else {
+                    this.previewName.textContent = 'ваше-имя';
+                }
+            }
+
+            openGoogle() {
+                window.open('https://www.google.com', '_blank');
+                this.showToast('🔗 Открыт Google.com');
+                
+                const vbLink = this.links.find(l => l.name === 'vb');
+                if (vbLink) {
+                    vbLink.clicks = (vbLink.clicks || 0) + 1;
+                    this.saveLinks();
+                    this.renderLinks();
+                    this.updateStats();
+                }
+            }
+
+            createLink() {
+                const name = this.nameInput.value.trim().toLowerCase();
+                let url = this.urlInput.value.trim();
+
+                if (!name) {
+                    this.showToast('Введите имя ссылки', 'error');
+                    return;
+                }
+
+                if (!/^[a-zA-Z0-9\-_]+$/.test(name)) {
+                    this.showToast('Имя: только буквы, цифры, - и _', 'error');
+                    return;
+                }
+
+                if (!url) {
+                    this.showToast('Введите ссылку', 'error');
+                    return;
+                }
+
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url;
+                }
+
+                try {
+                    new URL(url);
+                } catch(e) {
+                    this.showToast('Введите корректный URL', 'error');
+                    return;
+                }
+
+                if (this.links.find(l => l.name === name)) {
+                    this.showToast(`Ссылка muzaffar.link/${name} уже существует!`, 'error');
+                    return;
+                }
+
+                const newLink = {
+                    id: Date.now(),
+                    name: name,
+                    originalUrl: url,
+                    shortUrl: `muzaffar.link/${name}`,
+                    createdAt: new Date().toISOString(),
+                    clicks: 0
+                };
+
+                this.links.unshift(newLink);
+                this.saveLinks();
+                this.renderLinks();
+                this.updateStats();
+
+                this.resultUrl.value = newLink.shortUrl;
+                this.resultCard.classList.add('show');
+                
+                this.nameInput.value = '';
+                this.urlInput.value = '';
+                this.updatePreview();
+                
+                this.showToast(`✅ Ссылка ${newLink.shortUrl} создана!`);
+                
+                setTimeout(() => {
+                    this.resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+
+            openLink(shortUrl) {
+                const name = shortUrl.replace('muzaffar.link/', '');
+                const link = this.links.find(l => l.name === name);
+                
+                if (link) {
+                    link.clicks = (link.clicks || 0) + 1;
+                    this.saveLinks();
+                    this.renderLinks();
+                    this.updateStats();
+                    window.open(link.originalUrl, '_blank');
+                    this.showToast(`🔗 Переход на ${link.originalUrl}`);
+                } else {
+                    this.showToast('Ссылка не найдена!', 'error');
+                }
+            }
+
+            deleteLink(id, name) {
+                if (confirm(`Удалить ссылку muzaffar.link/${name}?`)) {
+                    this.links = this.links.filter(l => l.id !== id);
+                    this.saveLinks();
+                    this.renderLinks();
+                    this.updateStats();
+                    this.showToast(`🗑 Ссылка ${name} удалена`);
+                    
+                    if (this.resultCard.classList.contains('show')) {
+                        this.resultCard.classList.remove('show');
+                    }
+                }
+            }
+
+            clearAll() {
+                if (this.links.length === 0) {
+                    this.showToast('Ссылок нет', 'info');
+                    return;
+                }
+                
+                if (confirm('Удалить ВСЕ ссылки? Ссылка vb останется!')) {
+                    const vbLink = this.links.find(l => l.name === 'vb');
+                    this.links = vbLink ? [vbLink] : [];
+                    this.saveLinks();
+                    this.renderLinks();
+                    this.updateStats();
+                    this.resultCard.classList.remove('show');
+                    this.showToast('Все ссылки удалены');
+                }
+            }
+
+            renderLinks() {
+                const searchTerm = this.searchInput?.value.toLowerCase() || '';
+                let filtered = this.links;
+                
+                if (searchTerm) {
+                    filtered = this.links.filter(link => 
+                        link.name.toLowerCase().includes(searchTerm) ||
+                        link.originalUrl.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                if (filtered.length === 0) {
+                    this.linksContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>Нет созданных ссылок</p>
+                            <p style="font-size: 12px;">Создайте первую ссылку выше</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                this.linksContainer.innerHTML = filtered.map(link => `
+                    <div class="link-card">
+                        <div class="link-header">
+                            <span class="link-name">
+                                <i class="fas fa-tag"></i> ${this.escapeHtml(link.name)}
+                                ${link.name === 'vb' ? '<i class="fas fa-star" style="font-size: 10px;"></i>' : ''}
+                            </span>
+                            <span class="link-date">
+                                <i class="far fa-calendar-alt"></i> ${new Date(link.createdAt).toLocaleString('ru-RU')}
+                            </span>
+                        </div>
+                        <div class="link-original">
+                            <i class="fas fa-external-link-alt"></i> ${this.truncateUrl(link.originalUrl, 70)}
+                        </div>
+                        <div class="link-short">
+                            <span><i class="fas fa-link"></i> ${link.shortUrl}</span>
+                            <a href="#" onclick="app.openLink('${link.shortUrl}'); return false;">
+                                <i class="fas fa-arrow-right"></i> Перейти
+                            </a>
+                        </div>
+                        <div style="font-size: 11px; color: #a0aec0; margin-bottom: 8px;">
+                            <i class="fas fa-eye"></i> ${link.clicks || 0} переходов
+                        </div>
+                        <div class="link-actions">
+                            <button class="action-btn open" onclick="app.openLink('${link.shortUrl}')">
+                                <i class="fas fa-external-link-alt"></i> Открыть
+                            </button>
+                            ${link.name !== 'vb' ? `
+                            <button class="action-btn delete" onclick="app.deleteLink(${link.id}, '${this.escapeHtml(link.name)}')">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateStats() {
+                const total = this.links.length;
+                const today = this.links.filter(link => {
+                    const linkDate = new Date(link.createdAt).toDateString();
+                    const todayDate = new Date().toDateString();
+                    return linkDate === todayDate;
+                }).length;
+                const totalClicks = this.links.reduce((sum, link) => sum + (link.clicks || 0), 0);
+                
+                this.totalCountSpan.textContent = total;
+                this.todayCountSpan.textContent = today;
+                this.totalClicksSpan.textContent = totalClicks;
+            }
+
+            showToast(message, type = 'success') {
+                this.toast.textContent = message;
+                this.toast.style.display = 'block';
+                this.toast.style.background = type === 'error' ? '#e53e3e' : '#2d3748';
+                setTimeout(() => {
+                    this.toast.style.display = 'none';
+                }, 2500);
+            }
+
+            saveLinks() {
+                localStorage.setItem(this.storageKey, JSON.stringify(this.links));
+            }
+
+            loadLinks() {
+                const saved = localStorage.getItem(this.storageKey);
+                if (saved) {
+                    try {
+                        this.links = JSON.parse(saved);
+                    } catch(e) {
+                        this.links = [];
+                    }
+                }
+                
+                if (!this.links.find(l => l.name === 'vb')) {
+                    this.links.unshift({
+                        id: Date.now(),
+                        name: 'vb',
+                        originalUrl: 'https://www.google.com',
+                        shortUrl: 'muzaffar.link/vb',
+                        createdAt: new Date().toISOString(),
+                        clicks: 0
+                    });
+                    this.saveLinks();
+                }
+            }
+
+            truncateUrl(url, maxLen) {
+                if (url.length <= maxLen) return url;
+                return url.substring(0, maxLen) + '...';
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new MuzaffarPro();
+            window.app = app;
+        });
+    </script>
+</body>
+</html>
