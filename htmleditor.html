@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Редактор - Чистая версия</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: sans-serif;
+            overflow: hidden; /* Убираем скроллы у страницы */
+        }
+        #editorContainer, #previewContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .CodeMirror {
+            height: calc(100% - 40px); /* Оставляем место для тулбара */
+            width: 100%;
+        }
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: #2c3e50;
+            color: white;
+            padding: 0 15px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #toolbar button {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        #toolbar button:hover {
+            background: #2980b9;
+        }
+        #previewContainer {
+            display: none;
+            background: white;
+        }
+        #preview {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+        #btnBack {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 30;
+            padding: 8px 16px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #btnBack:hover {
+            background: #c0392b;
+        }
+        /* Приветственное сообщение в редакторе */
+        .welcome-message {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 15;
+            pointer-events: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div id="editorContainer">
+    <div id="toolbar">
+        <button id="btnRun">🚀 Запустить код</button>
+        <span style="color: #ecf0f1; margin-left: auto; font-size: 14px;">HTML Редактор</span>
+    </div>
+    <textarea id="editor"><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя страница</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-bottom: 1rem;
+            font-size: 2.5em;
+        }
+        p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Привет, мир! ✨</h1>
+        <p>Это чистый HTML редактор. Всё лишнее удалено.</p>
+        <p>Пиши свой код здесь и нажимай "Запустить"</p>
+    </div>
+</body>
+</html></textarea>
+    <div class="welcome-message">✨ Чистый редактор, ничего лишнего</div>
+</div>
+
+<div id="previewContainer">
+    <iframe id="preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>
+    <button id="btnBack">← Вернуться к редактору</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+<script>
+    // Инициализация CodeMirror
+    const textarea = document.getElementById('editor');
+    const editor = CodeMirror.fromTextArea(textarea, {
+        mode: "htmlmixed",
+        lineNumbers: true,
+        autoCloseTags: true,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        indentUnit: 4,
+        tabSize: 4,
+        lineWrapping: true,
+        theme: "default",
+        extraKeys: {
+            "Ctrl-Space": "autocomplete",
+            "Tab": "indentMore"
+        }
+    });
+
+    // Делаем редактор чуть красивее
+    editor.setSize('100%', 'calc(100% - 40px)');
+
+    const editorContainer = document.getElementById('editorContainer');
+    const previewContainer = document.getElementById('previewContainer');
+    const preview = document.getElementById('preview');
+    const btnRun = document.getElementById('btnRun');
+    const btnBack = document.getElementById('btnBack');
+
+    // Запуск кода
+    btnRun.onclick = () => {
+        const code = editor.getValue();
+        preview.srcdoc = code; // Используем srcdoc для iframe
+        editorContainer.style.display = 'none';
+        previewContainer.style.display = 'block';
+    };
+
+    // Кнопка "Назад"
+    btnBack.onclick = () => {
+        previewContainer.style.display = 'none';
+        editorContainer.style.display = 'block';
+        editor.refresh(); // Обновляем редактор после скрытия/показа
+    };
+
+    // Обработка ошибок загрузки iframe (на всякий случай)
+    preview.onerror = function() {
+        console.log('Ошибка загрузки iframe');
+    };
+
+    // Добавляем поддержку клавиш для быстрого запуска (Ctrl+Enter)
+    editor.setOption('extraKeys', {
+        'Ctrl-Enter': function(cm) {
+            btnRun.click();
+        },
+        'Shift-Enter': function(cm) {
+            btnRun.click();
+        }
+    });
+
+    console.log('Редактор готов! Используй Ctrl+Enter для быстрого запуска.');
+</script>
+
+<!-- Всё чисто! Никакого QR, никаких оценок и домашек -->
+</body>
+</html>
