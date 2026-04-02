@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MUZAFFARcall - Private Meet</title>
+    <script src='https://meet.jit.si/external_api.js'></script>
+    <style>
+        :root { --primary: #0066ff; --bg: #121212; --card: #1e1e1e; --text: #fff; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: sans-serif; height: 100vh; overflow: hidden; }
+        
+        .screen { display: none; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
+        .active { display: flex; }
+
+        .card { width: 90%; max-width: 400px; background: var(--card); padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        
+        input { width: 100%; background: #2c2c2c; border: 1px solid #333; padding: 15px; border-radius: 10px; color: white; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--primary); }
+
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #333; color: white; }
+        .btn:hover { opacity: 0.9; }
+
+        #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: black; }
+        
+        /* Кнопки управления поверх видео */
+        .controls { position: absolute; top: 20px; left: 20px; z-index: 20; display: flex; gap: 10px; }
+        .ctrl-btn { background: rgba(0,0,0,0.6); color: white; border: 1px solid #555; padding: 8px 15px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(5px); }
+        .ctrl-btn.red { color: #ff4444; border-color: #ff4444; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen" class="screen active">
+        <div class="card">
+            <h2>Вход</h2>
+            <p style="color:#888; font-size: 14px;">Как вас представить?</p>
+            <input type="text" id="username" placeholder="Ваше имя">
+            <button class="btn btn-primary" onclick="login()">Войти</button>
+        </div>
+    </div>
+
+    <div id="dashboard-screen" class="screen">
+        <div class="card">
+            <h2 id="greet">Привеn добро пожаловать в MUZAFFARcall!</h2>
+            <p style="color:#888; font-size: 14px;">Придумайте название комнаты или создайте случайную</p>
+            
+            <input type="text" id="room-name" placeholder="Название (например: proekt-1)">
+            <button class="btn btn-primary" onclick="createNamedRoom()">📹 Создать комнату</button>
+            <button class="btn btn-secondary" onclick="createRandomRoom()">🎲 Случайная встреча</button>
+            
+            <p style="font-size: 12px; color: #555; margin-top: 20px;">
+                Отправьте ссылку другу, и он сразу попадет к вам.
+            </p>
+        </div>
+    </div>
+
+    <div id="video-screen" style="display: none;">
+        <div class="controls">
+            <button class="ctrl-btn red" onclick="leaveRoom()">Выйти</button>
+            <button class="ctrl-btn" onclick="copyLink()">🔗 Скопировать ссылку</button>
+        </div>
+        <div id="video-container"></div>
+    </div>
+
+    <script>
+        // === ВАЖНОЕ ИЗМЕНЕНИЕ: СЕРВЕР ===
+        // Используем meet.guifi.net вместо meet.jit.si, так как он не требует логина
+        // Если он будет тормозить, можно попробовать: 'meet.golem.de' или 'framatalk.org'
+        const DOMAIN = 'meet.guifi.net'; 
+        
+        const PREFIX = "MY_PRIV_V1_"; 
+        
+        let api = null;
+        let user = localStorage.getItem('user_name');
+
+        window.onload = () => {
+            const hash = window.location.hash.replace('#', '');
+            if(user) {
+                if(hash) startMeeting(hash);
+                else showDashboard();
+            }
+        };
+
+        function login() {
+            const val = document.getElementById('username').value;
+            if(!val) return alert("Введите имя");
+            user = val;
+            localStorage.setItem('user_name', user);
+            
+            const hash = window.location.hash.replace('#', '');
+            if(hash) startMeeting(hash);
+            else showDashboard();
+        }
+
+        function showDashboard() {
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById('video-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').classList.add('active');
+            document.getElementById('greet').innerText = `Привет, ${user}!`;
+            history.pushState("", document.title, window.location.pathname);
+        }
+
+        function createNamedRoom() {
+            let name = document.getElementById('room-name').value;
+            name = name.replace(/[^a-zA-Z0-9-_]/g, ''); // Только англ буквы и цифры
+            
+            if(!name) return alert("Используйте английские буквы для названия!");
+            startMeeting(name);
+        }
+
+        function createRandomRoom() {
+            const id = Math.random().toString(36).substring(2, 10);
+            startMeeting(id);
+        }
+
+        function startMeeting(roomID) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('video-screen').style.display = 'block';
+            
+            window.location.hash = roomID;
+
+            const options = {
+                roomName: PREFIX + roomID, 
+                width: '100%',
+                height: '100%',
+                parentNode: document.querySelector('#video-container'),
+                userInfo: { displayName: user },
+                // Отключаем лишние экраны
+                configOverwrite: { 
+                    prejoinPageEnabled: false,
+                    startWithAudioMuted: false, 
+                    startWithVideoMuted: false 
+                },
+                interfaceConfigOverwrite: { 
+                    MOBILE_APP_PROMO: false,
+                    SHOW_JITSI_WATERMARK: false
+                }
+            };
+
+            if(api) api.dispose();
+            // ВАЖНО: Тут мы используем переменную DOMAIN, которую задали выше
+            api = new JitsiMeetExternalAPI(DOMAIN, options);
+            
+            api.addEventListeners({
+                readyToClose: () => leaveRoom(),
+                videoConferenceLeft: () => leaveRoom()
+            });
+        }
+
+        function leaveRoom() {
+            if(api) api.dispose();
+            showDashboard();
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => alert("Ссылка скопирована!"))
+                .catch(() => alert("Скопируйте ссылку из адресной строки."));
+        }
+    </script>
+</body>
+</html>
