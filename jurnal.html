@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Elite School · Muzaffar | Электронный журнал</title>
+    <title>Elite School · EMIS | Электронный журнал</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -26,7 +26,6 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .logo-area { display: flex; align-items: center; gap: 14px; }
         .logo-icon {
@@ -38,11 +37,10 @@
             justify-content: center;
             font-size: 1.6rem;
             color: white;
-            box-shadow: 0 8px 20px rgba(47,128,255,0.3);
         }
-        .logo-text { font-size: 1.6rem; font-weight: 800; color: white; letter-spacing: -0.5px; }
-        .logo-text span { background: linear-gradient(135deg, #5bc0ff, #2f80ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .header-right { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .logo-text { font-size: 1.6rem; font-weight: 800; color: white; }
+        .logo-text span { color: #5bc0ff; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
         .school-badge-header {
             background: rgba(255,255,255,0.15);
             padding: 8px 20px;
@@ -52,16 +50,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            backdrop-filter: blur(5px);
         }
         .container { max-width: 1400px; margin: 0 auto; padding: 32px; }
         .card {
-            background: rgba(255,255,255,0.98);
+            background: white;
             border-radius: 32px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.08);
             overflow: hidden;
             margin-bottom: 28px;
-            border: 1px solid rgba(255,255,255,0.5);
         }
         .card-header {
             padding: 24px 32px;
@@ -71,7 +67,6 @@
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 12px;
-            background: rgba(248,250,252,0.5);
         }
         .card-title {
             font-size: 1.3rem;
@@ -81,25 +76,25 @@
             align-items: center;
             gap: 12px;
         }
-        .card-title i { color: #2f80ff; font-size: 1.4rem; }
+        .card-title i { color: #2f80ff; }
         
-        /* УЛУЧШЕННЫЙ ПОИСК ШКОЛЫ - ВИДИМЫЙ СПИСОК */
+        /* ПОЛЕ ПОИСКА ШКОЛЫ - АКТИВНОЕ */
         .school-search-container { position: relative; width: 100%; }
         .search-input-wrapper {
-            background: white;
-            border: 2px solid #2f80ff;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
             border-radius: 60px;
             display: flex;
             align-items: center;
             padding: 6px 8px 6px 24px;
             transition: all 0.3s;
-            cursor: pointer;
         }
-        .search-input-wrapper:hover {
-            border-color: #1a6be3;
+        .search-input-wrapper:focus-within {
+            border-color: #2f80ff;
             box-shadow: 0 0 0 4px rgba(47,128,255,0.15);
+            background: white;
         }
-        .search-input-wrapper i { color: #2f80ff; font-size: 1.1rem; }
+        .search-input-wrapper i { color: #8a99b0; font-size: 1.1rem; }
         .search-input-wrapper input {
             flex: 1;
             border: none;
@@ -108,10 +103,9 @@
             font-size: 1rem;
             outline: none;
             font-weight: 500;
-            cursor: pointer;
         }
         
-        /* ВЫПАДАЮЩИЙ СПИСОК - БОЛЬШОЙ И ВИДИМЫЙ */
+        /* ВЫПАДАЮЩИЙ СПИСОК */
         .school-dropdown {
             position: absolute;
             top: 100%;
@@ -119,58 +113,53 @@
             right: 0;
             background: white;
             border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-            max-height: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: 350px;
             overflow-y: auto;
             z-index: 1000;
             margin-top: 12px;
+            display: none;
             border: 1px solid #e2e8f0;
         }
         .school-dropdown.show { display: block; }
         
         .school-option {
-            padding: 16px 24px;
+            padding: 14px 20px;
             cursor: pointer;
             border-bottom: 1px solid #f0f2f5;
             transition: 0.15s;
             display: flex;
             align-items: center;
-            gap: 14px;
-            font-size: 1rem;
+            gap: 12px;
         }
-        .school-option i { font-size: 1.3rem; width: 32px; text-align: center; color: #2f80ff; }
         .school-option:hover { background: #e8f3ff; }
-        .school-option .school-name { font-weight: 700; color: #1a2c3e; font-size: 1rem; }
+        .school-option .school-name { font-weight: 600; color: #1a2c3e; }
         .school-option .school-city { 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             color: #6c7a91; 
-            margin-left: 10px; 
             background: #eef2f7;
-            padding: 4px 12px;
-            border-radius: 30px;
+            padding: 2px 10px;
+            border-radius: 20px;
         }
         
         .selected-badge {
-            background: linear-gradient(135deg, #e8f3ff, #d4e8ff);
+            background: #e8f3ff;
             border-radius: 60px;
-            padding: 12px 24px;
+            padding: 10px 20px;
             display: inline-flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             font-weight: 600;
-            border: 1px solid rgba(47,128,255,0.2);
         }
         
         .login-grid { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end; }
-        .input-group { flex: 1; min-width: 220px; }
+        .input-group { flex: 1; min-width: 200px; }
         .input-group label {
             font-size: 0.7rem;
             font-weight: 700;
-            text-transform: uppercase;
             color: #6c7a91;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: block;
-            letter-spacing: 0.5px;
         }
         .input-field {
             background: #f8fafc;
@@ -178,115 +167,95 @@
             border-radius: 20px;
             display: flex;
             align-items: center;
-            padding: 0 18px;
-            transition: all 0.2s;
+            padding: 0 16px;
         }
         .input-field:focus-within {
             border-color: #2f80ff;
             background: white;
-            box-shadow: 0 0 0 3px rgba(47,128,255,0.1);
         }
-        .input-field i { color: #8a99b0; font-size: 1rem; }
         .input-field input {
             flex: 1;
             border: none;
             background: transparent;
-            padding: 15px 14px;
+            padding: 14px 12px;
             font-size: 1rem;
             outline: none;
-            font-weight: 500;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #2f80ff, #1a6be3);
+            background: #2f80ff;
             border: none;
-            padding: 0 36px;
+            padding: 0 32px;
             border-radius: 20px;
             color: white;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             cursor: pointer;
-            height: 56px;
+            height: 54px;
             font-size: 1rem;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(47,128,255,0.3);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(47,128,255,0.4); }
+        .btn-primary:hover { background: #1a6be3; }
         .profile-card {
-            background: linear-gradient(135deg, #ffffff, #f8fafc);
-            border-radius: 32px;
-            padding: 28px 36px;
-            margin-bottom: 28px;
+            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            border-radius: 28px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 28px;
+            gap: 24px;
             flex-wrap: wrap;
-            border: 1px solid rgba(47,128,255,0.15);
         }
         .avatar-large {
-            width: 90px; height: 90px;
-            background: linear-gradient(145deg, #2f80ff, #5bc0ff);
-            border-radius: 30px;
+            width: 80px; height: 80px;
+            background: linear-gradient(145deg, #2f80ff, #1a6be3);
+            border-radius: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             color: white;
-            box-shadow: 0 12px 25px rgba(47,128,255,0.3);
         }
-        .student-info h2 { font-size: 2rem; font-weight: 800; color: #0a2b3e; }
-        .student-meta { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+        .student-info h2 { font-size: 1.8rem; font-weight: 700; color: #0a2b3e; }
+        .student-meta { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
         .meta-badge {
             background: #eef2f7;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
         }
-        .tabs-switch { display: flex; gap: 12px; flex-wrap: wrap; }
+        .tabs-switch { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
         .tab-btn {
-            padding: 12px 28px;
-            border-radius: 50px;
+            padding: 10px 24px;
+            border-radius: 40px;
             border: none;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
             background: #eef2f7;
             color: #4a5b7a;
         }
-        .tab-btn.active { background: linear-gradient(135deg, #2f80ff, #1a6be3); color: white; box-shadow: 0 4px 12px rgba(47,128,255,0.3); }
-        .table-scroll-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            border-radius: 20px;
-        }
-        .table-scroll-wrapper::-webkit-scrollbar { height: 10px; }
+        .tab-btn.active { background: #2f80ff; color: white; }
+        .table-scroll-wrapper { overflow-x: auto; border-radius: 20px; }
+        .table-scroll-wrapper::-webkit-scrollbar { height: 8px; }
         .table-scroll-wrapper::-webkit-scrollbar-track { background: #eef2f7; border-radius: 10px; }
         .table-scroll-wrapper::-webkit-scrollbar-thumb { background: #2f80ff; border-radius: 10px; }
         .subjects-table { width: 100%; border-collapse: collapse; min-width: 600px; }
         .subjects-table th {
-            padding: 18px 16px;
+            padding: 16px;
             background: #f8fafc;
             font-weight: 700;
-            color: #4a5b7a;
             border-bottom: 2px solid #e9edf2;
             text-align: left;
         }
-        .subjects-table td {
-            padding: 16px;
-            border-bottom: 1px solid #f0f2f5;
-            vertical-align: middle;
-        }
+        .subjects-table td { padding: 14px; border-bottom: 1px solid #f0f2f5; }
         .grade-badge {
             display: inline-block;
-            min-width: 40px;
-            padding: 6px 10px;
+            min-width: 38px;
+            padding: 5px 9px;
             text-align: center;
             border-radius: 12px;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             margin: 2px;
         }
         .grade-1-3 { background: #fee2e2; color: #cc3333; }
@@ -296,56 +265,51 @@
         .grade-empty { background: #f0f2f5; color: #8a99b0; }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 20px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
         .stat-box {
-            background: linear-gradient(135deg, #f8fafc, #ffffff);
-            border-radius: 24px;
-            padding: 22px;
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 18px;
             text-align: center;
-            border: 1px solid #eef2f7;
         }
-        .stat-number { font-size: 2.3rem; font-weight: 800; color: #2f80ff; }
+        .stat-number { font-size: 2rem; font-weight: 800; color: #2f80ff; }
         .recommendation-card {
-            background: linear-gradient(135deg, #f8fafc, #ffffff);
-            border-radius: 24px;
-            padding: 22px;
-            border-left: 5px solid #2f80ff;
-            margin-bottom: 14px;
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 18px;
+            border-left: 4px solid #2f80ff;
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 14px;
         }
         .register-form {
-            background: linear-gradient(135deg, #f8fafc, #ffffff);
-            border-radius: 28px;
-            padding: 24px;
-            margin-top: 20px;
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 16px;
         }
-        .form-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+        .form-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
         .form-input {
             flex: 1;
-            padding: 14px 18px;
+            padding: 12px 16px;
             border: 2px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 16px;
             outline: none;
-            font-size: 0.95rem;
         }
         .form-input:focus { border-color: #2f80ff; }
         .loader-overlay {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 50px;
+            padding: 40px;
             gap: 15px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 40px;
         }
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border: 3px solid #e2e8f0;
             border-top-color: #2f80ff;
             border-radius: 50%;
@@ -354,38 +318,23 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .hidden { display: none; }
         .mt-4 { margin-top: 20px; }
-        .success-msg { background: #e3f7ec; color: #27ae60; padding: 14px; border-radius: 20px; }
-        .error-msg { background: #fee2e2; color: #cc3333; padding: 14px; border-radius: 20px; }
-        .position-relative { position: relative; }
-        .scroll-hint {
-            text-align: center;
-            padding: 8px;
-            font-size: 0.75rem;
-            color: #8a99b0;
-            background: #f8fafc;
-            border-radius: 20px;
-            margin-bottom: 12px;
-        }
+        .success-msg { background: #e3f7ec; color: #27ae60; padding: 12px; border-radius: 16px; }
+        .error-msg { background: #fee2e2; color: #cc3333; padding: 12px; border-radius: 16px; }
         .debug-panel {
             background: #1e2f40;
             color: #5bc0ff;
             padding: 16px;
-            border-radius: 20px;
-            font-family: 'Courier New', monospace;
+            border-radius: 16px;
+            font-family: monospace;
             font-size: 0.75rem;
-            margin-top: 16px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
         }
-        @media (max-width: 800px) {
+        @media (max-width: 700px) {
             .container { padding: 16px; }
-            .student-info h2 { font-size: 1.4rem; }
-            .avatar-large { width: 65px; height: 65px; font-size: 1.8rem; }
-            .tab-btn { padding: 8px 16px; font-size: 0.8rem; }
-            .school-option { padding: 12px 16px; }
-            .school-option .school-city { font-size: 0.7rem; }
+            .student-info h2 { font-size: 1.3rem; }
+            .avatar-large { width: 60px; height: 60px; font-size: 1.6rem; }
+            .tab-btn { padding: 6px 14px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -393,7 +342,7 @@
 <div class="header">
     <div class="logo-area">
         <div class="logo-icon"><i class="fas fa-crown"></i></div>
-        <div class="logo-text">Elite <span>School</span> · Muzaffar</div>
+        <div class="logo-text">Elite <span>School</span> · EMIS</div>
     </div>
     <div class="header-right">
         <div class="school-badge-header" id="headerSchoolBadge"><i class="fas fa-school"></i> Не выбрана</div>
@@ -401,16 +350,16 @@
 </div>
 
 <div class="container">
-    <!-- Выбор школы - УЛУЧШЕННЫЙ -->
+    <!-- ВЫБОР ШКОЛЫ - ТЕПЕРЬ МОЖНО ПИСАТЬ -->
     <div class="card" id="schoolCard">
         <div class="card-header">
             <div class="card-title"><i class="fas fa-building-columns"></i> Общеобразовательное учреждение</div>
         </div>
         <div style="padding: 0 32px 32px 32px;">
             <div class="school-search-container">
-                <div class="search-input-wrapper" id="searchWrapper">
+                <div class="search-input-wrapper">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="schoolSearch" placeholder="Нажмите для выбора школы..." autocomplete="off" readonly>
+                    <input type="text" id="schoolSearch" placeholder="Введите название школы (Душанбе, Худжанд, Бохтар...)" autocomplete="off">
                 </div>
                 <div id="schoolDropdown" class="school-dropdown"></div>
             </div>
@@ -420,7 +369,7 @@
         </div>
     </div>
 
-    <!-- Вход -->
+    <!-- ВХОД -->
     <div class="card hidden" id="loginCard">
         <div class="card-header">
             <div class="card-title"><i class="fas fa-key"></i> Авторизация</div>
@@ -434,7 +383,7 @@
         </div>
     </div>
 
-    <!-- Основной контент -->
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
     <div id="mainContent" class="hidden">
         <div class="profile-card">
             <div class="avatar-large"><i class="fas fa-user-graduate"></i></div>
@@ -458,7 +407,7 @@
                     <button class="tab-btn" id="showDebugBtn">🔧 Диагностика</button>
                 </div>
             </div>
-            <div style="padding: 24px 28px;" id="dynamicContent"></div>
+            <div style="padding: 20px 24px;" id="dynamicContent"></div>
         </div>
 
         <div class="card">
@@ -466,7 +415,7 @@
                 <div class="card-title"><i class="fab fa-telegram"></i> Telegram-уведомления</div>
             </div>
             <div style="padding: 0 32px 32px 32px;">
-                <p style="margin-bottom: 18px; color:#6c7a91;">Получайте оценки и итоги в Telegram. Оставьте заявку:</p>
+                <p style="margin-bottom: 16px; color:#6c7a91;">Оставьте заявку, чтобы получать уведомления:</p>
                 <div class="register-form">
                     <div class="form-row">
                         <input type="text" id="parentName" class="form-input" placeholder="Ваше ФИО">
@@ -476,7 +425,7 @@
                         <input type="text" id="childCode" class="form-input" placeholder="Код ребёнка">
                         <input type="text" id="tgUsername" class="form-input" placeholder="@username Telegram">
                     </div>
-                    <button id="sendRequestBtn" class="btn-primary" style="background:linear-gradient(135deg,#27ae60,#219a52);"><i class="fab fa-telegram"></i> Отправить заявку</button>
+                    <button id="sendRequestBtn" class="btn-primary" style="background:#27ae60;"><i class="fab fa-telegram"></i> Отправить заявку</button>
                     <div id="requestStatus" class="mt-4"></div>
                 </div>
             </div>
@@ -485,8 +434,7 @@
 
     <div id="loadingState" class="loader-overlay hidden">
         <div class="spinner"></div>
-        <span>Загрузка данных 
-        </span>
+        <span>Загрузка данных из Google Sheets...</span>
     </div>
 </div>
 
@@ -496,7 +444,6 @@
     const BOT_TOKEN = '8031233615:AAGgZKmnpg27rBG351r4MslVg3Psi8Uykts';
     const ADMIN_CHAT_ID = '5450527103';
     
-    // ПРЕДМЕТЫ с ТОЧНЫМИ GID
     const SUBJECTS = [
         { name: 'Физика', gid: '425210832', icon: '⚛️' },
         { name: 'Алгебра', gid: '1623574883', icon: '📐' },
@@ -506,36 +453,14 @@
 
     const SCHEDULE_URL = 'https://saripovmuzaffar759-jpg.github.io/Muzaffar/rasjavoni.html';
 
-    // ВСЕ ШКОЛЫ (30+ школ)
     const SCHOOLS_LIST = [
-        { name: "🏫 Лицей Javoni", city: "Душанбе" },
-        { name: "🎓 СУНЦ-лицей «Хуросон»", city: "Душанбе" },
-        { name: "📚 Гимназия №1", city: "Душанбе" },
-        { name: "🏛️ СОШ №21", city: "Душанбе" },
-        { name: "⭐ РТЛ (Республиканский лицей)", city: "Душанбе" },
-        { name: "🏫 Лицей №2", city: "Худжанд" },
-        { name: "🎓 Гимназия №1", city: "Худжанд" },
-        { name: "🏛️ СОШ №5", city: "Худжанд" },
-        { name: "🏫 Лицей №1", city: "Бохтар" },
-        { name: "📚 СОШ №12", city: "Бохтар" },
-        { name: "⭐ Гимназия «Истиклол»", city: "Бохтар" },
-        { name: "🏛️ СОШ №3", city: "Куляб" },
-        { name: "🏫 Лицей №7", city: "Куляб" },
-        { name: "🎓 Гимназия №5", city: "Куляб" },
-        { name: "📚 СОШ №10", city: "Истаравшан" },
-        { name: "🏛️ СОШ №2", city: "Пенджикент" },
-        { name: "⭐ Лицей Рудаки", city: "Пенджикент" },
-        { name: "🏫 СОШ №15", city: "Вахдат" },
-        { name: "📚 СОШ №8", city: "Турсунзаде" },
-        { name: "🏛️ СОШ №1", city: "Гиссар" },
-        { name: "🏫 СОШ №20", city: "Рогун" },
-        { name: "🎓 Лицей №6", city: "Нурек" },
-        { name: "⭐ Гимназия «Сомониён»", city: "Дангара" },
-        { name: "🏫 Лицей №8", city: "Хорог" },
-        { name: "📚 СОШ №7", city: "Мургаб" },
-        { name: "🎓 Гимназия №1", city: "Исфара" },
-        { name: "🏛️ СОШ №14", city: "Канибадам" },
-        { name: "🏫 Лицей №3", city: "Табошар" }
+        "Лицей Javoni, Душанбе", "СУНЦ-лицей Хуросон, Душанбе", "Гимназия №1, Душанбе", "СОШ №21, Душанбе",
+        "РТЛ, Душанбе", "Лицей №2, Худжанд", "Гимназия №1, Худжанд", "СОШ №5, Худжанд",
+        "Лицей №1, Бохтар", "СОШ №12, Бохтар", "Гимназия Истиклол, Бохтар", "СОШ №3, Куляб",
+        "Лицей №7, Куляб", "Гимназия №5, Куляб", "СОШ №10, Истаравшан", "СОШ №2, Пенджикент",
+        "Лицей Рудаки, Пенджикент", "СОШ №15, Вахдат", "СОШ №8, Турсунзаде", "СОШ №1, Гиссар",
+        "СОШ №20, Рогун", "Лицей №6, Нурек", "Гимназия Сомониён, Дангара", "Лицей №8, Хорог",
+        "СОШ №7, Мургаб", "Гимназия №1, Исфара", "СОШ №14, Канибадам", "Лицей №3, Табошар"
     ];
 
     let selectedSchool = null;
@@ -549,7 +474,6 @@
     const mainContent = document.getElementById('mainContent');
     const loadingState = document.getElementById('loadingState');
     const schoolSearch = document.getElementById('schoolSearch');
-    const searchWrapper = document.getElementById('searchWrapper');
     const schoolDropdown = document.getElementById('schoolDropdown');
     const selectedSchoolChip = document.getElementById('selectedSchoolChip');
     const selectedSchoolNameSpan = document.getElementById('selectedSchoolName');
@@ -575,32 +499,40 @@
         console.log(msg);
     }
 
-    // ПОКАЗАТЬ ВСЕ ШКОЛЫ
-    function showAllSchools() {
-        addDebugLog(`Показываем список из ${SCHOOLS_LIST.length} школ`);
-        schoolDropdown.innerHTML = SCHOOLS_LIST.map(school => `
-            <div class="school-option" data-name="${school.name.replace(/^[^ ]+ /, '')}" data-city="${school.city}">
-                <i class="fas fa-school"></i>
-                <div>
-                    <span class="school-name">${school.name}</span>
-                    <span class="school-city">${school.city}</span>
-                </div>
-            </div>
-        `).join('');
+    // ФИЛЬТРАЦИЯ И ПОКАЗ ШКОЛ
+    function filterSchools() {
+        const query = schoolSearch.value.toLowerCase();
+        const filtered = query ? SCHOOLS_LIST.filter(s => s.toLowerCase().includes(query)) : SCHOOLS_LIST;
+        
+        if (filtered.length === 0) {
+            schoolDropdown.innerHTML = `<div class="school-option" style="justify-content:center; color:#8a99b0;">😔 Школ не найдено</div>`;
+        } else {
+            schoolDropdown.innerHTML = filtered.map(school => {
+                const [name, city] = school.split(', ');
+                return `
+                    <div class="school-option" data-full="${school}" data-name="${name}" data-city="${city}">
+                        <i class="fas fa-school"></i>
+                        <div>
+                            <span class="school-name">${name}</span>
+                            <span class="school-city">${city}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
         schoolDropdown.classList.add('show');
         
         document.querySelectorAll('.school-option[data-name]').forEach(el => {
             el.addEventListener('click', (e) => {
                 e.stopPropagation();
-                let name = el.dataset.name;
+                const full = el.dataset.full;
+                const name = el.dataset.name;
                 const city = el.dataset.city;
-                // Убираем эмодзи из имени если есть
-                name = name.replace(/[🏫🎓📚🏛️⭐]/g, '').trim();
-                selectedSchool = { name, city };
+                selectedSchool = { full, name, city };
                 selectedSchoolNameSpan.innerText = name;
                 selectedSchoolCitySpan.innerText = city;
                 selectedSchoolChip.style.display = 'block';
-                schoolSearch.value = `${name}, ${city}`;
+                schoolSearch.value = full;
                 schoolDropdown.classList.remove('show');
                 headerSchoolBadge.innerHTML = `<i class="fas fa-school"></i> ${name}`;
                 loginCard.classList.remove('hidden');
@@ -609,40 +541,29 @@
         });
     }
     
-    // При клике на поле ввода - показываем ВСЕ школы
-    searchWrapper.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showAllSchools();
-    });
-    
-    schoolSearch.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showAllSchools();
-    });
-    
-    // Закрываем список при клике вне
+    // События для поиска школы
+    schoolSearch.addEventListener('input', filterSchools);
+    schoolSearch.addEventListener('click', (e) => { e.stopPropagation(); filterSchools(); });
     document.addEventListener('click', (e) => {
-        if (!searchWrapper.contains(e.target) && !schoolDropdown.contains(e.target)) {
+        if (!schoolSearch.contains(e.target) && !schoolDropdown.contains(e.target)) {
             schoolDropdown.classList.remove('show');
         }
     });
 
-    // Загрузка данных с конкретного листа
+    // Загрузка данных
     async function fetchSheetData(gid) {
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`;
         addDebugLog(`📥 Загрузка GID: ${gid}`);
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const text = await response.text();
-        addDebugLog(`📥 Получено ${text.length} байт для GID ${gid}`);
-        return text;
+        return await response.text();
     }
 
     async function loadAllSubjects() {
         if (!selectedSchool) return;
         loadingState.classList.remove('hidden');
         debugLogs = [];
-        addDebugLog(`🚀 Начинаем загрузку всех предметов...`);
+        addDebugLog(`🚀 Загрузка всех предметов...`);
         
         for (let subj of SUBJECTS) {
             try {
@@ -653,16 +574,12 @@
                         students: parsed.students, 
                         headers: parsed.headers,
                         name: subj.name,
-                        icon: subj.icon,
-                        rawFirstLines: csv.split('\n').slice(0, 3).join('\n')
+                        icon: subj.icon
                     };
-                    addDebugLog(`✅ ${subj.name}: ${parsed.students.length} учеников, тем: ${parsed.headers.length}`);
-                    if (parsed.students.length > 0) {
-                        addDebugLog(`   Пример: ${parsed.students[0].name} (код: ${parsed.students[0].code})`);
-                    }
+                    addDebugLog(`✅ ${subj.name}: ${parsed.students.length} учеников, ${parsed.headers.length} тем`);
                 } else {
                     allSubjectsCache[subj.gid] = { students: [], headers: [], name: subj.name, icon: subj.icon };
-                    addDebugLog(`⚠️ ${subj.name}: пустые данные`);
+                    addDebugLog(`⚠️ ${subj.name}: нет данных`);
                 }
             } catch(e) {
                 addDebugLog(`❌ Ошибка ${subj.name}: ${e.message}`);
@@ -716,32 +633,27 @@
         const code = studentCodeInput.value.trim();
         const id = studentIdInput.value.trim();
         if (!selectedSchool) { alert('Выберите школу'); return; }
-        if (!code || !id) { alert('Введите код и ID ученика'); return; }
+        if (!code || !id) { alert('Введите код и ID'); return; }
         
         addDebugLog(`🔑 Поиск: код="${code}", ID="${id}"`);
         await loadAllSubjects();
         
         let foundStudent = null;
-        let foundSubject = null;
         for (let subj of SUBJECTS) {
             const data = allSubjectsCache[subj.gid];
             if (data && data.students) {
-                const student = data.students.find(s => s.code === code && s.name.toLowerCase().includes(id.toLowerCase()));
-                if (student) {
-                    foundStudent = student;
-                    foundSubject = subj.name;
-                    break;
-                }
+                foundStudent = data.students.find(s => s.code === code && s.name.toLowerCase().includes(id.toLowerCase()));
+                if (foundStudent) break;
             }
         }
         
         if (!foundStudent) {
             addDebugLog(`❌ Ученик не найден`);
-            alert(`Ученик с кодом "${code}" не найден. Нажмите "Диагностика" для проверки.`);
+            alert(`Ученик с кодом "${code}" не найден`);
             return;
         }
         
-        addDebugLog(`✅ Найден: ${foundStudent.name} в ${foundSubject}`);
+        addDebugLog(`✅ Найден: ${foundStudent.name}`);
         currentUser = { code: foundStudent.code, name: foundStudent.name };
         schoolCard.classList.add('hidden');
         loginCard.classList.add('hidden');
@@ -755,12 +667,9 @@
     }
 
     function renderGradesTable() {
-        let html = `<div class="scroll-hint"><i class="fas fa-arrows-left-right"></i> Листайте вправо →</div>
-                    <div class="table-scroll-wrapper">
+        let html = `<div class="table-scroll-wrapper">
                         <table class="subjects-table">
-                            <thead>
-                                <tr><th>Предмет</th><th>Оценки по темам</th><th>Средний балл</th></tr>
-                            </thead>
+                            <thead><tr><th>Предмет</th><th>Оценки по темам</th><th>Средний балл</th></tr></thead>
                             <tbody>`;
         
         for (let subj of SUBJECTS) {
@@ -772,61 +681,45 @@
             
             if (studentData && studentData.data && data.headers) {
                 for (let i = 0; i < studentData.data.length; i++) {
-                    const val = studentData.data[i];
-                    const num = parseFloat(val);
+                    const num = parseFloat(studentData.data[i]);
                     if (!isNaN(num) && num >= 1 && num <= 10) {
                         numericGrades.push(num);
                         let cls = num <= 3 ? 'grade-1-3' : (num <= 6 ? 'grade-4-6' : (num <= 8 ? 'grade-7-8' : 'grade-9-10'));
-                        gradesHtml += `<span class="grade-badge ${cls}" title="${data.headers[i]}">${num}</span>`;
-                    } else if (val && val.trim() !== '') {
-                        gradesHtml += `<span class="grade-badge grade-empty">${val}</span>`;
+                        gradesHtml += `<span class="grade-badge ${cls}">${num}</span>`;
                     } else {
                         gradesHtml += `<span class="grade-badge grade-empty">—</span>`;
                     }
                 }
-                if (numericGrades.length > 0) {
-                    avg = (numericGrades.reduce((a,b) => a + b, 0) / numericGrades.length).toFixed(1);
-                }
+                if (numericGrades.length > 0) avg = (numericGrades.reduce((a,b)=>a+b,0)/numericGrades.length).toFixed(1);
             } else {
                 gradesHtml = '<span style="color:#8a99b0;">нет оценок</span>';
             }
             
             html += `<tr>
-                        <td style="font-weight: 700; white-space: nowrap; background: white;">
-                            ${data.icon} ${data.name}
-                         </td>
-                         <td><div style="display: flex; flex-wrap: wrap; gap: 6px;">${gradesHtml}</div></td>
-                        <td style="text-align: center; font-weight: 700;">${avg}</td>
-                      </tr>`;
+                        <td style="font-weight:700;">${data.icon} ${data.name}</td>
+                        <td><div style="display:flex; flex-wrap:wrap; gap:6px;">${gradesHtml}</div></td>
+                        <td style="text-align:center; font-weight:700;">${avg}</td>
+                     </tr>`;
         }
         
-        html += `</tbody>
-                 </table>
-            </div>`;
-        
+        html += `</tbody></table></div>`;
         dynamicContent.innerHTML = html;
     }
 
     function renderSchedule() {
-        dynamicContent.innerHTML = `<iframe src="${SCHEDULE_URL}" style="width:100%; min-height:600px; border:none; border-radius:24px;"></iframe>`;
+        dynamicContent.innerHTML = `<iframe src="${SCHEDULE_URL}" style="width:100%; min-height:500px; border:none; border-radius:20px;"></iframe>`;
     }
 
     function renderAnalytics() {
-        let allGrades = [];
-        let low = 0, medium = 0, high = 0, excellent = 0;
-        let subjectStats = [];
-        
+        let allGrades = [], low=0, medium=0, high=0, excellent=0;
         for (let subj of SUBJECTS) {
             const data = allSubjectsCache[subj.gid];
             const studentData = data?.students?.find(s => s.code === currentUser.code);
-            let subjGrades = [];
-            
             if (studentData && studentData.data) {
                 for (let val of studentData.data) {
                     const num = parseFloat(val);
                     if (!isNaN(num) && num >= 1 && num <= 10) {
                         allGrades.push(num);
-                        subjGrades.push(num);
                         if (num <= 3) low++;
                         else if (num <= 6) medium++;
                         else if (num <= 8) high++;
@@ -834,29 +727,25 @@
                     }
                 }
             }
-            let subjAvg = subjGrades.length ? (subjGrades.reduce((a,b)=>a+b,0)/subjGrades.length).toFixed(1) : '—';
-            subjectStats.push({ name: data.name, icon: data.icon, avg: subjAvg, count: subjGrades.length });
         }
-        
         const avgOverall = allGrades.length ? (allGrades.reduce((a,b)=>a+b,0)/allGrades.length).toFixed(1) : '—';
-        let recText = avgOverall !== '—' ? (parseFloat(avgOverall) >= 8.5 ? 'Отличная успеваемость!' : (parseFloat(avgOverall) >= 7 ? 'Хороший результат!' : (parseFloat(avgOverall) >= 5 ? 'Можно улучшить!' : 'Требуется внимание!'))) : '';
+        let recText = avgOverall !== '—' ? (parseFloat(avgOverall) >= 8 ? 'Отличная успеваемость!' : (parseFloat(avgOverall) >= 6 ? 'Хороший результат!' : (parseFloat(avgOverall) >= 4 ? 'Можно улучшить!' : 'Требуется внимание!'))) : '';
         
         let html = `<div class="stats-grid">
-            <div class="stat-box"><div class="stat-number">${avgOverall}</div><div>Общий средний балл</div></div>
+            <div class="stat-box"><div class="stat-number">${avgOverall}</div><div>Средний балл</div></div>
             <div class="stat-box"><div class="stat-number">${allGrades.length}</div><div>Всего оценок</div></div>
-            <div class="stat-box"><div class="stat-number">${excellent}</div><div>Отлично (9-10)</div></div>
-            <div class="stat-box"><div class="stat-number">${high}</div><div>Хорошо (7-8)</div></div>
-            <div class="stat-box"><div class="stat-number">${medium}</div><div>Средне (4-6)</div></div>
-            <div class="stat-box"><div class="stat-number">${low}</div><div>Низко (1-3)</div></div>
+            <div class="stat-box"><div class="stat-number">${excellent}</div><div>Отлично</div></div>
+            <div class="stat-box"><div class="stat-number">${high}</div><div>Хорошо</div></div>
+            <div class="stat-box"><div class="stat-number">${medium}</div><div>Средне</div></div>
+            <div class="stat-box"><div class="stat-number">${low}</div><div>Низко</div></div>
         </div>
-        <div class="recommendation-card"><span style="font-size:1.8rem;">🤖</span><div><strong>ИИ-рекомендация</strong><br>${recText || 'Нет данных для анализа'}</div></div>`;
+        <div class="recommendation-card"><span style="font-size:1.5rem;">🤖</span><div><strong>ИИ-рекомендация</strong><br>${recText || 'Нет данных'}</div></div>`;
         dynamicContent.innerHTML = html;
     }
 
     function renderResults() {
         let subjectAverages = [];
         let allGrades = [];
-        
         for (let subj of SUBJECTS) {
             const data = allSubjectsCache[subj.gid];
             const studentData = data?.students?.find(s => s.code === currentUser.code);
@@ -870,11 +759,10 @@
             let avg = grades.length ? (grades.reduce((a,b)=>a+b,0)/grades.length).toFixed(1) : '—';
             subjectAverages.push({ name: data.name, icon: data.icon, avg, count: grades.length });
         }
-        
         let overall = allGrades.length ? (allGrades.reduce((a,b)=>a+b,0)/allGrades.length).toFixed(1) : '—';
+        
         let html = `<div class="stats-grid">
             <div class="stat-box"><div class="stat-number">${overall}</div><div>Итоговый балл</div></div>
-            <div class="stat-box"><div class="stat-number">${allGrades.length}</div><div>Всего оценок</div></div>
         </div>
         <div class="stats-grid">
             ${subjectAverages.map(s => `<div class="stat-box"><div class="stat-number">${s.avg}</div><div>${s.icon} ${s.name}</div><div>${s.count} оценок</div></div>`).join('')}
@@ -883,21 +771,15 @@
     }
 
     function renderDebug() {
-        let html = `<div class="scroll-hint"><i class="fas fa-bug"></i> Диагностика</div>
-                    <div class="debug-panel">
+        let html = `<div class="debug-panel">
                         <strong>👤 Пользователь:</strong> ${currentUser ? `${currentUser.name} (${currentUser.code})` : 'Не авторизован'}<br>
-                        <strong>🏫 Школа:</strong> ${selectedSchool?.name || '—'}<br>
-                        <strong>📊 Всего предметов:</strong> ${SUBJECTS.length}<br><br>
-                        <strong>📋 Логи загрузки:</strong><br>${debugLogs.join('<br>')}<br><br>
-                        <strong>📁 Данные по предметам:</strong><br>`;
-        
+                        <strong>🏫 Школа:</strong> ${selectedSchool?.name || '—'}<br><br>
+                        <strong>📋 Логи:</strong><br>${debugLogs.join('<br>')}<br><br>
+                        <strong>📁 Данные:</strong><br>`;
         for (let subj of SUBJECTS) {
             const data = allSubjectsCache[subj.gid];
             if (data) {
                 html += `🔹 ${data.icon} ${data.name}: ${data.students.length} учеников, ${data.headers.length} тем<br>`;
-                if (data.rawFirstLines) {
-                    html += `<details><summary>📄 Первые строки CSV</summary><code style="font-size:10px;">${data.rawFirstLines.substring(0, 300)}</code></details>`;
-                }
             }
         }
         html += `</div>`;
