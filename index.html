@@ -5,265 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Muzaffar Pro | Браузер с Google входом</title>
     <script async src="https://cse.google.com/cse.js?cx=40fe40e6028d84ece"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0a0f1e;
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Элегантный тёмный фон */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse at 20% 30%, rgba(139, 92, 246, 0.2), transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(99, 102, 241, 0.15), transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-            animation: slowMove 20s ease infinite;
-        }
-        body.no-bg::before { display: none; }
-        body.custom-bg { background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }
-        body.custom-bg::before { display: none; }
-
-        @keyframes slowMove {
-            0%, 100% { opacity: 0.7; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.02); }
-        }
-
-        body.light {
-            background: #f8fafc;
-        }
-        body.light::before {
-            background: 
-                radial-gradient(ellipse at 20% 30%, rgba(139, 92, 246, 0.08), transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(99, 102, 241, 0.05), transparent 50%);
-        }
-
-        /* Верхняя панель */
-        .top-bar {
-            padding: 10px 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(10, 15, 30, 0.7);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
-            z-index: 20;
-            position: relative;
-        }
-        body.light .top-bar {
-            background: rgba(255, 255, 255, 0.7);
-            border-bottom-color: rgba(139, 92, 246, 0.2);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(139, 92, 246, 0.2);
-            padding: 5px 16px;
-            border-radius: 40px;
-        }
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #8b5cf6, #6366f1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-        .action-btn {
-            background: rgba(139, 92, 246, 0.15);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            color: #c4b5fd;
-            padding: 7px 20px;
-            border-radius: 100px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        body.light .action-btn {
-            color: #4f46e5;
-            background: rgba(139, 92, 246, 0.1);
-        }
-        .action-btn:hover {
-            background: linear-gradient(135deg, #8b5cf6, #6366f1);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0f1e; font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 30%, rgba(139,92,246,0.2), transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(99,102,241,0.15), transparent 50%); pointer-events: none; z-index: 0; animation: slowMove 20s ease infinite; }
+        @keyframes slowMove { 0%,100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
+        body.light { background: #f8fafc; }
+        body.light::before { background: radial-gradient(ellipse at 20% 30%, rgba(139,92,246,0.08), transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(99,102,241,0.05), transparent 50%); }
+        .top-bar { padding: 10px 28px; display: flex; justify-content: space-between; align-items: center; background: rgba(10,15,30,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(139,92,246,0.3); z-index: 20; position: relative; }
+        body.light .top-bar { background: rgba(255,255,255,0.7); border-bottom-color: rgba(139,92,246,0.2); }
+        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(139,92,246,0.2); padding: 5px 16px; border-radius: 40px; }
+        .user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .action-btn { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #c4b5fd; padding: 7px 20px; border-radius: 100px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        .action-btn:hover { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139,92,246,0.4); }
         .hidden { display: none !important; }
-
-        /* VPN статус */
-        .vpn-status {
-            position: fixed;
-            bottom: 24px;
-            left: 24px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
-            padding: 8px 18px;
-            border-radius: 40px;
-            color: #94a3b8;
-            font-size: 0.75rem;
-            z-index: 100;
-            cursor: pointer;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-        .vpn-status.active {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-        }
-
-        /* Основной контейнер */
+        .vpn-status { position: fixed; bottom: 24px; left: 24px; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); padding: 8px 18px; border-radius: 40px; color: #94a3b8; font-size: 0.75rem; z-index: 100; cursor: pointer; border: 1px solid rgba(139,92,246,0.3); }
+        .vpn-status.active { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
         .app-container { display: flex; flex: 1; overflow: hidden; z-index: 1; flex-direction: column; }
         .main-layout { display: flex; flex: 1; overflow: hidden; }
-
-        /* Панель проектов */
-        .projects-panel {
-            width: 460px;
-            background: rgba(10, 15, 30, 0.55);
-            backdrop-filter: blur(24px);
-            border-right: 1px solid rgba(139, 92, 246, 0.25);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.4s;
-            flex-shrink: 0;
-            overflow-y: auto;
-        }
-        body.light .projects-panel { background: rgba(255, 255, 255, 0.6); }
+        .projects-panel { width: 460px; background: rgba(10,15,30,0.55); backdrop-filter: blur(24px); border-right: 1px solid rgba(139,92,246,0.25); display: flex; flex-direction: column; transition: transform 0.4s; flex-shrink: 0; overflow-y: auto; }
+        body.light .projects-panel { background: rgba(255,255,255,0.6); }
         .projects-panel.collapsed { transform: translateX(-460px); position: absolute; height: 100%; }
-
         .projects-header { padding: 18px 24px 10px; display: flex; justify-content: space-between; align-items: center; }
         .projects-header h3 { font-size: 0.95rem; font-weight: 700; background: linear-gradient(135deg, #a78bfa, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .toggle-panel-btn { background: rgba(139, 92, 246, 0.2); border: none; color: #c4b5fd; width: 32px; height: 32px; border-radius: 30px; cursor: pointer; }
-
+        .toggle-panel-btn { background: rgba(139,92,246,0.2); border: none; color: #c4b5fd; width: 32px; height: 32px; border-radius: 30px; cursor: pointer; }
         .projects-search { padding: 6px 20px 14px; }
-        .projects-search input {
-            width: 100%; padding: 10px 16px; background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 60px;
-            color: white; font-size: 0.8rem; outline: none;
-        }
-        body.light .projects-search input { background: rgba(0, 0, 0, 0.04); color: #1e293b; }
-
+        .projects-search input { width: 100%; padding: 10px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(139,92,246,0.3); border-radius: 60px; color: white; font-size: 0.8rem; outline: none; }
+        body.light .projects-search input { background: rgba(0,0,0,0.04); color: #1e293b; }
         .projects-grid { flex: 1; overflow-y: auto; padding: 6px 16px 20px; }
         .category-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #a78bfa; margin: 14px 0 8px 6px; }
         .projects-grid-category { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-        .project-card {
-            display: flex; align-items: center; gap: 8px; padding: 8px 10px;
-            background: rgba(139, 92, 246, 0.1); border-radius: 14px; cursor: pointer;
-            transition: all 0.2s; border: 1px solid rgba(139, 92, 246, 0.2);
-        }
-        .project-card:hover { background: rgba(139, 92, 246, 0.25); transform: translateY(-2px); }
-        .project-card-icon { font-size: 1.1rem; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: rgba(139, 92, 246, 0.2); border-radius: 8px; }
+        .project-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(139,92,246,0.1); border-radius: 14px; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(139,92,246,0.2); }
+        .project-card:hover { background: rgba(139,92,246,0.25); transform: translateY(-2px); }
+        .project-card-icon { font-size: 1.1rem; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: rgba(139,92,246,0.2); border-radius: 8px; }
         .project-card-name { font-size: 0.75rem; font-weight: 500; color: #e2e8f0; flex: 1; }
         body.light .project-card-name { color: #1e293b; }
-
-        .panel-toggle {
-            position: fixed; left: 16px; top: 50%; transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px); border-radius: 50px;
-            padding: 10px 14px; cursor: pointer; z-index: 22; display: none; color: white;
-        }
+        .panel-toggle { position: fixed; left: 16px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); border-radius: 50px; padding: 10px 14px; cursor: pointer; z-index: 22; display: none; color: white; }
         .projects-panel.collapsed + .panel-toggle { display: flex; }
-
         .right-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-        /* Вкладки */
-        .tab-bar {
-            padding: 6px 20px 4px 24px; display: flex; gap: 8px; overflow-x: auto;
-            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(139, 92, 246, 0.2); flex-shrink: 0;
-        }
-        .tab {
-            display: flex; align-items: center; gap: 6px; padding: 5px 14px;
-            background: rgba(139, 92, 246, 0.15); border-radius: 60px; cursor: pointer; white-space: nowrap;
-        }
-        .tab.active { background: linear-gradient(135deg, #8b5cf6, #6366f1); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); }
+        .tab-bar { padding: 6px 20px 4px 24px; display: flex; gap: 8px; overflow-x: auto; background: rgba(0,0,0,0.3); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(139,92,246,0.2); flex-shrink: 0; }
+        .tab { display: flex; align-items: center; gap: 6px; padding: 5px 14px; background: rgba(139,92,246,0.15); border-radius: 60px; cursor: pointer; white-space: nowrap; }
+        .tab.active { background: linear-gradient(135deg, #8b5cf6, #6366f1); box-shadow: 0 4px 12px rgba(139,92,246,0.4); }
         .tab-title { font-size: 0.75rem; font-weight: 500; color: #cbd5e1; }
         .tab.active .tab-title { color: white; }
         .tab-close { background: transparent; border: none; font-size: 0.8rem; cursor: pointer; color: #94a3b8; width: 20px; height: 20px; border-radius: 20px; }
         .tab-close:hover { background: #ef4444; color: white; }
-        .new-tab-btn { background: rgba(139, 92, 246, 0.25); border: none; font-size: 1.1rem; cursor: pointer; width: 34px; height: 34px; border-radius: 60px; color: #c4b5fd; }
-
+        .new-tab-btn { background: rgba(139,92,246,0.25); border: none; font-size: 1.1rem; cursor: pointer; width: 34px; height: 34px; border-radius: 60px; color: #c4b5fd; }
         .tabs-container { flex: 1; position: relative; overflow: auto; }
         .tab-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: none; background: white; }
         .tab-frame.active { display: block; }
-
-        /* Поисковая страница */
-        .search-tab-content {
-            display: none; flex-direction: column; width: 100%; height: 100%;
-            position: absolute; top: 0; left: 0; overflow-y: auto; background: transparent;
-        }
+        .search-tab-content { display: none; flex-direction: column; width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; background: transparent; }
         .search-tab-content.active { display: flex; }
         .search-container { max-width: 750px; width: 90%; margin: 45px auto 30px; text-align: center; }
         .logo-icon { font-size: 4rem; animation: float 3s infinite; }
         @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         .logo-text { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
-
-        /* Цветной поисковик */
         .gsc-control-cse { padding: 0 !important; background: transparent !important; border: none !important; }
-        .gsc-input-box {
-            border: 2px solid transparent !important;
-            background: rgba(30, 41, 59, 0.95) !important;
-            border-radius: 80px !important;
-            background-image: linear-gradient(rgba(30,41,59,0.95), rgba(30,41,59,0.95)), linear-gradient(135deg, #8b5cf6, #c084fc, #6366f1) !important;
-            background-origin: border-box !important;
-            background-clip: padding-box, border-box !important;
-        }
+        .gsc-input-box { border: 2px solid transparent !important; background: rgba(30,41,59,0.95) !important; border-radius: 80px !important; background-image: linear-gradient(rgba(30,41,59,0.95), rgba(30,41,59,0.95)), linear-gradient(135deg, #8b5cf6, #c084fc, #6366f1) !important; background-origin: border-box !important; background-clip: padding-box, border-box !important; }
         body.light .gsc-input-box { background: rgba(255,255,255,0.95) !important; background-image: linear-gradient(white, white), linear-gradient(135deg, #8b5cf6, #c084fc) !important; }
         .gsc-input input { font-size: 0.95rem !important; padding: 16px 26px !important; background: transparent !important; color: #f1f5f9 !important; }
         body.light .gsc-input input { color: #1e293b !important; }
         .gsc-search-button { background: linear-gradient(135deg, #8b5cf6, #6366f1) !important; border-radius: 80px !important; padding: 0 38px !important; margin: 6px 10px !important; font-weight: 700 !important; }
-        .gsc-result { background: rgba(30, 41, 59, 0.92) !important; backdrop-filter: blur(12px) !important; border-radius: 22px !important; padding: 18px !important; margin-bottom: 14px !important; border: 1px solid rgba(139,92,246,0.35) !important; }
+        .gsc-result { background: rgba(30,41,59,0.92) !important; backdrop-filter: blur(12px) !important; border-radius: 22px !important; padding: 18px !important; margin-bottom: 14px !important; border: 1px solid rgba(139,92,246,0.35) !important; }
         body.light .gsc-result { background: rgba(255,255,255,0.95) !important; }
         .gs-title a { font-size: 1rem !important; font-weight: 700 !important; color: #c4b5fd !important; }
         body.light .gs-title a { color: #8b5cf6 !important; }
         .gsc-branding, .gcsc-branding { display: none !important; }
-
-        /* Закладки */
-        .bookmarks-bar {
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(139, 92, 246, 0.25); padding: 6px 20px;
-            display: flex; align-items: center; gap: 10px; overflow-x: auto; flex-shrink: 0;
-        }
+        .bookmarks-bar { background: rgba(0,0,0,0.4); backdrop-filter: blur(20px); border-top: 1px solid rgba(139,92,246,0.25); padding: 6px 20px; display: flex; align-items: center; gap: 10px; overflow-x: auto; flex-shrink: 0; }
         .bookmarks-title { font-size: 0.65rem; font-weight: 600; color: #a78bfa; }
-        .bookmark-item {
-            display: flex; align-items: center; gap: 6px; padding: 4px 12px;
-            background: rgba(139, 92, 246, 0.18); border-radius: 40px; cursor: pointer;
-            font-size: 0.7rem; color: #cbd5e1;
-        }
-        .add-bookmark-btn { background: rgba(139, 92, 246, 0.2); border: none; border-radius: 40px; padding: 4px 12px; cursor: pointer; font-size: 0.65rem; color: #c4b5fd; }
-
-        /* ИИ окно */
-        .ai-modal {
-            position: fixed; bottom: 90px; right: 20px; width: 420px; height: 580px;
-            background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(28px);
-            border-radius: 28px; border: 1px solid rgba(139, 92, 246, 0.5);
-            z-index: 1000; display: none; flex-direction: column; overflow: hidden;
-        }
+        .bookmark-item { display: flex; align-items: center; gap: 6px; padding: 4px 12px; background: rgba(139,92,246,0.18); border-radius: 40px; cursor: pointer; font-size: 0.7rem; color: #cbd5e1; }
+        .add-bookmark-btn { background: rgba(139,92,246,0.2); border: none; border-radius: 40px; padding: 4px 12px; cursor: pointer; font-size: 0.65rem; color: #c4b5fd; }
+        .ai-modal { position: fixed; bottom: 90px; right: 20px; width: 420px; height: 580px; background: rgba(15,23,42,0.98); backdrop-filter: blur(28px); border-radius: 28px; border: 1px solid rgba(139,92,246,0.5); z-index: 1000; display: none; flex-direction: column; overflow: hidden; }
         .ai-modal.open { display: flex; }
         .ai-header { padding: 14px 18px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; display: flex; justify-content: space-between; align-items: center; }
         .ai-model-selector { display: flex; gap: 6px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 40px; }
@@ -276,19 +89,8 @@
         .ai-input-area { display: flex; padding: 14px; border-top: 1px solid rgba(139,92,246,0.3); gap: 8px; }
         .ai-input { flex: 1; padding: 8px 14px; background: rgba(30,41,59,0.9); border: 1px solid rgba(139,92,246,0.4); border-radius: 40px; color: white; outline: none; }
         .ai-send { background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; color: white; padding: 8px 18px; border-radius: 40px; cursor: pointer; }
-        .ai-toggle {
-            position: fixed; bottom: 24px; right: 24px; width: 54px; height: 54px;
-            background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            color: white; font-size: 1.5rem; box-shadow: 0 8px 25px rgba(139,92,246,0.5); z-index: 999;
-        }
-
-        /* История */
-        .history-sidebar {
-            position: fixed; right: -420px; top: 0; width: 380px; height: 100%;
-            background: rgba(10,15,30,0.98); backdrop-filter: blur(28px);
-            transition: right 0.4s; z-index: 1000; display: flex; flex-direction: column;
-        }
+        .ai-toggle { position: fixed; bottom: 24px; right: 24px; width: 54px; height: 54px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 1.5rem; box-shadow: 0 8px 25px rgba(139,92,246,0.5); z-index: 999; }
+        .history-sidebar { position: fixed; right: -420px; top: 0; width: 380px; height: 100%; background: rgba(10,15,30,0.98); backdrop-filter: blur(28px); transition: right 0.4s; z-index: 1000; display: flex; flex-direction: column; }
         .history-sidebar.open { right: 0; }
         .history-header { padding: 20px 24px; border-bottom: 1px solid rgba(139,92,246,0.3); display: flex; justify-content: space-between; }
         .close-history { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #c4b5fd; }
@@ -296,35 +98,14 @@
         .history-item { background: rgba(139,92,246,0.12); padding: 10px 14px; margin-bottom: 8px; border-radius: 16px; cursor: pointer; color: #e2e8f0; }
         .clear-history { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; margin: 16px; padding: 10px; border-radius: 40px; cursor: pointer; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 999; display: none; }
-
-        /* Модальное окно входа в Google */
-        .google-login-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            z-index: 2000; display: none; align-items: center; justify-content: center;
-        }
+        .google-login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .google-login-modal.open { display: flex; }
-        .google-login-card {
-            background: rgba(20, 25, 45, 0.95); backdrop-filter: blur(20px);
-            border-radius: 32px; padding: 32px; width: 380px;
-            border: 1px solid rgba(139,92,246,0.5); text-align: center;
-        }
+        .google-login-card { background: rgba(20,25,45,0.95); backdrop-filter: blur(20px); border-radius: 32px; padding: 32px; width: 380px; border: 1px solid rgba(139,92,246,0.5); text-align: center; }
         .google-login-card h2 { color: white; margin-bottom: 20px; }
-        .google-login-card input {
-            width: 100%; padding: 12px 16px; margin-bottom: 16px;
-            background: rgba(30,41,59,0.8); border: 1px solid rgba(139,92,246,0.4);
-            border-radius: 60px; color: white; outline: none;
-        }
-        .google-login-card button {
-            width: 100%; padding: 12px; background: linear-gradient(135deg, #8b5cf6, #6366f1);
-            color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 600;
-            margin-bottom: 12px;
-        }
-        .google-login-card .google-btn {
-            background: #4285f4; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+        .google-login-card input { width: 100%; padding: 12px 16px; margin-bottom: 16px; background: rgba(30,41,59,0.8); border: 1px solid rgba(139,92,246,0.4); border-radius: 60px; color: white; outline: none; }
+        .google-login-card button { width: 100%; padding: 12px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 600; margin-bottom: 12px; }
+        .google-login-card .google-btn { background: #4285f4; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .close-google-modal { background: transparent; border: none; color: #94a3b8; cursor: pointer; margin-top: 10px; }
-
         @media (max-width: 768px) { .projects-panel { width: 320px; } .ai-modal { width: 320px; right: 10px; } }
     </style>
 </head>
@@ -352,7 +133,7 @@
 <div class="app-container">
     <div class="main-layout">
         <div class="projects-panel" id="projectsPanel">
-            <div class="projects-header"><h3>📁 Все проекты Muzaffar (79)</h3><button class="toggle-panel-btn" id="togglePanelBtn">◀</button></div>
+            <div class="projects-header"><h3>📁 Все проекты Muzaffar (80+)</h3><button class="toggle-panel-btn" id="togglePanelBtn">◀</button></div>
             <div class="projects-search"><input type="text" id="projectSearch" placeholder="🔍 Поиск проекта..."></div>
             <div class="projects-grid" id="projectsGrid"></div>
         </div>
@@ -365,14 +146,11 @@
     <div class="bookmarks-bar"><span class="bookmarks-title">⭐ ЗАКЛАДКИ</span><div id="bookmarksList" style="display:flex; gap:6px; flex-wrap:wrap;"></div><button class="add-bookmark-btn" id="addBookmarkBtn">+ Добавить</button></div>
 </div>
 
-<!-- Google Вход модальное окно -->
 <div class="google-login-modal" id="googleLoginModal">
     <div class="google-login-card">
         <h2>🔐 Вход в Google</h2>
         <input type="email" id="googleEmail" placeholder="Email или телефон">
-        <button class="google-btn" id="googleLoginSubmit">
-            <span>🔵</span> Войти через Google
-        </button>
+        <button class="google-btn" id="googleLoginSubmit"><span>🔵</span> Войти через Google</button>
         <button id="guestLoginBtn">Продолжить как гость</button>
         <button class="close-google-modal" id="closeGoogleModal">✕ Закрыть</button>
     </div>
@@ -389,76 +167,113 @@
 <div id="overlay" class="overlay"></div>
 
 <script>
-// ==================== ВСЕ ПРОЕКТЫ (79 штук) ====================
+// ==================== ВСЕ 80+ ПРОЕКТОВ ИЗ ТВОЕГО РЕПОЗИТОРИЯ ====================
 const allProjects = [
-    { name: "Muzaffar Browser", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/", icon: "🌐", category: "⭐ Главные" },
-    { name: "Main", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Main.html", icon: "🏠", category: "⭐ Главные" },
-    { name: "index", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/index.html", icon: "🏠", category: "⭐ Главные" },
-    { name: "Brauzer", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/brauzer.html", icon: "🌍", category: "⭐ Главные" },
-    { name: "браузер", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/браузер.html", icon: "🌎", category: "⭐ Главные" },
-    { name: "MuzaffarHub", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffarhub.html", icon: "🌟", category: "⭐ Главные" },
-    { name: "Hub", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/hub.html", icon: "🕹️", category: "⭐ Главные" },
-    { name: "Ai Assistant", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Ai.html", icon: "🤖", category: "🤖 AI" },
-    { name: "ai1", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/ai1.html", icon: "⚡", category: "🤖 AI" },
-    { name: "Chat", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Chat.html", icon: "💬", category: "🤖 AI" },
-    { name: "Calculator", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/calculator.html", icon: "🧮", category: "🛠️ Инструменты" },
-    { name: "QR Code", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Qr.html", icon: "📱", category: "🛠️ Инструменты" },
-    { name: "qrjavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/qrjavoni.html", icon: "📲", category: "🛠️ Инструменты" },
-    { name: "Password", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/password.html", icon: "🔒", category: "🛠️ Инструменты" },
-    { name: "Pdf", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pdf.html", icon: "📑", category: "🛠️ Инструменты" },
-    { name: "Time", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/time.html", icon: "⏰", category: "🛠️ Инструменты" },
-    { name: "Shrift", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shrift.html", icon: "🔤", category: "🛠️ Инструменты" },
-    { name: "Typ", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/typ.html", icon: "⌨️", category: "🛠️ Инструменты" },
-    { name: "Transleted", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/transleted.html", icon: "🌐", category: "🛠️ Инструменты" },
-    { name: "Car Game", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cargame.html", icon: "🚗", category: "🎮 Игры" },
-    { name: "Game", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/game.html", icon: "🎮", category: "🎮 Игры" },
-    { name: "gamenumber", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/gamenumber.html", icon: "🔢", category: "🎮 Игры" },
-    { name: "Shahmat", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shahmat.html", icon: "♟️", category: "🎮 Игры" },
-    { name: "Gallery", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/gallery.html", icon: "🖼️", category: "🎬 Медиа" },
-    { name: "Music", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/музыка.html", icon: "🎵", category: "🎬 Медиа" },
-    { name: "MuzaffarTube", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffartube.html", icon: "▶️", category: "🎬 Медиа" },
-    { name: "Shorts", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shorts.html", icon: "📹", category: "🎬 Медиа" },
-    { name: "Paint", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/paint.html", icon: "🎨", category: "🎨 Творчество" },
-    { name: "Video Editor", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/videoeditor.html", icon: "🎬", category: "🎨 Творчество" },
-    { name: "rasjavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/rasjavoni.html", icon: "🎨", category: "🎨 Творчество" },
-    { name: "Online School", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/onlainschool.html", icon: "🏫", category: "📚 Образование" },
-    { name: "Wikipedia", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/vikipedi.html", icon: "📖", category: "📚 Образование" },
-    { name: "encyclopedia", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/encyclopedia.html", icon: "📚", category: "📚 Образование" },
-    { name: "jurnal", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/jurnal.html", icon: "📓", category: "📚 Образование" },
-    { name: "pagejavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pagejavoni.html", icon: "📄", category: "📚 Образование" },
-    { name: "Muzaffar Bank", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Muzaffarbank.html", icon: "🏦", category: "💰 Финансы" },
-    { name: "finans", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/finans.html", icon: "💰", category: "💰 Финансы" },
-    { name: "akci", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/akci.html", icon: "📈", category: "💰 Финансы" },
-    { name: "birza", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/birza.html", icon: "💱", category: "💰 Финансы" },
-    { name: "News", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/news.html", icon: "📰", category: "📰 Новости" },
-    { name: "Zvonok", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Zvonok.html", icon: "📞", category: "📞 Связь" },
-    { name: "Pochta", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pochta.html", icon: "✉️", category: "📞 Связь" },
-    { name: "почта", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/почта.html", icon: "📧", category: "📞 Связь" },
-    { name: "Taxi", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/taxi.html", icon: "🚕", category: "🚕 Сервисы" },
-    { name: "Shop", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shop.html", icon: "🛒", category: "🚕 Сервисы" },
-    { name: "servis", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/servis.html", icon: "🛠️", category: "🚕 Сервисы" },
-    { name: "cabinet", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cabinet.html", icon: "👤", category: "🚕 Сервисы" },
-    { name: "pomoshnik", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pomoshnik.html", icon: "🆘", category: "🚕 Сервисы" },
-    { name: "MuzaffarGram", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffargram.html", icon: "📷", category: "📱 Соцсети" },
-    { name: "muzaffartvit", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffartvit.html", icon: "🐦", category: "📱 Соцсети" },
-    { name: "muzaffarconeec", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffarconeec.html", icon: "🦊", category: "📱 Соцсети" },
-    { name: "Map", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/map.html", icon: "🗺️", category: "🧭 Навигация" },
-    { name: "Navigator", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/navigator.html", icon: "🧭", category: "🧭 Навигация" },
-    { name: "mapfriend", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/mapfriend.html", icon: "👥", category: "🧭 Навигация" },
-    { name: "trevel", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/trevel.html", icon: "✈️", category: "🧭 Навигация" },
-    { name: "Hab", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/hab.html", icon: "🏠", category: "📁 Другое" },
-    { name: "os", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/os.html", icon: "💻", category: "📁 Другое" },
-    { name: "cake", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cake.html", icon: "🍰", category: "📁 Другое" },
-    { name: "doska", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/doska.html", icon: "📌", category: "📁 Другое" },
-    { name: "dream", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/dream.html", icon: "✨", category: "📁 Другое" },
-    { name: "fail", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/fail.html", icon: "📁", category: "📁 Другое" },
-    { name: "link", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/link.html", icon: "🔗", category: "📁 Другое" },
-    { name: "onas", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/onas.html", icon: "ℹ️", category: "📁 Другое" },
-    { name: "saymongovorit", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/saymongovorit.html", icon: "🗣️", category: "📁 Другое" },
-    { name: "strice", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/strice.html", icon: "💇", category: "📁 Другое" },
-    { name: "test", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/test.html", icon: "✅", category: "📁 Другое" },
-    { name: "tich", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/tich.html", icon: "🤫", category: "📁 Другое" },
-    { name: "облоко", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/облоко.html", icon: "☁️", category: "📁 Другое" }
+    // ⭐ ГЛАВНЫЕ СТРАНИЦЫ
+    { name: "🏠 Muzaffar Browser", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/", icon: "🌐", category: "⭐ Главные" },
+    { name: "🏠 Main", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Main.html", icon: "🏠", category: "⭐ Главные" },
+    { name: "🏠 index", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/index.html", icon: "🏠", category: "⭐ Главные" },
+    { name: "🕹️ Hub", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/hub.html", icon: "🕹️", category: "⭐ Главные" },
+    { name: "🌟 muzaffarhub", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffarhub.html", icon: "🌟", category: "⭐ Главные" },
+    { name: "✨ MuzaffarHub New", url: "https://tubular-mermaid-2caf5c.netlify.app/", icon: "✨", category: "⭐ Главные" },
+    { name: "🛒 Интернет Магазин", url: "https://sharipovmuzaffar.netlify.app/", icon: "🛒", category: "⭐ Главные" },
+    { name: "📊 Google Scripts App", url: "https://script.google.com/macros/s/AKfycbweTacSK8Sn7_7t6md71pwou9EPd-ad0gStdjHYTunfo5cV53iQCo28OLJJMUmR7Ncf/exec", icon: "📊", category: "⭐ Главные" },
+    { name: "🌍 brauzer", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/brauzer.html", icon: "🌍", category: "⭐ Главные" },
+    { name: "🌎 браузер", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/браузер.html", icon: "🌎", category: "⭐ Главные" },
+    
+    // 🤖 AI
+    { name: "🤖 Ai Assistant", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Ai.html", icon: "🤖", category: "🤖 AI" },
+    { name: "⚡ ai1", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/ai1.html", icon: "⚡", category: "🤖 AI" },
+    { name: "💬 Chat", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Chat.html", icon: "💬", category: "🤖 AI" },
+    
+    // 🛠️ ИНСТРУМЕНТЫ
+    { name: "🧮 Calculator", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/calculator.html", icon: "🧮", category: "🛠️ Инструменты" },
+    { name: "📱 QR Code", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Qr.html", icon: "📱", category: "🛠️ Инструменты" },
+    { name: "📲 qrjavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/qrjavoni.html", icon: "📲", category: "🛠️ Инструменты" },
+    { name: "🔒 Password", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/password.html", icon: "🔒", category: "🛠️ Инструменты" },
+    { name: "📑 Pdf", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pdf.html", icon: "📑", category: "🛠️ Инструменты" },
+    { name: "⏰ Time", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/time.html", icon: "⏰", category: "🛠️ Инструменты" },
+    { name: "🔤 Shrift", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shrift.html", icon: "🔤", category: "🛠️ Инструменты" },
+    { name: "⌨️ Typ", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/typ.html", icon: "⌨️", category: "🛠️ Инструменты" },
+    { name: "🌐 Transleted", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/transleted.html", icon: "🌐", category: "🛠️ Инструменты" },
+    { name: "💻 htmleditor", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/htmleditor.html", icon: "💻", category: "🛠️ Инструменты" },
+    
+    // 🎮 ИГРЫ
+    { name: "🚗 Car Game", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cargame.html", icon: "🚗", category: "🎮 Игры" },
+    { name: "🎮 Game", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/game.html", icon: "🎮", category: "🎮 Игры" },
+    { name: "🔢 gamenumber", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/gamenumber.html", icon: "🔢", category: "🎮 Игры" },
+    { name: "♟️ Shahmat", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shahmat.html", icon: "♟️", category: "🎮 Игры" },
+    
+    // 🎬 МЕДИА
+    { name: "🖼️ Gallery", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/gallery.html", icon: "🖼️", category: "🎬 Медиа" },
+    { name: "🎵 Music", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/музыка.html", icon: "🎵", category: "🎬 Медиа" },
+    { name: "▶️ MuzaffarTube", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffartube.html", icon: "▶️", category: "🎬 Медиа" },
+    { name: "📹 Shorts", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shorts.html", icon: "📹", category: "🎬 Медиа" },
+    
+    // 🎨 ТВОРЧЕСТВО
+    { name: "🎨 Paint", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/paint.html", icon: "🎨", category: "🎨 Творчество" },
+    { name: "🎬 Video Editor", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/videoeditor.html", icon: "🎬", category: "🎨 Творчество" },
+    { name: "🎨 rasjavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/rasjavoni.html", icon: "🎨", category: "🎨 Творчество" },
+    
+    // 📚 ОБРАЗОВАНИЕ
+    { name: "🏫 Online School", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/onlainschool.html", icon: "🏫", category: "📚 Образование" },
+    { name: "📖 Wikipedia", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/vikipedi.html", icon: "📖", category: "📚 Образование" },
+    { name: "📚 encyclopedia", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/encyclopedia.html", icon: "📚", category: "📚 Образование" },
+    { name: "📓 jurnal", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/jurnal.html", icon: "📓", category: "📚 Образование" },
+    { name: "📄 pagejavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pagejavoni.html", icon: "📄", category: "📚 Образование" },
+    { name: "📐 geomit", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/geomit.html", icon: "📐", category: "📚 Образование" },
+    { name: "🏛️ schoolsistem", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/schoolsistem.html", icon: "🏛️", category: "📚 Образование" },
+    { name: "🏫 school", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/school.html", icon: "🏫", category: "📚 Образование" },
+    
+    // 💰 ФИНАНСЫ
+    { name: "🏦 Muzaffar Bank", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Muzaffarbank.html", icon: "🏦", category: "💰 Финансы" },
+    { name: "💰 finans", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/finans.html", icon: "💰", category: "💰 Финансы" },
+    { name: "📈 akci", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/akci.html", icon: "📈", category: "💰 Финансы" },
+    { name: "💱 birza", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/birza.html", icon: "💱", category: "💰 Финансы" },
+    
+    // 📰 НОВОСТИ
+    { name: "📰 News", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/news.html", icon: "📰", category: "📰 Новости" },
+    
+    // 📞 СВЯЗЬ
+    { name: "📞 Zvonok", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Zvonok.html", icon: "📞", category: "📞 Связь" },
+    { name: "✉️ Pochta", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pochta.html", icon: "✉️", category: "📞 Связь" },
+    { name: "📧 почта", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/почта.html", icon: "📧", category: "📞 Связь" },
+    { name: "📱 phoune", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/phoune.html", icon: "📱", category: "📞 Связь" },
+    
+    // 🚕 СЕРВИСЫ
+    { name: "🚕 Taxi", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/taxi.html", icon: "🚕", category: "🚕 Сервисы" },
+    { name: "🛒 Shop", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shop.html", icon: "🛒", category: "🚕 Сервисы" },
+    { name: "🛠️ servis", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/servis.html", icon: "🛠️", category: "🚕 Сервисы" },
+    { name: "👤 cabinet", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cabinet.html", icon: "👤", category: "🚕 Сервисы" },
+    { name: "🆘 pomoshnik", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pomoshnik.html", icon: "🆘", category: "🚕 Сервисы" },
+    
+    // 📱 СОЦСЕТИ
+    { name: "📷 MuzaffarGram", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffargram.html", icon: "📷", category: "📱 Соцсети" },
+    { name: "🐦 muzaffartvit", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffartvit.html", icon: "🐦", category: "📱 Соцсети" },
+    { name: "🦊 muzaffarconeec", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffarconeec.html", icon: "🦊", category: "📱 Соцсети" },
+    
+    // 🧭 НАВИГАЦИЯ
+    { name: "🗺️ Map", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/map.html", icon: "🗺️", category: "🧭 Навигация" },
+    { name: "🧭 Navigator", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/navigator.html", icon: "🧭", category: "🧭 Навигация" },
+    { name: "👥 mapfriend", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/mapfriend.html", icon: "👥", category: "🧭 Навигация" },
+    { name: "✈️ trevel", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/trevel.html", icon: "✈️", category: "🧭 Навигация" },
+    
+    // 📁 ДРУГОЕ
+    { name: "🏠 Hab", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/hab.html", icon: "🏠", category: "📁 Другое" },
+    { name: "💻 os", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/os.html", icon: "💻", category: "📁 Другое" },
+    { name: "🍰 cake", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cake.html", icon: "🍰", category: "📁 Другое" },
+    { name: "📌 doska", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/doska.html", icon: "📌", category: "📁 Другое" },
+    { name: "✨ dream", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/dream.html", icon: "✨", category: "📁 Другое" },
+    { name: "📁 fail", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/fail.html", icon: "📁", category: "📁 Другое" },
+    { name: "🔗 link", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/link.html", icon: "🔗", category: "📁 Другое" },
+    { name: "🔗 muzaffarlink", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffarlink.html", icon: "🔗", category: "📁 Другое" },
+    { name: "ℹ️ onas", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/onas.html", icon: "ℹ️", category: "📁 Другое" },
+    { name: "🗣️ saymongovorit", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/saymongovorit.html", icon: "🗣️", category: "📁 Другое" },
+    { name: "💇 strice", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/strice.html", icon: "💇", category: "📁 Другое" },
+    { name: "✅ test", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/test.html", icon: "✅", category: "📁 Другое" },
+    { name: "🤫 tich", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/tich.html", icon: "🤫", category: "📁 Другое" },
+    { name: "☁️ облоко", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/облоко.html", icon: "☁️", category: "📁 Другое" },
+    { name: "📅 day", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/day.html", icon: "📅", category: "📁 Другое" }
 ];
 
 const categories = {};
@@ -471,7 +286,6 @@ let vpnActive = false;
 let currentModel = "gpt";
 let currentUser = JSON.parse(localStorage.getItem('muzaffar_google_user')) || null;
 
-// Google Вход (имитация)
 function updateUIForUser() {
     if(currentUser) {
         document.getElementById('loginBtn').classList.add('hidden');
@@ -513,7 +327,6 @@ document.getElementById('logoutBtn').onclick = () => {
     updateUIForUser();
 };
 
-// Выключение обоев
 document.getElementById('resetWallpaperBtn').onclick = () => {
     document.body.style.background = '';
     document.body.classList.remove('custom-bg');
@@ -522,7 +335,6 @@ document.getElementById('resetWallpaperBtn').onclick = () => {
     alert('Фон возвращён к стандартному');
 };
 
-// ИИ функция
 async function askAI(question) {
     const messagesDiv = document.getElementById('aiMessages');
     messagesDiv.innerHTML += `<div class="message user">${escapeHtml(question)}</div>`;
@@ -559,7 +371,7 @@ function createSearchTab() {
     const div = document.createElement('div');
     div.className = 'search-tab-content';
     div.id = `search-tab-${id}`;
-    div.innerHTML = `<div class="search-container"><div class="logo"><div class="logo-icon">🦊</div><div class="logo-text">Muzaffar Pro</div><div class="logo-sub">79 проектов · ИИ-помощник · Google вход</div></div><div class="gcse-search"></div></div>`;
+    div.innerHTML = `<div class="search-container"><div class="logo"><div class="logo-icon">🦊</div><div class="logo-text">Muzaffar Pro</div><div class="logo-sub">80+ проектов · ИИ-помощник · Google вход</div></div><div class="gcse-search"></div></div>`;
     tabs.push({ id, title: "Поиск", type: "search", element: div });
     document.getElementById('tabsContainerIframes').appendChild(div);
     updateTabsBar();
@@ -569,7 +381,7 @@ function createSearchTab() {
 
 function createWebTab(url, title) {
     let finalUrl = url;
-    if(vpnActive && !url.includes('github.io')) finalUrl = `https://cors-anywhere.herokuapp.com/${url}`;
+    if(vpnActive && !url.includes('github.io') && !url.includes('netlify.app') && !url.includes('google.com')) finalUrl = `https://cors-anywhere.herokuapp.com/${url}`;
     const id = nextTabId++;
     const iframe = document.createElement('iframe');
     iframe.className = 'tab-frame';
