@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Hotel Manager — Аналог Bnovo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app {
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ----- header ----- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.5px;
+        }
+        .logo span {
+            color: #3b82f6;
+        }
+        .date-today {
+            background: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        /* ----- metric cards ----- */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+        }
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .card-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+        }
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .card-footer {
+            font-size: 12px;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+
+        /* ----- СЕКЦИЯ ШАХМАТКИ (ГЛАВНАЯ ФИШКА) ----- */
+        .chess-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+            overflow-x: auto;
+        }
+        .chess-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 20px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        .legend-color.red {
+            background: #fee2e2;
+            border: 2px solid #f87171;
+        }
+        .legend-color.yellow {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+        }
+        .legend-color.green {
+            background: #dcfce7;
+            border: 2px solid #4ade80;
+        }
+
+        .chess-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+            font-size: 13px;
+        }
+        .chess-table th,
+        .chess-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 6px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .chess-table th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #334155;
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+        }
+        .chess-table .room-col {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: left;
+            padding-left: 12px;
+            min-width: 120px;
+        }
+        .cell-booking {
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            transition: 0.15s;
+            position: relative;
+            padding: 4px 6px;
+        }
+        .cell-booking:hover {
+            transform: scale(1.03);
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            outline: 2px solid #3b82f6;
+        }
+        .payment-red {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        .payment-yellow {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        .payment-green {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+        .cell-free {
+            background: #ffffff;
+            color: #cbd5e1;
+            font-size: 11px;
+        }
+
+        /* ----- tasks block ----- */
+        .tasks-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+        }
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 14px;
+        }
+        .task-check {
+            width: 20px;
+            height: 20px;
+            accent-color: #3b82f6;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .task-desc {
+            flex: 1;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        .task-room {
+            background: #e2e8f0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+        }
+        button {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        .modal h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .modal-label {
+            font-weight: 600;
+            color: #64748b;
+        }
+        .modal-value {
+            color: #1e293b;
+            font-weight: 500;
+        }
+        .modal-close {
+            margin-top: 16px;
+            width: 100%;
+            background: #e2e8f0;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="logo">🏨 Hotel<span>Manager</span></div>
+            <div class="date-today" id="currentDate"></div>
+        </div>
+
+        <!-- Метрики -->
+        <div class="metrics" id="metricsContainer"></div>
+
+        <!-- 🔥 ШАХМАТКА БРОНИРОВАНИЙ (как в Bnovo) -->
+        <div class="chess-section">
+            <div class="chess-header">
+                <div class="section-title">📅 Шахматка бронирований</div>
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-color red"></span> Не оплачено</div>
+                    <div class="legend-item"><span class="legend-color yellow"></span> Частично</div>
+                    <div class="legend-item"><span class="legend-color green"></span> Оплачено</div>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="chess-table" id="chessTable">
+                    <thead id="chessHead"></thead>
+                    <tbody id="chessBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Задачи -->
+        <div class="tasks-panel">
+            <div class="flex-row">
+                <div class="section-title">📋 Текущие задачи</div>
+                <button id="addTaskBtn">+ Добавить</button>
+            </div>
+            <div class="task-list" id="taskList"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно деталей брони -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalContent"></div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- ДАННЫЕ ----------
+            const apartments = [
+                { id: 1, number: "Люкс 101", type: "Апартаменты" },
+                { id: 2, number: "Стандарт 102", type: "Стандарт" },
+                { id: 3, number: "Люкс 103", type: "Апартаменты" },
+                { id: 4, number: "Семейный 104", type: "Семейный" },
+                { id: 5, number: "Стандарт 105", type: "Стандарт" },
+                { id: 6, number: "Люкс 106", type: "Апартаменты" },
+                { id: 7, number: "Эконом 107", type: "Эконом" },
+                { id: 8, number: "Люкс 108", type: "Апартаменты" },
+            ];
+
+            // Бронирования: квартира, даты, гость, телефон, цена, оплачено
+            const bookings = [
+                { id: 1, apartmentId: 1, guest: "Иванов И.И.", phone: "+7 (999) 123-45-67",
+                    dateFrom: "2026-05-17", dateTo: "2026-05-20", price: 15000, paid: 15000, status: "green" },
+                { id: 2, apartmentId: 3, guest: "Петрова А.С.", phone: "+7 (916) 555-44-33",
+                    dateFrom: "2026-05-18", dateTo: "2026-05-22", price: 20000, paid: 10000, status: "yellow" },
+                { id: 3, apartmentId: 5, guest: "Сидоров К.М.", phone: "+7 (903) 111-22-88",
+                    dateFrom: "2026-05-17", dateTo: "2026-05-19", price: 8000, paid: 0, status: "red" },
+                { id: 4, apartmentId: 6, guest: "Козлова Е.В.", phone: "+7 (925) 777-88-99",
+                    dateFrom: "2026-05-19", dateTo: "2026-05-23", price: 22000, paid: 22000, status: "green" },
+                { id: 5, apartmentId: 8, guest: "Морозов Д.А.", phone: "+7 (977) 333-22-11",
+                    dateFrom: "2026-05-17", dateTo: "2026-05-21", price: 18000, paid: 9000, status: "yellow" },
+            ];
+
+            let tasks = [
+                { id: 1, text: "Уборка Люкс 103", room: "103", done: false },
+                { id: 2, text: "Заезд Иванов (Люкс 101)", room: "101", done: false },
+                { id: 3, text: "Оплата от Сидорова", room: "105", done: false },
+            ];
+
+            // ---------- ГЕНЕРАЦИЯ ДАТ ДЛЯ ШАХМАТКИ ----------
+            function getDatesArray() {
+                const today = new Date();
+                const dates = [];
+                for (let i = -1; i < 10; i++) {
+                    const d = new Date(today);
+                    d.setDate(today.getDate() + i);
+                    dates.push(d);
+                }
+                return dates;
+            }
+
+            function formatDateShort(date) {
+                return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+            }
+
+            function formatDateISO(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            // Проверка, попадает ли дата в диапазон брони
+            function isDateInBooking(booking, dateStr) {
+                return dateStr >= booking.dateFrom && dateStr <= booking.dateTo;
+            }
+
+            // ---------- ОТРИСОВКА ШАХМАТКИ ----------
+            function renderChessTable() {
+                const dates = getDatesArray();
+                const thead = document.getElementById('chessHead');
+                const tbody = document.getElementById('chessBody');
+
+                // Заголовок таблицы
+                thead.innerHTML = `
+                    <tr>
+                        <th style="min-width: 130px;">Квартира</th>
+                        ${dates.map(d => `<th>${formatDateShort(d)}<br><small>${d.toLocaleDateString('ru-RU', { weekday: 'short' })}</small></th>`).join('')}
+                    </tr>
+                `;
+
+                // Тело таблицы — по квартирам
+                tbody.innerHTML = apartments.map(apt => {
+                    let cells = dates.map(date => {
+                        const dateStr = formatDateISO(date);
+                        const booking = bookings.find(b => b.apartmentId === apt.id && isDateInBooking(
+                            b, dateStr));
+
+                        if (booking) {
+                            const paymentClass = booking.status === 'red' ? 'payment-red' :
+                                booking.status === 'yellow' ? 'payment-yellow' : 'payment-green';
+                            const guestShort = booking.guest.split(' ')[0];
+                            return `
+                                <td class="cell-booking ${paymentClass}" 
+                                    data-booking-id="${booking.id}"
+                                    title="Нажми для подробностей">
+                                    ${guestShort}
+                                </td>`;
+                        } else {
+                            return `<td class="cell-free">—</td>`;
+                        }
+                    }).join('');
+
+                    return `<tr><td class="room-col">🏠 ${apt.number}</td>${cells}</tr>`;
+                }).join('');
+
+                // Вешаем клики на ячейки бронирований
+                document.querySelectorAll('.cell-booking').forEach(cell => {
+                    cell.addEventListener('click', function() {
+                        const bookingId = parseInt(this.dataset.bookingId);
+                        const booking = bookings.find(b => b.id === bookingId);
+                        if (booking) showBookingModal(booking);
+                    });
+                });
+            }
+
+            // ---------- МОДАЛЬНОЕ ОКНО С ДЕТАЛЯМИ ----------
+            function showBookingModal(booking) {
+                const apartment = apartments.find(a => a.id === booking.apartmentId);
+                const overlay = document.getElementById('modalOverlay');
+                const content = document.getElementById('modalContent');
+
+                const paidPercent = Math.round((booking.paid / booking.price) * 100);
+                const statusText = booking.status === 'green' ? '✅ Оплачено полностью' :
+                    booking.status === 'yellow' ? '⚠️ Оплачено частично' : '❌ Не оплачено';
+                const statusColor = booking.status === 'green' ? '#16a34a' :
+                    booking.status === 'yellow' ? '#d97706' : '#dc2626';
+
+                content.innerHTML = `
+                    <h3>📋 Детали бронирования</h3>
+                    <div class="modal-row"><span class="modal-label">Квартира:</span><span class="modal-value">${apartment ? apartment.number : '—'}</span></div>
+                    <div class="modal-row"><span class="modal-label">Гость:</span><span class="modal-value">${booking.guest}</span></div>
+                    <div class="modal-row"><span class="modal-label">Телефон:</span><span class="modal-value">${booking.phone}</span></div>
+                    <div class="modal-row"><span class="modal-label">Заезд:</span><span class="modal-value">${new Date(booking.dateFrom).toLocaleDateString('ru-RU')}</span></div>
+                    <div class="modal-row"><span class="modal-label">Выезд:</span><span class="modal-value">${new Date(booking.dateTo).toLocaleDateString('ru-RU')}</span></div>
+                    <hr style="border-color: #e2e8f0;">
+                    <div class="modal-row"><span class="modal-label">Стоимость:</span><span class="modal-value">${booking.price.toLocaleString()} ₽</span></div>
+                    <div class="modal-row"><span class="modal-label">Оплачено:</span><span class="modal-value">${booking.paid.toLocaleString()} ₽ (${paidPercent}%)</span></div>
+                    <div class="modal-row"><span class="modal-label">Статус:</span><span class="modal-value" style="color: ${statusColor}; font-weight: 700;">${statusText}</span></div>
+                    <button class="modal-close" id="closeModal">Закрыть</button>
+                `;
+
+                overlay.style.display = 'flex';
+                document.getElementById('closeModal').addEventListener('click', () => {
+                    overlay.style.display = 'none';
+                });
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) overlay.style.display = 'none';
+                });
+            }
+
+            // ---------- МЕТРИКИ ----------
+            function updateMetrics() {
+                const totalPaid = bookings.filter(b => b.status === 'green').length;
+                const partialPaid = bookings.filter(b => b.status === 'yellow').length;
+                const notPaid = bookings.filter(b => b.status === 'red').length;
+                const pendingTasks = tasks.filter(t => !t.done).length;
+
+                document.getElementById('metricsContainer').innerHTML = `
+                    <div class="card">
+                        <div class="card-label">✅ Оплачено</div>
+                        <div class="card-value">${totalPaid}</div>
+                        <div class="card-footer">броней</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">⚠️ Частично</div>
+                        <div class="card-value">${partialPaid}</div>
+                        <div class="card-footer">броней</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">❌ Не оплачено</div>
+                        <div class="card-value">${notPaid}</div>
+                        <div class="card-footer">броней</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">📌 Задачи</div>
+                        <div class="card-value">${pendingTasks}</div>
+                        <div class="card-footer">активных</div>
+                    </div>
+                `;
+            }
+
+            // ---------- ЗАДАЧИ ----------
+            function renderTasks() {
+                const taskList = document.getElementById('taskList');
+                taskList.innerHTML = tasks.map(task => `
+                    <div class="task-item" data-task-id="${task.id}">
+                        <input type="checkbox" class="task-check" ${task.done ? 'checked' : ''} />
+                        <span class="task-desc" style="${task.done ? 'text-decoration: line-through; color: #94a3b8;' : ''}">${task.text}</span>
+                        <span class="task-room">№${task.room}</span>
+                    </div>
+                `).join('');
+
+                document.querySelectorAll('.task-check').forEach(checkbox => {
+                    checkbox.addEventListener('change', function(e) {
+                        const taskId = parseInt(this.closest('.task-item').dataset.taskId);
+                        const task = tasks.find(t => t.id === taskId);
+                        if (task) {
+                            task.done = this.checked;
+                            renderAll();
+                        }
+                    });
+                });
+            }
+
+            function renderAll() {
+                updateMetrics();
+                renderChessTable();
+                renderTasks();
+                document.getElementById('currentDate').textContent = new Date().toLocaleDateString(
+                'ru-RU', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+            }
+
+            // Добавление задачи
+            document.getElementById('addTaskBtn').addEventListener('click', () => {
+                const roomNum = prompt('Номер квартиры:', '101');
+                if (!roomNum) return;
+                const text = prompt('Описание задачи:', `Уборка номера ${roomNum}`);
+                if (!text) return;
+                const newId = tasks.length ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+                tasks.push({ id: newId, text, room: roomNum, done: false });
+                renderAll();
+            });
+
+            renderAll();
+        })();
+    </script>
+</body>
+</html>
