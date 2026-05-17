@@ -1,377 +1,482 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Muzaffar Pro | Браузер с Google входом</title>
+    <title>Muzaffar Pro | Браузер</title>
     <script async src="https://cse.google.com/cse.js?cx=40fe40e6028d84ece"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0f1e; font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 30%, rgba(139,92,246,0.2), transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(99,102,241,0.15), transparent 50%); pointer-events: none; z-index: 0; animation: slowMove 20s ease infinite; }
-        @keyframes slowMove { 0%,100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
-        body.light { background: #f8fafc; }
+        body { background: linear-gradient(135deg, #0a0f1e 0%, #0f1425 50%, #1a1f35 100%); font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 30%, rgba(139,92,246,0.15), transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(99,102,241,0.1), transparent 50%); pointer-events: none; z-index: 0; animation: slowMove 20s ease infinite; }
+        @keyframes slowMove { 0%,100% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
+        body.light { background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #eef2ff 100%); }
         body.light::before { background: radial-gradient(ellipse at 20% 30%, rgba(139,92,246,0.08), transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(99,102,241,0.05), transparent 50%); }
-        .top-bar { padding: 10px 28px; display: flex; justify-content: space-between; align-items: center; background: rgba(10,15,30,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(139,92,246,0.3); z-index: 20; position: relative; }
-        body.light .top-bar { background: rgba(255,255,255,0.7); border-bottom-color: rgba(139,92,246,0.2); }
-        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(139,92,246,0.2); padding: 5px 16px; border-radius: 40px; }
-        .user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
-        .action-btn { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #c4b5fd; padding: 7px 20px; border-radius: 100px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; }
-        .action-btn:hover { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139,92,246,0.4); }
+        
+        .top-bar { padding: 12px 28px; display: flex; justify-content: space-between; align-items: center; background: rgba(10,15,30,0.75); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(139,92,246,0.3); z-index: 20; position: relative; }
+        body.light .top-bar { background: rgba(255,255,255,0.8); border-bottom-color: rgba(139,92,246,0.2); }
+        
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(0,0,0,0.2); }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-text { font-size: 1.2rem; font-weight: 700; background: linear-gradient(135deg, #a78bfa, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        
+        .action-btn { background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25); color: #c4b5fd; padding: 8px 18px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .action-btn:hover { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,92,246,0.35); border-color: transparent; }
+        
+        .vpn-btn { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #4ade80; padding: 8px 18px; border-radius: 40px; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .vpn-btn.active { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
+        
         .hidden { display: none !important; }
-        .vpn-status { position: fixed; bottom: 24px; left: 24px; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); padding: 8px 18px; border-radius: 40px; color: #94a3b8; font-size: 0.75rem; z-index: 100; cursor: pointer; border: 1px solid rgba(139,92,246,0.3); }
-        .vpn-status.active { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        
+        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(139,92,246,0.2); padding: 5px 16px; border-radius: 40px; }
+        .user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+        
         .app-container { display: flex; flex: 1; overflow: hidden; z-index: 1; flex-direction: column; }
         .main-layout { display: flex; flex: 1; overflow: hidden; }
-        .projects-panel { width: 460px; background: rgba(10,15,30,0.55); backdrop-filter: blur(24px); border-right: 1px solid rgba(139,92,246,0.25); display: flex; flex-direction: column; transition: transform 0.4s; flex-shrink: 0; overflow-y: auto; }
+        
+        .projects-panel { width: 460px; background: rgba(15,20,35,0.7); backdrop-filter: blur(24px); border-right: 1px solid rgba(139,92,246,0.25); display: flex; flex-direction: column; transition: transform 0.3s; flex-shrink: 0; overflow-y: auto; }
         body.light .projects-panel { background: rgba(255,255,255,0.6); }
         .projects-panel.collapsed { transform: translateX(-460px); position: absolute; height: 100%; }
-        .projects-header { padding: 18px 24px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .projects-header h3 { font-size: 0.95rem; font-weight: 700; background: linear-gradient(135deg, #a78bfa, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        
+        .projects-header { padding: 20px 24px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(139,92,246,0.2); }
+        .projects-header h3 { font-size: 0.9rem; font-weight: 600; background: linear-gradient(135deg, #a78bfa, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .toggle-panel-btn { background: rgba(139,92,246,0.2); border: none; color: #c4b5fd; width: 32px; height: 32px; border-radius: 30px; cursor: pointer; }
-        .projects-search { padding: 6px 20px 14px; }
-        .projects-search input { width: 100%; padding: 10px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(139,92,246,0.3); border-radius: 60px; color: white; font-size: 0.8rem; outline: none; }
-        body.light .projects-search input { background: rgba(0,0,0,0.04); color: #1e293b; }
-        .projects-grid { flex: 1; overflow-y: auto; padding: 6px 16px 20px; }
-        .category-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #a78bfa; margin: 14px 0 8px 6px; }
-        .projects-grid-category { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-        .project-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(139,92,246,0.1); border-radius: 14px; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(139,92,246,0.2); }
-        .project-card:hover { background: rgba(139,92,246,0.25); transform: translateY(-2px); }
-        .project-card-icon { font-size: 1.1rem; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: rgba(139,92,246,0.2); border-radius: 8px; }
-        .project-card-name { font-size: 0.75rem; font-weight: 500; color: #e2e8f0; flex: 1; }
+        
+        .projects-search { padding: 16px 20px; }
+        .projects-search input { width: 100%; padding: 12px 18px; background: rgba(255,255,255,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 60px; color: white; font-size: 0.85rem; outline: none; }
+        .projects-search input:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139,92,246,0.2); }
+        
+        .analytics-section {
+            background: rgba(139,92,246,0.1);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin: 16px 20px;
+            border: 1px solid rgba(139,92,246,0.25);
+        }
+        .analytics-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a78bfa;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .analytics-title button {
+            background: rgba(239,68,68,0.2);
+            border: none;
+            color: #f87171;
+            font-size: 0.6rem;
+            padding: 3px 8px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .analytics-title button:hover { background: #ef4444; color: white; }
+        .top-project-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 0.7rem;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(139,92,246,0.15);
+        }
+        .top-project-rank {
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: white;
+        }
+        .top-project-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .top-project-count { font-size: 0.65rem; color: #94a3b8; }
+        
+        .projects-grid { flex: 1; overflow-y: auto; padding: 8px 16px 20px; }
+        .category-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #a78bfa; margin: 16px 0 10px 8px; }
+        .projects-grid-category { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .project-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(139,92,246,0.08); border-radius: 16px; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(139,92,246,0.15); }
+        .project-card:hover { background: rgba(139,92,246,0.2); transform: translateY(-2px); border-color: rgba(139,92,246,0.4); }
+        .project-card-icon { font-size: 1.2rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(139,92,246,0.2); border-radius: 10px; }
+        .project-card-name { font-size: 0.8rem; font-weight: 500; color: #e2e8f0; flex: 1; }
         body.light .project-card-name { color: #1e293b; }
-        .panel-toggle { position: fixed; left: 16px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); border-radius: 50px; padding: 10px 14px; cursor: pointer; z-index: 22; display: none; color: white; }
+        
+        .panel-toggle { position: fixed; left: 16px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); border-radius: 50px; padding: 12px 16px; cursor: pointer; z-index: 22; display: none; color: white; }
         .projects-panel.collapsed + .panel-toggle { display: flex; }
+        
         .right-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .tab-bar { padding: 6px 20px 4px 24px; display: flex; gap: 8px; overflow-x: auto; background: rgba(0,0,0,0.3); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(139,92,246,0.2); flex-shrink: 0; }
-        .tab { display: flex; align-items: center; gap: 6px; padding: 5px 14px; background: rgba(139,92,246,0.15); border-radius: 60px; cursor: pointer; white-space: nowrap; }
+        .tab-bar { padding: 10px 20px 8px 24px; display: flex; gap: 8px; overflow-x: auto; background: rgba(0,0,0,0.3); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(139,92,246,0.2); flex-shrink: 0; }
+        .tab { display: flex; align-items: center; gap: 8px; padding: 6px 16px; background: rgba(139,92,246,0.12); border-radius: 40px; cursor: pointer; transition: all 0.2s; }
+        .tab:hover { background: rgba(139,92,246,0.25); }
         .tab.active { background: linear-gradient(135deg, #8b5cf6, #6366f1); box-shadow: 0 4px 12px rgba(139,92,246,0.4); }
-        .tab-title { font-size: 0.75rem; font-weight: 500; color: #cbd5e1; }
+        .tab-title { font-size: 0.8rem; font-weight: 500; color: #cbd5e1; }
         .tab.active .tab-title { color: white; }
-        .tab-close { background: transparent; border: none; font-size: 0.8rem; cursor: pointer; color: #94a3b8; width: 20px; height: 20px; border-radius: 20px; }
+        .tab-close { background: transparent; border: none; font-size: 0.8rem; cursor: pointer; color: #94a3b8; width: 22px; height: 22px; border-radius: 20px; }
         .tab-close:hover { background: #ef4444; color: white; }
-        .new-tab-btn { background: rgba(139,92,246,0.25); border: none; font-size: 1.1rem; cursor: pointer; width: 34px; height: 34px; border-radius: 60px; color: #c4b5fd; }
+        .new-tab-btn { background: rgba(139,92,246,0.25); border: none; font-size: 1.2rem; cursor: pointer; width: 36px; height: 36px; border-radius: 40px; color: #c4b5fd; }
+        .new-tab-btn:hover { background: #8b5cf6; color: white; }
+        
         .tabs-container { flex: 1; position: relative; overflow: auto; }
         .tab-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: none; background: white; }
         .tab-frame.active { display: block; }
-        .search-tab-content { display: none; flex-direction: column; width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; background: transparent; }
-        .search-tab-content.active { display: flex; }
-        .search-container { max-width: 750px; width: 90%; margin: 45px auto 30px; text-align: center; }
-        .logo-icon { font-size: 4rem; animation: float 3s infinite; }
-        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .logo-text { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        
+        .search-tab-content {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            background: transparent;
+        }
+        .search-tab-content.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .search-center {
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .logo-icon-big {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 28px;
+            overflow: hidden;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(139,92,246,0.4);
+        }
+        .logo-icon-big img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .logo-text-big {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa, #c084fc, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+        .sub-text {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        
         .gsc-control-cse { padding: 0 !important; background: transparent !important; border: none !important; }
         .gsc-input-box { border: 2px solid transparent !important; background: rgba(30,41,59,0.95) !important; border-radius: 80px !important; background-image: linear-gradient(rgba(30,41,59,0.95), rgba(30,41,59,0.95)), linear-gradient(135deg, #8b5cf6, #c084fc, #6366f1) !important; background-origin: border-box !important; background-clip: padding-box, border-box !important; }
         body.light .gsc-input-box { background: rgba(255,255,255,0.95) !important; background-image: linear-gradient(white, white), linear-gradient(135deg, #8b5cf6, #c084fc) !important; }
-        .gsc-input input { font-size: 0.95rem !important; padding: 16px 26px !important; background: transparent !important; color: #f1f5f9 !important; }
+        .gsc-input input { font-size: 1rem !important; padding: 18px 26px !important; background: transparent !important; color: #f1f5f9 !important; }
         body.light .gsc-input input { color: #1e293b !important; }
-        .gsc-search-button { background: linear-gradient(135deg, #8b5cf6, #6366f1) !important; border-radius: 80px !important; padding: 0 38px !important; margin: 6px 10px !important; font-weight: 700 !important; }
+        .gsc-search-button { background: linear-gradient(135deg, #8b5cf6, #6366f1) !important; border-radius: 80px !important; padding: 0 42px !important; margin: 8px 12px !important; font-weight: 600 !important; }
         .gsc-result { background: rgba(30,41,59,0.92) !important; backdrop-filter: blur(12px) !important; border-radius: 22px !important; padding: 18px !important; margin-bottom: 14px !important; border: 1px solid rgba(139,92,246,0.35) !important; }
         body.light .gsc-result { background: rgba(255,255,255,0.95) !important; }
         .gs-title a { font-size: 1rem !important; font-weight: 700 !important; color: #c4b5fd !important; }
         body.light .gs-title a { color: #8b5cf6 !important; }
         .gsc-branding, .gcsc-branding { display: none !important; }
-        .bookmarks-bar { background: rgba(0,0,0,0.4); backdrop-filter: blur(20px); border-top: 1px solid rgba(139,92,246,0.25); padding: 6px 20px; display: flex; align-items: center; gap: 10px; overflow-x: auto; flex-shrink: 0; }
-        .bookmarks-title { font-size: 0.65rem; font-weight: 600; color: #a78bfa; }
-        .bookmark-item { display: flex; align-items: center; gap: 6px; padding: 4px 12px; background: rgba(139,92,246,0.18); border-radius: 40px; cursor: pointer; font-size: 0.7rem; color: #cbd5e1; }
-        .add-bookmark-btn { background: rgba(139,92,246,0.2); border: none; border-radius: 40px; padding: 4px 12px; cursor: pointer; font-size: 0.65rem; color: #c4b5fd; }
-        .ai-modal { position: fixed; bottom: 90px; right: 20px; width: 420px; height: 580px; background: rgba(15,23,42,0.98); backdrop-filter: blur(28px); border-radius: 28px; border: 1px solid rgba(139,92,246,0.5); z-index: 1000; display: none; flex-direction: column; overflow: hidden; }
-        .ai-modal.open { display: flex; }
-        .ai-header { padding: 14px 18px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .ai-model-selector { display: flex; gap: 6px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 40px; }
-        .model-btn { background: transparent; border: none; color: rgba(255,255,255,0.7); cursor: pointer; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; }
-        .model-btn.active { background: white; color: #8b5cf6; }
-        .ai-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-        .message { max-width: 85%; padding: 8px 12px; border-radius: 16px; font-size: 0.8rem; }
-        .message.user { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .message.bot { background: rgba(139,92,246,0.25); color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .ai-input-area { display: flex; padding: 14px; border-top: 1px solid rgba(139,92,246,0.3); gap: 8px; }
-        .ai-input { flex: 1; padding: 8px 14px; background: rgba(30,41,59,0.9); border: 1px solid rgba(139,92,246,0.4); border-radius: 40px; color: white; outline: none; }
-        .ai-send { background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; color: white; padding: 8px 18px; border-radius: 40px; cursor: pointer; }
-        .ai-toggle { position: fixed; bottom: 24px; right: 24px; width: 54px; height: 54px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 1.5rem; box-shadow: 0 8px 25px rgba(139,92,246,0.5); z-index: 999; }
-        .history-sidebar { position: fixed; right: -420px; top: 0; width: 380px; height: 100%; background: rgba(10,15,30,0.98); backdrop-filter: blur(28px); transition: right 0.4s; z-index: 1000; display: flex; flex-direction: column; }
+        
+        .bookmarks-bar { background: rgba(0,0,0,0.4); backdrop-filter: blur(20px); border-top: 1px solid rgba(139,92,246,0.25); padding: 8px 20px; display: flex; align-items: center; gap: 12px; overflow-x: auto; flex-shrink: 0; }
+        .bookmarks-title { font-size: 0.7rem; font-weight: 600; color: #a78bfa; }
+        .bookmark-item { display: flex; align-items: center; gap: 6px; padding: 5px 14px; background: rgba(139,92,246,0.18); border-radius: 40px; cursor: pointer; font-size: 0.75rem; color: #cbd5e1; transition: 0.2s; }
+        .bookmark-item:hover { background: rgba(139,92,246,0.35); }
+        .add-bookmark-btn { background: rgba(139,92,246,0.2); border: none; border-radius: 40px; padding: 5px 14px; cursor: pointer; font-size: 0.7rem; color: #c4b5fd; }
+        
+        .ai-integration-modal { position: fixed; bottom: 90px; right: 24px; width: 500px; height: 650px; background: rgba(15,23,42,0.98); backdrop-filter: blur(28px); border-radius: 28px; border: 1px solid rgba(139,92,246,0.4); z-index: 1000; display: none; flex-direction: column; overflow: hidden; }
+        .ai-integration-modal.open { display: flex; }
+        .ai-integration-header { padding: 16px 20px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .ai-integration-iframe { flex: 1; width: 100%; border: none; }
+        .ai-integration-toggle { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 1.5rem; box-shadow: 0 8px 25px rgba(139,92,246,0.5); z-index: 999; }
+        
+        .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .login-modal.open { display: flex; }
+        .login-card { background: rgba(20,25,45,0.98); backdrop-filter: blur(20px); border-radius: 36px; padding: 36px; width: 400px; border: 1px solid rgba(139,92,246,0.5); text-align: center; }
+        .login-card h2 { color: white; margin-bottom: 24px; }
+        .login-card input { width: 100%; padding: 14px 18px; margin-bottom: 18px; background: rgba(30,41,59,0.8); border: 1px solid rgba(139,92,246,0.4); border-radius: 60px; color: white; outline: none; }
+        .login-card button { width: 100%; padding: 14px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 600; margin-bottom: 12px; }
+        .close-login-modal { background: transparent !important; border: 1px solid rgba(139,92,246,0.4) !important; }
+        
+        .history-sidebar { position: fixed; right: -420px; top: 0; width: 380px; height: 100%; background: rgba(15,20,35,0.98); backdrop-filter: blur(28px); transition: right 0.3s; z-index: 1000; display: flex; flex-direction: column; }
         .history-sidebar.open { right: 0; }
-        .history-header { padding: 20px 24px; border-bottom: 1px solid rgba(139,92,246,0.3); display: flex; justify-content: space-between; }
-        .close-history { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #c4b5fd; }
+        .history-header { padding: 24px; border-bottom: 1px solid rgba(139,92,246,0.3); display: flex; justify-content: space-between; }
         .history-list { flex: 1; overflow-y: auto; padding: 16px; }
-        .history-item { background: rgba(139,92,246,0.12); padding: 10px 14px; margin-bottom: 8px; border-radius: 16px; cursor: pointer; color: #e2e8f0; }
-        .clear-history { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; margin: 16px; padding: 10px; border-radius: 40px; cursor: pointer; }
+        .history-item { background: rgba(139,92,246,0.1); padding: 12px 16px; margin-bottom: 8px; border-radius: 16px; cursor: pointer; }
+        .clear-history { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; margin: 16px; padding: 12px; border-radius: 40px; cursor: pointer; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 999; display: none; }
-        .google-login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .google-login-modal.open { display: flex; }
-        .google-login-card { background: rgba(20,25,45,0.95); backdrop-filter: blur(20px); border-radius: 32px; padding: 32px; width: 380px; border: 1px solid rgba(139,92,246,0.5); text-align: center; }
-        .google-login-card h2 { color: white; margin-bottom: 20px; }
-        .google-login-card input { width: 100%; padding: 12px 16px; margin-bottom: 16px; background: rgba(30,41,59,0.8); border: 1px solid rgba(139,92,246,0.4); border-radius: 60px; color: white; outline: none; }
-        .google-login-card button { width: 100%; padding: 12px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border: none; border-radius: 60px; cursor: pointer; font-weight: 600; margin-bottom: 12px; }
-        .google-login-card .google-btn { background: #4285f4; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .close-google-modal { background: transparent; border: none; color: #94a3b8; cursor: pointer; margin-top: 10px; }
-        @media (max-width: 768px) { .projects-panel { width: 320px; } .ai-modal { width: 320px; right: 10px; } }
+        
+        @media (max-width: 768px) { .projects-panel { width: 320px; } .ai-integration-modal { width: 340px; right: 10px; bottom: 80px; height: 550px; } }
     </style>
 </head>
 <body>
 <div class="top-bar">
-    <div class="header-left">
+    <div class="logo-area">
+        <div class="logo-icon"><img src="https://saripovmuzaffar759-jpg.github.io/Muzaffar/logo.png" alt="Logo"></div>
+        <div class="logo-text">Muzaffar Pro</div>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <div class="user-info hidden" id="userInfo">
             <div class="user-avatar" id="userAvatar">👤</div>
             <span id="userName" style="color:white;">Гость</span>
-            <button class="action-btn" id="logoutBtn" style="padding:3px 12px;">Выйти</button>
+            <button class="action-btn" id="logoutBtn" style="padding:3px 12px;"><i class="fas fa-sign-out-alt"></i></button>
         </div>
-        <button class="action-btn" id="loginBtn">🔐 Войти в Google</button>
-    </div>
-    <div class="header-right" style="display: flex; gap: 10px;">
-        <button class="action-btn" id="readingModeBtn">📖 Чтение</button>
-        <button class="action-btn" id="historyBtnHeader">📜 История</button>
-        <button class="action-btn" id="themeBtnHeader">☀️ Светлая</button>
-        <button class="action-btn" id="wallpaperBtn">🎨 Обои</button>
-        <button class="action-btn" id="resetWallpaperBtn">🗑️ Выкл обои</button>
+        <button class="action-btn" id="loginBtn"><i class="fas fa-key"></i> Войти</button>
+        <button class="vpn-btn" id="vpnBtn"><i class="fas fa-shield-alt"></i> VPN</button>
+        <button class="action-btn" id="readingModeBtn"><i class="fas fa-book-open"></i> Чтение</button>
+        <button class="action-btn" id="historyBtnHeader"><i class="fas fa-history"></i></button>
+        <button class="action-btn" id="themeBtnHeader"><i class="fas fa-sun"></i></button>
+        <button class="action-btn" id="wallpaperBtn"><i class="fas fa-image"></i></button>
+        <button class="action-btn" id="resetWallpaperBtn"><i class="fas fa-undo-alt"></i></button>
     </div>
 </div>
-
-<div class="vpn-status" id="vpnStatus">🔒 VPN: ВЫКЛ</div>
 
 <div class="app-container">
     <div class="main-layout">
         <div class="projects-panel" id="projectsPanel">
-            <div class="projects-header"><h3>📁 Все проекты Muzaffar (80+)</h3><button class="toggle-panel-btn" id="togglePanelBtn">◀</button></div>
-            <div class="projects-search"><input type="text" id="projectSearch" placeholder="🔍 Поиск проекта..."></div>
-            <div class="projects-grid" id="projectsGrid"></div>
+            <div class="projects-header">
+                <h3><i class="fas fa-folder"></i> Все проекты Muzaffar (<span id="projectCount">0</span>)</h3>
+                <button class="toggle-panel-btn" id="togglePanelBtn"><i class="fas fa-chevron-left"></i></button>
+            </div>
+            <div class="projects-search">
+                <input type="text" id="projectSearch" placeholder="🔍 Поиск проекта...">
+            </div>
+            
+            <div class="analytics-section">
+                <div class="analytics-title">
+                    <span><i class="fas fa-chart-line"></i> ПОПУЛЯРНЫЕ ПРОЕКТЫ</span>
+                    <button id="resetAnalyticsBtn">🗑️ Сброс</button>
+                </div>
+                <div id="topProjectsList">
+                    <div style="text-align:center; padding:8px; color:#94a3b8; font-size:0.7rem;">Нет данных. Кликайте на проекты!</div>
+                </div>
+            </div>
+            
+            <div class="projects-grid" id="projectsGrid"><div style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-pulse"></i> Загрузка проектов...</div></div>
         </div>
-        <div class="panel-toggle" id="panelToggleBtn">📁</div>
+        <div class="panel-toggle" id="panelToggleBtn"><i class="fas fa-chevron-right"></i></div>
         <div class="right-section">
-            <div class="tab-bar"><div id="tabsContainer" style="display:flex; gap:8px; flex:1; overflow-x:auto;"></div><button class="new-tab-btn" id="newTabBtn">+</button></div>
+            <div class="tab-bar">
+                <div id="tabsContainer" style="display:flex; gap:8px; flex:1; overflow-x:auto;"></div>
+                <button class="new-tab-btn" id="newTabBtn"><i class="fas fa-plus"></i></button>
+            </div>
             <div class="tabs-container" id="tabsContainerIframes"></div>
         </div>
     </div>
-    <div class="bookmarks-bar"><span class="bookmarks-title">⭐ ЗАКЛАДКИ</span><div id="bookmarksList" style="display:flex; gap:6px; flex-wrap:wrap;"></div><button class="add-bookmark-btn" id="addBookmarkBtn">+ Добавить</button></div>
-</div>
-
-<div class="google-login-modal" id="googleLoginModal">
-    <div class="google-login-card">
-        <h2>🔐 Вход в Google</h2>
-        <input type="email" id="googleEmail" placeholder="Email или телефон">
-        <button class="google-btn" id="googleLoginSubmit"><span>🔵</span> Войти через Google</button>
-        <button id="guestLoginBtn">Продолжить как гость</button>
-        <button class="close-google-modal" id="closeGoogleModal">✕ Закрыть</button>
+    <div class="bookmarks-bar">
+        <span class="bookmarks-title"><i class="fas fa-star"></i> ЗАКЛАДКИ</span>
+        <div id="bookmarksList" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+        <button class="add-bookmark-btn" id="addBookmarkBtn"><i class="fas fa-plus"></i> Добавить</button>
     </div>
 </div>
 
-<div class="ai-modal" id="aiModal">
-    <div class="ai-header"><span>🤖 Muzaffar AI</span><div class="ai-model-selector"><button class="model-btn active" data-model="gpt">GPT</button><button class="model-btn" data-model="llama">Llama</button><button class="model-btn" data-model="mistral">Mistral</button><button class="model-btn" data-model="gemini">Gemini</button></div><span id="closeAiModal" style="cursor:pointer;">✕</span></div>
-    <div class="ai-messages" id="aiMessages"><div class="message bot">✨ Привет! Я Muzaffar AI. Выбери модель и задай вопрос.</div></div>
-    <div class="ai-input-area"><input type="text" class="ai-input" id="aiInput" placeholder="Спроси меня..."><button class="ai-send" id="aiSend">➤</button></div>
+<div class="login-modal" id="loginModal">
+    <div class="login-card">
+        <h2><i class="fas fa-key"></i> Вход в аккаунт</h2>
+        <input type="text" id="userNameInput" placeholder="Имя пользователя">
+        <button id="loginSubmitBtn"><i class="fas fa-sign-in-alt"></i> Войти</button>
+        <button id="guestLoginBtn">Продолжить как гость</button>
+        <button class="close-login-modal" id="closeLoginModal">✕ Закрыть</button>
+    </div>
 </div>
-<div class="ai-toggle" id="aiToggle">🤖</div>
 
-<div class="history-sidebar" id="historySidebar"><div class="history-header"><h3>📜 История поиска</h3><button id="closeHistoryBtn" class="close-history">✕</button></div><div id="historyList" class="history-list"></div><button id="clearHistoryBtn" class="clear-history">🗑️ Очистить всё</button></div>
+<div class="ai-integration-modal" id="aiIntegrationModal">
+    <div class="ai-integration-header">
+        <h4><i class="fas fa-robot"></i> Muzaffar AI</h4>
+        <button class="close-ai-integration" id="closeAiIntegrationBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <iframe class="ai-integration-iframe" src="https://mellifluous-moxie-9f1033.netlify.app/"></iframe>
+</div>
+<div class="ai-integration-toggle" id="aiIntegrationToggle">
+    <i class="fas fa-robot"></i>
+</div>
+
+<div class="history-sidebar" id="historySidebar">
+    <div class="history-header">
+        <h3><i class="fas fa-history"></i> История поиска</h3>
+        <button id="closeHistoryBtn" class="close-history"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="historyList" class="history-list"></div>
+    <button id="clearHistoryBtn" class="clear-history"><i class="fas fa-trash-alt"></i> Очистить всё</button>
+</div>
 <div id="overlay" class="overlay"></div>
 
 <script>
-// ==================== ВСЕ 80+ ПРОЕКТОВ ИЗ ТВОЕГО РЕПОЗИТОРИЯ ====================
-const allProjects = [
-    // ⭐ ГЛАВНЫЕ СТРАНИЦЫ
-    { name: "🏠 Muzaffar Browser", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/", icon: "🌐", category: "⭐ Главные" },
-    { name: "🏠 Main", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Main.html", icon: "🏠", category: "⭐ Главные" },
-    { name: "🏠 index", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/index.html", icon: "🏠", category: "⭐ Главные" },
-    { name: "🕹️ Hub", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/hub.html", icon: "🕹️", category: "⭐ Главные" },
-    { name: "🌟 muzaffarhub", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffarhub.html", icon: "🌟", category: "⭐ Главные" },
-    { name: "✨ MuzaffarHub New", url: "https://tubular-mermaid-2caf5c.netlify.app/", icon: "✨", category: "⭐ Главные" },
-    { name: "🛒 Интернет Магазин", url: "https://sharipovmuzaffar.netlify.app/", icon: "🛒", category: "⭐ Главные" },
-    { name: "📊 Google Scripts App", url: "https://script.google.com/macros/s/AKfycbweTacSK8Sn7_7t6md71pwou9EPd-ad0gStdjHYTunfo5cV53iQCo28OLJJMUmR7Ncf/exec", icon: "📊", category: "⭐ Главные" },
-    { name: "🌍 brauzer", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/brauzer.html", icon: "🌍", category: "⭐ Главные" },
-    { name: "🌎 браузер", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/браузер.html", icon: "🌎", category: "⭐ Главные" },
-    
-    // 🤖 AI
-    { name: "🤖 Ai Assistant", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Ai.html", icon: "🤖", category: "🤖 AI" },
-    { name: "⚡ ai1", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/ai1.html", icon: "⚡", category: "🤖 AI" },
-    { name: "💬 Chat", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Chat.html", icon: "💬", category: "🤖 AI" },
-    
-    // 🛠️ ИНСТРУМЕНТЫ
-    { name: "🧮 Calculator", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/calculator.html", icon: "🧮", category: "🛠️ Инструменты" },
-    { name: "📱 QR Code", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Qr.html", icon: "📱", category: "🛠️ Инструменты" },
-    { name: "📲 qrjavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/qrjavoni.html", icon: "📲", category: "🛠️ Инструменты" },
-    { name: "🔒 Password", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/password.html", icon: "🔒", category: "🛠️ Инструменты" },
-    { name: "📑 Pdf", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pdf.html", icon: "📑", category: "🛠️ Инструменты" },
-    { name: "⏰ Time", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/time.html", icon: "⏰", category: "🛠️ Инструменты" },
-    { name: "🔤 Shrift", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shrift.html", icon: "🔤", category: "🛠️ Инструменты" },
-    { name: "⌨️ Typ", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/typ.html", icon: "⌨️", category: "🛠️ Инструменты" },
-    { name: "🌐 Transleted", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/transleted.html", icon: "🌐", category: "🛠️ Инструменты" },
-    { name: "💻 htmleditor", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/htmleditor.html", icon: "💻", category: "🛠️ Инструменты" },
-    
-    // 🎮 ИГРЫ
-    { name: "🚗 Car Game", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cargame.html", icon: "🚗", category: "🎮 Игры" },
-    { name: "🎮 Game", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/game.html", icon: "🎮", category: "🎮 Игры" },
-    { name: "🔢 gamenumber", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/gamenumber.html", icon: "🔢", category: "🎮 Игры" },
-    { name: "♟️ Shahmat", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shahmat.html", icon: "♟️", category: "🎮 Игры" },
-    
-    // 🎬 МЕДИА
-    { name: "🖼️ Gallery", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/gallery.html", icon: "🖼️", category: "🎬 Медиа" },
-    { name: "🎵 Music", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/музыка.html", icon: "🎵", category: "🎬 Медиа" },
-    { name: "▶️ MuzaffarTube", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffartube.html", icon: "▶️", category: "🎬 Медиа" },
-    { name: "📹 Shorts", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shorts.html", icon: "📹", category: "🎬 Медиа" },
-    
-    // 🎨 ТВОРЧЕСТВО
-    { name: "🎨 Paint", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/paint.html", icon: "🎨", category: "🎨 Творчество" },
-    { name: "🎬 Video Editor", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/videoeditor.html", icon: "🎬", category: "🎨 Творчество" },
-    { name: "🎨 rasjavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/rasjavoni.html", icon: "🎨", category: "🎨 Творчество" },
-    
-    // 📚 ОБРАЗОВАНИЕ
-    { name: "🏫 Online School", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/onlainschool.html", icon: "🏫", category: "📚 Образование" },
-    { name: "📖 Wikipedia", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/vikipedi.html", icon: "📖", category: "📚 Образование" },
-    { name: "📚 encyclopedia", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/encyclopedia.html", icon: "📚", category: "📚 Образование" },
-    { name: "📓 jurnal", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/jurnal.html", icon: "📓", category: "📚 Образование" },
-    { name: "📄 pagejavoni", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pagejavoni.html", icon: "📄", category: "📚 Образование" },
-    { name: "📐 geomit", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/geomit.html", icon: "📐", category: "📚 Образование" },
-    { name: "🏛️ schoolsistem", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/schoolsistem.html", icon: "🏛️", category: "📚 Образование" },
-    { name: "🏫 school", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/school.html", icon: "🏫", category: "📚 Образование" },
-    
-    // 💰 ФИНАНСЫ
-    { name: "🏦 Muzaffar Bank", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Muzaffarbank.html", icon: "🏦", category: "💰 Финансы" },
-    { name: "💰 finans", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/finans.html", icon: "💰", category: "💰 Финансы" },
-    { name: "📈 akci", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/akci.html", icon: "📈", category: "💰 Финансы" },
-    { name: "💱 birza", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/birza.html", icon: "💱", category: "💰 Финансы" },
-    
-    // 📰 НОВОСТИ
-    { name: "📰 News", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/news.html", icon: "📰", category: "📰 Новости" },
-    
-    // 📞 СВЯЗЬ
-    { name: "📞 Zvonok", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/Zvonok.html", icon: "📞", category: "📞 Связь" },
-    { name: "✉️ Pochta", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pochta.html", icon: "✉️", category: "📞 Связь" },
-    { name: "📧 почта", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/почта.html", icon: "📧", category: "📞 Связь" },
-    { name: "📱 phoune", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/phoune.html", icon: "📱", category: "📞 Связь" },
-    
-    // 🚕 СЕРВИСЫ
-    { name: "🚕 Taxi", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/taxi.html", icon: "🚕", category: "🚕 Сервисы" },
-    { name: "🛒 Shop", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/shop.html", icon: "🛒", category: "🚕 Сервисы" },
-    { name: "🛠️ servis", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/servis.html", icon: "🛠️", category: "🚕 Сервисы" },
-    { name: "👤 cabinet", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cabinet.html", icon: "👤", category: "🚕 Сервисы" },
-    { name: "🆘 pomoshnik", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/pomoshnik.html", icon: "🆘", category: "🚕 Сервисы" },
-    
-    // 📱 СОЦСЕТИ
-    { name: "📷 MuzaffarGram", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffargram.html", icon: "📷", category: "📱 Соцсети" },
-    { name: "🐦 muzaffartvit", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffartvit.html", icon: "🐦", category: "📱 Соцсети" },
-    { name: "🦊 muzaffarconeec", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffarconeec.html", icon: "🦊", category: "📱 Соцсети" },
-    
-    // 🧭 НАВИГАЦИЯ
-    { name: "🗺️ Map", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/map.html", icon: "🗺️", category: "🧭 Навигация" },
-    { name: "🧭 Navigator", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/navigator.html", icon: "🧭", category: "🧭 Навигация" },
-    { name: "👥 mapfriend", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/mapfriend.html", icon: "👥", category: "🧭 Навигация" },
-    { name: "✈️ trevel", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/trevel.html", icon: "✈️", category: "🧭 Навигация" },
-    
-    // 📁 ДРУГОЕ
-    { name: "🏠 Hab", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/hab.html", icon: "🏠", category: "📁 Другое" },
-    { name: "💻 os", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/os.html", icon: "💻", category: "📁 Другое" },
-    { name: "🍰 cake", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/cake.html", icon: "🍰", category: "📁 Другое" },
-    { name: "📌 doska", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/doska.html", icon: "📌", category: "📁 Другое" },
-    { name: "✨ dream", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/dream.html", icon: "✨", category: "📁 Другое" },
-    { name: "📁 fail", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/fail.html", icon: "📁", category: "📁 Другое" },
-    { name: "🔗 link", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/link.html", icon: "🔗", category: "📁 Другое" },
-    { name: "🔗 muzaffarlink", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/muzaffarlink.html", icon: "🔗", category: "📁 Другое" },
-    { name: "ℹ️ onas", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/onas.html", icon: "ℹ️", category: "📁 Другое" },
-    { name: "🗣️ saymongovorit", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/saymongovorit.html", icon: "🗣️", category: "📁 Другое" },
-    { name: "💇 strice", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/strice.html", icon: "💇", category: "📁 Другое" },
-    { name: "✅ test", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/test.html", icon: "✅", category: "📁 Другое" },
-    { name: "🤫 tich", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/tich.html", icon: "🤫", category: "📁 Другое" },
-    { name: "☁️ облоко", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/облоко.html", icon: "☁️", category: "📁 Другое" },
-    { name: "📅 day", url: "https://saripovmuzaffar759-jpg.github.io/Muzaffar/day.html", icon: "📅", category: "📁 Другое" }
-];
+// ==================== ТВОЙ РАБОЧИЙ API URL ====================
+const API_URL = 'https://script.google.com/macros/s/AKfycbxnC4Ejt1EpV1xnQF4UKB1Dni6GvZUbcTEceMX4dWirHJ8PEGinaAVIEdNmjs7baF8f/exec';
 
-const categories = {};
-allProjects.forEach(p => { if (!categories[p.category]) categories[p.category] = []; categories[p.category].push(p); });
-const categoryOrder = ["⭐ Главные", "🤖 AI", "🛠️ Инструменты", "🎮 Игры", "🎬 Медиа", "🎨 Творчество", "📚 Образование", "💰 Финансы", "📰 Новости", "📞 Связь", "🚕 Сервисы", "📱 Соцсети", "🧭 Навигация", "📁 Другое"];
-
+let projects = [];
 let tabs = [], activeTabId = null, nextTabId = 1, isDark = true, historyStore = [];
 let bookmarks = JSON.parse(localStorage.getItem('muzaffar_bookmarks') || '[]');
 let vpnActive = false;
-let currentModel = "gpt";
-let currentUser = JSON.parse(localStorage.getItem('muzaffar_google_user')) || null;
+let currentUser = JSON.parse(localStorage.getItem('muzaffar_user')) || null;
 
+// ==================== АНАЛИТИКА ====================
+let analytics = JSON.parse(localStorage.getItem('muzaffar_analytics')) || {};
+
+function incrementAnalytics(projectName) {
+    if (!projectName) return;
+    analytics[projectName] = (analytics[projectName] || 0) + 1;
+    localStorage.setItem('muzaffar_analytics', JSON.stringify(analytics));
+    renderTopProjects();
+}
+
+function renderTopProjects() {
+    const container = document.getElementById('topProjectsList');
+    if (!container) return;
+    const sorted = Object.entries(analytics).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    if (sorted.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:8px; color:#94a3b8; font-size:0.7rem;">Нет данных. Кликайте на проекты!</div>';
+        return;
+    }
+    container.innerHTML = '';
+    sorted.forEach(([name, count], idx) => {
+        const div = document.createElement('div');
+        div.className = 'top-project-item';
+        div.innerHTML = `<div class="top-project-rank">${idx + 1}</div><div class="top-project-name" title="${escapeHtml(name)}">${escapeHtml(name.length > 30 ? name.slice(0,27)+'...' : name)}</div><div class="top-project-count">${count} раз</div>`;
+        container.appendChild(div);
+    });
+}
+
+function resetAnalytics() {
+    if (confirm('Сбросить статистику использования проектов?')) {
+        analytics = {};
+        localStorage.setItem('muzaffar_analytics', JSON.stringify(analytics));
+        renderTopProjects();
+        alert('✅ Статистика сброшена');
+    }
+}
+
+// ==================== ПОЛЬЗОВАТЕЛЬ ====================
 function updateUIForUser() {
     if(currentUser) {
         document.getElementById('loginBtn').classList.add('hidden');
         document.getElementById('userInfo').classList.remove('hidden');
-        document.getElementById('userName').innerText = currentUser.email.split('@')[0];
-        document.getElementById('userAvatar').innerText = currentUser.email[0].toUpperCase();
+        document.getElementById('userName').innerText = currentUser.name;
+        document.getElementById('userAvatar').innerText = currentUser.name[0].toUpperCase();
     } else {
         document.getElementById('loginBtn').classList.remove('hidden');
         document.getElementById('userInfo').classList.add('hidden');
     }
 }
 
-function showGoogleLoginModal() { document.getElementById('googleLoginModal').classList.add('open'); }
-function hideGoogleLoginModal() { document.getElementById('googleLoginModal').classList.remove('open'); }
+function showLoginModal() { document.getElementById('loginModal').classList.add('open'); }
+function hideLoginModal() { document.getElementById('loginModal').classList.remove('open'); }
 
-document.getElementById('loginBtn').onclick = showGoogleLoginModal;
-document.getElementById('closeGoogleModal').onclick = hideGoogleLoginModal;
-document.getElementById('googleLoginSubmit').onclick = () => {
-    const email = document.getElementById('googleEmail').value;
-    if(email && email.includes('@')) {
-        currentUser = { email: email, name: email.split('@')[0] };
-        localStorage.setItem('muzaffar_google_user', JSON.stringify(currentUser));
+document.getElementById('loginBtn').onclick = showLoginModal;
+document.getElementById('closeLoginModal').onclick = hideLoginModal;
+document.getElementById('loginSubmitBtn').onclick = () => {
+    const name = document.getElementById('userNameInput').value;
+    if(name) {
+        currentUser = { name: name };
+        localStorage.setItem('muzaffar_user', JSON.stringify(currentUser));
         updateUIForUser();
-        hideGoogleLoginModal();
-        alert(`✅ Добро пожаловать, ${email}!`);
-    } else {
-        alert('Введите корректный email');
-    }
+        hideLoginModal();
+        alert(`✅ Добро пожаловать, ${name}!`);
+    } else { alert('Введите имя'); }
 };
 document.getElementById('guestLoginBtn').onclick = () => {
-    currentUser = { email: 'guest@muzaffar.com', name: 'Гость' };
-    localStorage.setItem('muzaffar_google_user', JSON.stringify(currentUser));
+    currentUser = { name: 'Гость' };
+    localStorage.setItem('muzaffar_user', JSON.stringify(currentUser));
     updateUIForUser();
-    hideGoogleLoginModal();
+    hideLoginModal();
 };
 document.getElementById('logoutBtn').onclick = () => {
     currentUser = null;
-    localStorage.removeItem('muzaffar_google_user');
+    localStorage.removeItem('muzaffar_user');
     updateUIForUser();
 };
 
-document.getElementById('resetWallpaperBtn').onclick = () => {
-    document.body.style.background = '';
-    document.body.classList.remove('custom-bg');
-    document.body.classList.remove('no-bg');
-    localStorage.removeItem('muzaffar_wallpaper');
-    alert('Фон возвращён к стандартному');
-};
-
-async function askAI(question) {
-    const messagesDiv = document.getElementById('aiMessages');
-    messagesDiv.innerHTML += `<div class="message user">${escapeHtml(question)}</div>`;
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    const loadingId = Date.now();
-    messagesDiv.innerHTML += `<div class="message bot" id="msg-${loadingId}">🤔 Думаю...</div>`;
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+// ==================== ЗАГРУЗКА ПРОЕКТОВ ИЗ API ====================
+async function loadProjects() {
     try {
-        let model = "gpt-4o-mini";
-        if (currentModel === "llama") model = "llama-3.3-70b";
-        else if (currentModel === "mistral") model = "mistral-7b";
-        else if (currentModel === "gemini") model = "gemini-2.0-flash-exp";
-        const response = await fetch(`https://text.pollinations.ai/generate?model=${model}&prompt=${encodeURIComponent(question)}`);
+        const response = await fetch(`${API_URL}?action=get`);
         const data = await response.json();
-        let answer = data.response || "Извините, не смог ответить.";
-        document.getElementById(`msg-${loadingId}`)?.remove();
-        messagesDiv.innerHTML += `<div class="message bot">${escapeHtml(answer)}</div>`;
+        
+        if (data.success && data.projects && data.projects.length > 0) {
+            projects = data.projects;
+            document.getElementById('projectCount').innerText = projects.length;
+            renderProjectsGrid();
+            return projects;
+        } else {
+            document.getElementById('projectsGrid').innerHTML = '<div style="text-align:center; padding:40px;">❌ Нет проектов в API. Проверьте таблицу.</div>';
+            return [];
+        }
     } catch (error) {
-        document.getElementById(`msg-${loadingId}`)?.remove();
-        messagesDiv.innerHTML += `<div class="message bot">⚠️ Ошибка соединения. Попробуйте позже.</div>`;
+        console.error('Ошибка:', error);
+        document.getElementById('projectsGrid').innerHTML = '<div style="text-align:center; padding:40px;">❌ Ошибка соединения. Проверьте API URL.</div>';
+        return [];
     }
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-function toggleVPN() {
-    vpnActive = !vpnActive;
-    const vpnStatus = document.getElementById('vpnStatus');
-    if(vpnActive) { vpnStatus.innerHTML = '🔒 VPN: ВКЛ'; vpnStatus.classList.add('active'); }
-    else { vpnStatus.innerHTML = '🔒 VPN: ВЫКЛ'; vpnStatus.classList.remove('active'); }
+const categoryOrder = ["⭐ Главные", "💸 Платежи", "🚚 Доставка", "🛍️ Торговля", "👤 Профиль", "💰 Кошелёк", "📈 Акции", "💱 Обмен", "🤖 AI", "🛠️ Инструменты", "🎮 Игры", "🎬 Медиа", "🎨 Творчество", "📚 Образование", "📞 Связь", "🚕 Сервисы", "📱 Соцсети", "🧭 Навигация", "📁 Другое"];
+
+function renderProjectsGrid() {
+    const container = document.getElementById('projectsGrid');
+    const searchInput = document.getElementById('projectSearch');
+    
+    function render(term='') {
+        container.innerHTML = '';
+        const lowerTerm = term.toLowerCase();
+        const cats = {};
+        projects.forEach(p => { if (!cats[p.category]) cats[p.category] = []; cats[p.category].push(p); });
+        
+        categoryOrder.forEach(catName => {
+            const projectsInCat = cats[catName];
+            if (!projectsInCat) return;
+            const filtered = projectsInCat.filter(p => p.name.toLowerCase().includes(lowerTerm));
+            if (filtered.length === 0) return;
+            
+            const catDiv = document.createElement('div'); catDiv.style.marginBottom = '14px';
+            catDiv.innerHTML = `<div class="category-title">${catName}</div><div class="projects-grid-category"></div>`;
+            container.appendChild(catDiv);
+            const grid = catDiv.querySelector('.projects-grid-category');
+            
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.onclick = () => { incrementAnalytics(p.name); createWebTab(p.url, p.name); };
+                card.innerHTML = `<div class="project-card-icon">${p.icon || '📄'}</div><div class="project-card-name">${escapeHtml(p.name)}</div>`;
+                grid.appendChild(card);
+            });
+        });
+        
+        if (container.children.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;">🔍 Проект не найден</div>';
+        }
+    }
+    
+    render();
+    if (searchInput) searchInput.addEventListener('input', (e) => render(e.target.value));
 }
 
+// ==================== ВКЛАДКИ ====================
 function createSearchTab() {
     const id = nextTabId++;
     const div = document.createElement('div');
     div.className = 'search-tab-content';
     div.id = `search-tab-${id}`;
-    div.innerHTML = `<div class="search-container"><div class="logo"><div class="logo-icon">🦊</div><div class="logo-text">Muzaffar Pro</div><div class="logo-sub">80+ проектов · ИИ-помощник · Google вход</div></div><div class="gcse-search"></div></div>`;
+    div.innerHTML = `<div class="search-center"><div class="logo-icon-big"><img src="https://saripovmuzaffar759-jpg.github.io/Muzaffar/logo.png" alt="Logo"></div><div class="logo-text-big">Muzaffar Pro</div><div class="sub-text">${projects.length} проектов · Аналитика · Поиск</div><div class="gcse-search"></div></div>`;
     tabs.push({ id, title: "Поиск", type: "search", element: div });
     document.getElementById('tabsContainerIframes').appendChild(div);
     updateTabsBar();
@@ -381,7 +486,7 @@ function createSearchTab() {
 
 function createWebTab(url, title) {
     let finalUrl = url;
-    if(vpnActive && !url.includes('github.io') && !url.includes('netlify.app') && !url.includes('google.com')) finalUrl = `https://cors-anywhere.herokuapp.com/${url}`;
+    if (vpnActive && !url.includes('github.io') && !url.includes('netlify.app')) finalUrl = `https://cors-anywhere.herokuapp.com/${url}`;
     const id = nextTabId++;
     const iframe = document.createElement('iframe');
     iframe.className = 'tab-frame';
@@ -398,58 +503,32 @@ function switchToTab(id) { activeTabId = id; tabs.forEach(t => { if(t.type === "
 function closeTab(id) { const idx = tabs.findIndex(t => t.id === id); if(idx === -1) return; const t = tabs[idx]; if(t.type === "web") t.iframe.remove(); else t.element.remove(); tabs.splice(idx,1); if(tabs.length === 0) createSearchTab(); else if(activeTabId === id) switchToTab(tabs[Math.min(idx, tabs.length-1)].id); updateTabsBar(); }
 function updateTabsBar() { const cont = document.getElementById('tabsContainer'); cont.innerHTML = ''; tabs.forEach(t => { const btn = document.createElement('div'); btn.className = `tab ${t.id === activeTabId ? 'active' : ''}`; btn.onclick = () => switchToTab(t.id); btn.innerHTML = `<span class="tab-title">${t.type === 'search' ? '🔍 ' + t.title : '🌐 ' + t.title}</span><button class="tab-close" onclick="event.stopPropagation(); closeTab(${t.id})">✕</button>`; cont.appendChild(btn); }); }
 
-function renderProjectsGrid() {
-    const container = document.getElementById('projectsGrid');
-    const searchInput = document.getElementById('projectSearch');
-    function render(term='') {
-        container.innerHTML = '';
-        const lowerTerm = term.toLowerCase();
-        categoryOrder.forEach(catName => {
-            const projectsInCat = categories[catName];
-            if(!projectsInCat) return;
-            const filtered = projectsInCat.filter(p => p.name.toLowerCase().includes(lowerTerm));
-            if(filtered.length === 0) return;
-            const catDiv = document.createElement('div'); catDiv.style.marginBottom = '14px';
-            catDiv.innerHTML = `<div class="category-title">${catName}</div><div class="projects-grid-category"></div>`;
-            container.appendChild(catDiv);
-            const grid = catDiv.querySelector('.projects-grid-category');
-            filtered.forEach(p => { 
-                const card = document.createElement('div'); 
-                card.className = 'project-card'; 
-                card.onclick = () => createWebTab(p.url, p.name);
-                card.oncontextmenu = (e) => { e.preventDefault(); if(confirm(`Добавить "${p.name}" в закладки?`)) { bookmarks.push({name:p.name, url:p.url, icon:p.icon}); saveBookmarks(); } return false; };
-                card.innerHTML = `<div class="project-card-icon">${p.icon}</div><div class="project-card-name">${escapeHtml(p.name)}</div>`; 
-                grid.appendChild(card); 
-            });
-        });
-        if(container.children.length === 0) container.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;">🔍 Проект не найден</div>';
-    }
-    render();
-    searchInput.addEventListener('input', (e) => render(e.target.value));
-}
-
+// ==================== ЗАКЛАДКИ ====================
 function saveBookmarks() { localStorage.setItem('muzaffar_bookmarks', JSON.stringify(bookmarks)); renderBookmarks(); }
 function renderBookmarks() {
     const container = document.getElementById('bookmarksList');
-    if(!container) return;
+    if (!container) return;
     container.innerHTML = '';
     bookmarks.forEach(b => {
         const div = document.createElement('div');
         div.className = 'bookmark-item';
-        div.innerHTML = `<span>${b.icon || '🔖'}</span><span>${escapeHtml(b.name)}</span><button class="bookmark-remove" data-url="${b.url}" style="background:transparent; border:none; color:#94a3b8; cursor:pointer;">✕</button>`;
+        div.innerHTML = `<span>${b.icon || '🔖'}</span><span>${escapeHtml(b.name)}</span><button class="bookmark-remove" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; margin-left:5px;">✕</button>`;
         div.onclick = (e) => { if (!e.target.classList.contains('bookmark-remove')) createWebTab(b.url, b.name); };
         div.querySelector('.bookmark-remove').onclick = (e) => { e.stopPropagation(); bookmarks = bookmarks.filter(bk => bk.url !== b.url); saveBookmarks(); };
         container.appendChild(div);
     });
 }
 
+// ==================== ИСТОРИЯ ====================
 function loadHistory() { const s = localStorage.getItem('muzaffar_history'); if(s) historyStore = JSON.parse(s); renderHistory(); }
 function addToHistory(q) { if(!q?.trim()) return; historyStore = historyStore.filter(i=>i.query!==q); historyStore.unshift({query:q, date:new Date().toLocaleString()}); if(historyStore.length>50) historyStore.pop(); localStorage.setItem('muzaffar_history', JSON.stringify(historyStore)); renderHistory(); }
-function renderHistory() { const container = document.getElementById('historyList'); if(!historyStore.length){ container.innerHTML='<div style="padding:30px;text-align:center;">✨ История пуста</div>'; return; } container.innerHTML = ''; historyStore.forEach(item=>{ const d=document.createElement('div'); d.className='history-item'; d.innerHTML=`🔍 ${escapeHtml(item.query)}<div style="font-size:0.7rem; color:#a78bfa;">${item.date}</div>`; d.onclick=()=>{ const activeDiv = document.querySelector('.search-tab-content.active'); if(activeDiv){ const inp = activeDiv.querySelector('.gsc-input input'); if(inp){ inp.value=item.query; inp.dispatchEvent(new Event('input',{bubbles:true})); activeDiv.querySelector('.gsc-search-button')?.click(); } } closeHistory(); }; container.appendChild(d); }); }
+function renderHistory() { const container = document.getElementById('historyList'); if(!historyStore.length){ container.innerHTML='<div style="padding:30px;text-align:center; color:#94a3b8;">✨ История пуста</div>'; return; } container.innerHTML = ''; historyStore.forEach(item=>{ const d=document.createElement('div'); d.className='history-item'; d.innerHTML=`🔍 ${escapeHtml(item.query)}<div style="font-size:0.7rem; color:#a78bfa;">${item.date}</div>`; d.onclick=()=>{ const activeDiv = document.querySelector('.search-tab-content.active'); if(activeDiv){ const inp = activeDiv.querySelector('.gsc-input input'); if(inp){ inp.value=item.query; inp.dispatchEvent(new Event('input',{bubbles:true})); activeDiv.querySelector('.gsc-search-button')?.click(); } } closeHistory(); }; container.appendChild(d); }); }
 function clearHistory() { if(confirm('Очистить историю?')){ historyStore=[]; localStorage.setItem('muzaffar_history','[]'); renderHistory(); } }
 function openHistory() { document.getElementById('historySidebar').classList.add('open'); document.getElementById('overlay').style.display='block'; }
 function closeHistory() { document.getElementById('historySidebar').classList.remove('open'); document.getElementById('overlay').style.display='none'; }
 
+// ==================== ДРУГИЕ ФУНКЦИИ ====================
+function toggleVPN() { vpnActive = !vpnActive; const btn = document.getElementById('vpnBtn'); if(vpnActive) { btn.innerHTML = '<i class="fas fa-shield-alt"></i> VPN ВКЛ'; btn.classList.add('active'); } else { btn.innerHTML = '<i class="fas fa-shield-alt"></i> VPN'; btn.classList.remove('active'); } }
 function enterReadingMode() {
     const activeFrame = document.querySelector('.tab-frame.active');
     if(activeFrame) {
@@ -459,24 +538,11 @@ function enterReadingMode() {
             const title = doc.title;
             const win = window.open('', '_blank', 'width=900,height=700');
             win.document.write(`<html><head><title>${title} - Режим чтения</title><style>body{font-family:Georgia;max-width:800px;margin:40px auto;padding:30px;line-height:1.8;font-size:18px;background:#1e1e2e;color:#e2e8f0;}h1{color:#a78bfa;}button{position:fixed;top:20px;right:20px;padding:10px 20px;background:#8b5cf6;color:white;border:none;border-radius:30px;cursor:pointer;}</style></head><body><button onclick="window.close()">✕ Закрыть</button><h1>${escapeHtml(title)}</h1><p>${escapeHtml(text.slice(0,15000)).replace(/\n/g,'<br>')}</p></body></html>`);
-        } catch(e) { alert('Не удалось открыть режим чтения'); }
-    } else alert('Сначала откройте страницу для чтения');
+        } catch(e) { alert('Ошибка'); }
+    } else alert('Откройте страницу');
 }
-
-function changeWallpaper() {
-    const url = prompt('Введите URL картинки для фона:', 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809');
-    if(url) {
-        document.body.style.background = `url(${url}) center/cover no-repeat`;
-        document.body.classList.add('custom-bg');
-        localStorage.setItem('muzaffar_wallpaper', url);
-    }
-}
-
-function applyTheme() {
-    if(isDark) { document.body.classList.remove('light'); document.getElementById('themeBtnHeader').innerHTML = '☀️ Светлая'; }
-    else { document.body.classList.add('light'); document.getElementById('themeBtnHeader').innerHTML = '🌙 Тёмная'; }
-    localStorage.setItem('muzaffar_theme', isDark ? 'dark' : 'light');
-}
+function changeWallpaper() { const url = prompt('Введите URL картинки:'); if(url) { document.body.style.background = `url(${url}) center/cover no-repeat`; document.body.classList.add('custom-bg'); localStorage.setItem('muzaffar_wallpaper', url); } }
+function applyTheme() { if(isDark) { document.body.classList.remove('light'); document.getElementById('themeBtnHeader').innerHTML = '<i class="fas fa-sun"></i>'; } else { document.body.classList.add('light'); document.getElementById('themeBtnHeader').innerHTML = '<i class="fas fa-moon"></i>'; } localStorage.setItem('muzaffar_theme', isDark ? 'dark' : 'light'); }
 function toggleTheme() { isDark = !isDark; applyTheme(); }
 function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
 
@@ -488,34 +554,46 @@ document.getElementById('historyBtnHeader').onclick = openHistory;
 document.getElementById('closeHistoryBtn').onclick = closeHistory;
 document.getElementById('overlay').onclick = closeHistory;
 document.getElementById('clearHistoryBtn').onclick = clearHistory;
-document.getElementById('addBookmarkBtn').onclick = () => { const activeTab = tabs.find(t => t.id === activeTabId); if(activeTab && activeTab.type === 'web') { const name = prompt('Название закладки:', activeTab.title); if(name) { bookmarks.push({name, url:activeTab.iframe.src, icon:'🔖'}); saveBookmarks(); } } else alert('Откройте сайт для добавления'); };
 document.getElementById('readingModeBtn').onclick = enterReadingMode;
 document.getElementById('wallpaperBtn').onclick = changeWallpaper;
-document.getElementById('vpnStatus').onclick = toggleVPN;
+document.getElementById('vpnBtn').onclick = toggleVPN;
+document.getElementById('resetWallpaperBtn').onclick = () => { document.body.style.background = ''; document.body.classList.remove('custom-bg'); localStorage.removeItem('muzaffar_wallpaper'); alert('Фон возвращён'); };
+document.getElementById('addBookmarkBtn').onclick = () => { const activeTab = tabs.find(t => t.id === activeTabId); if(activeTab && activeTab.type === 'web') { const name = prompt('Название закладки:', activeTab.title); if(name) { bookmarks.push({name, url:activeTab.iframe.src, icon:'🔖'}); saveBookmarks(); } } else alert('Откройте сайт'); };
+document.getElementById('resetAnalyticsBtn').onclick = resetAnalytics;
+document.getElementById('aiIntegrationToggle').onclick = () => document.getElementById('aiIntegrationModal').classList.toggle('open');
+document.getElementById('closeAiIntegrationBtn').onclick = () => document.getElementById('aiIntegrationModal').classList.remove('open');
 
-document.getElementById('aiToggle').onclick = () => document.getElementById('aiModal').classList.toggle('open');
-document.getElementById('closeAiModal').onclick = () => document.getElementById('aiModal').classList.remove('open');
-document.getElementById('aiSend').onclick = () => { const input = document.getElementById('aiInput'); if(input.value) { askAI(input.value); input.value = ''; } };
-document.getElementById('aiInput').onkeypress = (e) => { if(e.key === 'Enter') document.getElementById('aiSend').click(); };
-document.querySelectorAll('.model-btn').forEach(btn => {
-    btn.onclick = () => {
-        document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentModel = btn.dataset.model;
-    };
-});
+function loadGoogleSearch() {
+    const script = document.createElement('script');
+    script.src = 'https://cse.google.com/cse.js?cx=40fe40e6028d84ece';
+    script.async = true;
+    document.head.appendChild(script);
+}
 
-(function init(){
-    renderProjectsGrid();
+setInterval(() => {
+    const searchInputs = document.querySelectorAll('.gsc-input input');
+    searchInputs.forEach(input => {
+        if(input && !input.hasAttribute('data-history-listener')) {
+            input.setAttribute('data-history-listener', 'true');
+            const form = input.closest('form');
+            if(form) form.addEventListener('submit', (e) => { setTimeout(() => { if(input.value) addToHistory(input.value); }, 100); });
+            input.addEventListener('keypress', (e) => { if(e.key === 'Enter') setTimeout(() => { if(input.value) addToHistory(input.value); }, 100); });
+        }
+    });
+}, 1000);
+
+(async function init() {
+    await loadProjects();
     createSearchTab();
+    loadGoogleSearch();
     loadHistory();
     renderBookmarks();
+    renderTopProjects();
     updateUIForUser();
     const savedTheme = localStorage.getItem('muzaffar_theme');
     if(savedTheme === 'light'){ isDark=false; applyTheme(); } else { isDark=true; applyTheme(); }
     const savedWallpaper = localStorage.getItem('muzaffar_wallpaper');
     if(savedWallpaper) { document.body.style.background = `url(${savedWallpaper}) center/cover no-repeat`; document.body.classList.add('custom-bg'); }
-    setInterval(() => { document.querySelectorAll('.gsc-branding, .gcsc-branding').forEach(el => el.style.display='none'); }, 1000);
 })();
 </script>
 </body>
